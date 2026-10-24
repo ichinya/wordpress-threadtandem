@@ -1,0 +1,20 @@
+# Local credentials and site configuration.
+.info/
+.env
+.env.*
+!.env.example
+auth.json
+wp-config.php
+*.pem
+*.key
+
+# Generated packages, dependencies and diagnostics.
+/dist/
+/vendor/
+/node_modules/
+/.playwright-mcp/
+*.zip
+*.sha256
+*.log
+.DS_Store
+Thumbs.db

@@ -1,0 +1,14 @@
+/.git
+/.gitignore
+/.gitattributes
+/.info
+/README.md
+/docs
+/dist
+/tests
+/tools
+/composer.json
+/composer.lock
+/vendor
+/*.zip
+/*.log
