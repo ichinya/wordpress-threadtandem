@@ -28,6 +28,26 @@ final class Treda_Admin {
 			}
 		);
 		add_action( 'admin_post_treda_action', array( __CLASS__, 'action' ) );
+		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'assets' ) );
+	}
+
+	public static function assets( $hook ) {
+		if ( $hook !== 'settings_page_treda' ) {
+			return;
+		}
+		wp_enqueue_style( 'treda-admin', plugins_url( 'assets/admin.css', TREDA_DIR . 'treda.php' ), array(), TREDA_VERSION );
+		wp_enqueue_script( 'treda-admin', plugins_url( 'assets/admin.js', TREDA_DIR . 'treda.php' ), array(), TREDA_VERSION, true );
+		wp_localize_script(
+			'treda-admin',
+			'tredaAdmin',
+			array(
+				'show'       => __( 'Show', 'treda' ),
+				'hide'       => __( 'Hide', 'treda' ),
+				'copied'     => __( 'Copied', 'treda' ),
+				'copyManual' => __( 'Address selected. Copy it with your keyboard.', 'treda' ),
+				'unsaved'    => __( 'You have unsaved changes. Save them before checking the connection.', 'treda' ),
+			)
+		);
 	}
 
 	public static function action() {
@@ -70,11 +90,11 @@ final class Treda_Admin {
 		exit;
 	}
 
-	private static function action_form( $operation, $label ) {
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="treda-inline-form">';
+	private static function action_form( $operation, $label, $class = 'secondary', $disabled = false ) {
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="treda-inline-form" data-treda-action-form>';
 		wp_nonce_field( 'treda_action' );
 		echo '<input type="hidden" name="action" value="treda_action"><input type="hidden" name="operation" value="' . esc_attr( $operation ) . '">';
-		submit_button( $label, 'secondary', 'submit', false );
+		submit_button( $label, $class, 'submit', false, $disabled ? array( 'disabled' => true ) : array() );
 		echo '</form>';
 	}
 
@@ -84,6 +104,8 @@ final class Treda_Admin {
 		}
 		$settings   = Treda_Settings::get();
 		$connection = Treda_Settings::connection();
+		$jobs       = Treda_Queue::recent();
+		$counts     = Treda_Queue::counts();
 		$notice     = get_transient( 'treda_notice_' . get_current_user_id() );
 		if ( $notice ) {
 			delete_transient( 'treda_notice_' . get_current_user_id() );

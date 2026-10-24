@@ -1,0 +1,118 @@
+/* Treda settings. Keep all styles inside this screen. */
+.treda-settings { --treda-accent: var(--wp-admin-theme-color, #2271b1); --treda-border: #dcdcde; --treda-muted: #646970; max-width: 1160px; padding: 14px 0 20px; color: #1d2327; }
+.treda-settings *, .treda-settings *::before, .treda-settings *::after { box-sizing: border-box; }
+.treda-header { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 28px; }
+.treda-header h1 { display: flex; align-items: center; gap: 12px; padding: 0; font-size: 28px; font-weight: 650; line-height: 1.3; }
+.treda-header p { margin: 8px 0 0; color: var(--treda-muted); font-size: 14px; }
+.treda-version { padding: 3px 7px; border: 1px solid var(--treda-border); border-radius: 5px; font-size: 11px; font-weight: 500; color: var(--treda-muted); }
+.treda-header-link { display: inline-flex; gap: 7px; align-items: center; font-weight: 500; text-decoration: none; white-space: nowrap; }
+.treda-header-link .dashicons { font-size: 17px; }
+.treda-layout { display: grid; grid-template-columns: minmax(0, 1fr) 316px; gap: 24px; align-items: start; }
+.treda-main, .treda-sidebar { display: flex; flex-direction: column; gap: 20px; margin: 0; min-width: 0; }
+.treda-card { margin: 0; background: #fff; border: 1px solid var(--treda-border); border-radius: 9px; box-shadow: 0 1px 2px #00000003; overflow: hidden; }
+.treda-card h2 { margin: 0; font-size: 15px; font-weight: 600; line-height: 1.5; }
+.treda-card-header { display: flex; gap: 13px; align-items: flex-start; padding: 22px 24px 19px; border-bottom: 1px solid #f0f0f1; }
+.treda-section-icon { display: flex; align-items: center; justify-content: center; flex: 0 0 34px; width: 34px; height: 34px; border-radius: 7px; color: var(--treda-accent); background: #f0f6fc; font-size: 19px; }
+.treda-card-header p { margin: 4px 0 0; color: var(--treda-muted); font-size: 13px; line-height: 1.5; }
+.treda-card-body { padding: 23px 24px; }
+.treda-field + .treda-field { margin-top: 23px; }
+.treda-field > label { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 9px; font-weight: 600; font-size: 13px; }
+.treda-settings input[type=text], .treda-settings input[type=password], .treda-settings input[type=url] { display: block; width: 100%; min-width: 0; min-height: 40px; margin: 0; padding: 7px 11px; border-color: #b8bdc2; border-radius: 5px; font-size: 13px; }
+.treda-settings input::placeholder { color: #8c8f94; opacity: 1; }
+.treda-settings input:focus { border-color: var(--treda-accent); box-shadow: 0 0 0 1px var(--treda-accent); }
+.treda-input-group { display: flex; align-items: stretch; gap: 8px; }
+.treda-input-group input { flex: 1; }
+.treda-settings .button { min-height: 36px; border-radius: 5px; padding: 2px 12px; box-shadow: none; white-space: nowrap; }
+.treda-settings .treda-input-button { min-width: 74px; background: #fff; color: #50575e; border-color: #b8bdc2; }
+.treda-settings .treda-help { margin: 8px 0 0; color: var(--treda-muted); font-size: 12px; line-height: 1.6; }
+.treda-inline-saved { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 500; color: #008a20; }
+.treda-inline-saved .dashicons { font-size: 16px; width: 16px; height: 16px; }
+.treda-settings .treda-checkbox { display: flex; align-items: flex-start; justify-content: flex-start; gap: 7px; font-weight: 400; font-size: 13px; line-height: 1.6; }
+.treda-checkbox input { flex: 0 0 auto; margin: 3px 0 0; }
+.treda-settings .treda-remove-token { margin: 11px 0 0; font-size: 12px; color: var(--treda-muted); }
+.treda-option { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; padding: 23px 24px; }
+.treda-option + .treda-option { border-top: 1px solid #f0f0f1; }
+.treda-option-title { font-weight: 600; font-size: 13px; cursor: pointer; }
+.treda-option p { margin: 6px 0 0; color: var(--treda-muted); font-size: 13px; line-height: 1.6; max-width: 470px; }
+.treda-switch { position: relative; display: block; flex: 0 0 38px; width: 38px; height: 22px; margin-top: 1px; cursor: pointer; }
+.treda-switch input { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.treda-switch span { display: block; width: 38px; height: 22px; border: 1px solid #8c8f94; border-radius: 20px; background: #8c8f94; transition: background .15s, border-color .15s; }
+.treda-switch span::after { content: ''; display: block; width: 16px; height: 16px; margin: 2px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px #0002; transition: transform .15s; }
+.treda-switch input:checked + span { background: var(--treda-accent); border-color: var(--treda-accent); }
+.treda-switch input:checked + span::after { transform: translateX(16px); }
+.treda-switch input:focus-visible + span { outline: 2px solid var(--treda-accent); outline-offset: 3px; }
+.treda-moderation { padding: 19px 24px 23px; border-top: 1px solid #f0f0f1; background: #fcfcfd; }
+.treda-moderation .treda-help { margin-left: 23px; }
+.treda-privacy-note { display: flex; gap: 7px; margin: 16px 0 0; font-size: 12px; line-height: 1.6; color: var(--treda-muted); }
+.treda-privacy-note .dashicons { flex: 0 0 16px; font-size: 16px; }
+.treda-disclosure > summary { display: flex; align-items: center; gap: 12px; padding: 19px 24px; cursor: pointer; font-size: 14px; font-weight: 600; list-style: none; }
+.treda-disclosure > summary::-webkit-details-marker { display: none; }
+.treda-disclosure > summary > .dashicons { color: var(--treda-muted); font-size: 18px; }
+.treda-disclosure > summary small { display: block; margin-top: 4px; color: var(--treda-muted); font-size: 12px; font-weight: 400; line-height: 1.5; }
+.treda-disclosure > summary .treda-chevron { margin-left: auto; flex: 0 0 18px; font-size: 13px; }
+.treda-disclosure[open] > summary .treda-chevron { transform: rotate(180deg); }
+.treda-disclosure[open] > summary { border-bottom: 1px solid #f0f0f1; }
+.treda-disclosure > summary:focus-visible, .treda-endpoint > summary:focus-visible { outline: 2px solid var(--treda-accent); outline-offset: -3px; }
+.treda-status-card, .treda-delivery-card { padding: 21px; }
+.treda-sidebar-heading { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.treda-sidebar-heading h2 { font-size: 13px; }
+.treda-sidebar-heading > .dashicons { color: var(--treda-muted); font-size: 17px; }
+.treda-badge { display: inline-flex; gap: 4px; align-items: center; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; line-height: 1.6; white-space: nowrap; }
+.treda-badge-success, .treda-status-done { background: #edfaef; color: #126c2e; }
+.treda-badge-neutral { background: #f0f0f1; color: #50575e; }
+.treda-badge-warning, .treda-status-uncertain { background: #fcf4dd; color: #795411; }
+.treda-status-pending, .treda-status-running { background: #edf5fc; color: #185f8c; }
+.treda-status-failed { background: #fcf0f1; color: #a1222c; }
+.treda-bot-name { display: flex; align-items: center; gap: 8px; margin-top: 21px; font-size: 14px; overflow-wrap: anywhere; }
+.treda-bot-name .dashicons { color: var(--treda-accent); }
+.treda-connection-list { margin: 18px 0; }
+.treda-connection-list > div { padding: 11px 0; border-bottom: 1px solid #f0f0f1; }
+.treda-connection-list dt { color: var(--treda-muted); font-size: 11px; }
+.treda-connection-list dd { margin: 5px 0 0; font-size: 13px; font-weight: 500; overflow-wrap: anywhere; }
+.treda-connection-list dd small { display: block; margin-top: 3px; color: var(--treda-muted); font-size: 11px; font-weight: 400; }
+.treda-connection-list code { padding: 0; background: none; font-size: 11px; }
+.treda-status-intro, .treda-delivery-card > p { color: var(--treda-muted); font-size: 13px; line-height: 1.65; margin: 16px 0; }
+.treda-inline-form { display: inline-block; margin: 0; }
+.treda-status-card > .treda-inline-form { margin-top: 16px; }
+.treda-status-card > .treda-inline-form, .treda-status-card > .treda-inline-form .button { width: 100%; }
+.treda-action-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 18px; }
+.treda-action-row .button-link-delete { border: 0; background: transparent; padding-left: 0; padding-right: 0; }
+.treda-settings .treda-callout { padding: 11px 12px; border-radius: 5px; background: #f0f6fc; font-size: 12px; line-height: 1.6; }
+.treda-settings .treda-callout-warning { color: #775716; background: #fcf7e8; }
+.treda-endpoint { margin-top: 18px; font-size: 12px; }
+.treda-endpoint summary { color: var(--treda-accent); cursor: pointer; }
+.treda-endpoint .treda-input-group { margin-top: 10px; }
+.treda-endpoint input { font-size: 11px !important; min-height: 36px !important; }
+.treda-copy-status { display: block; min-height: 0; margin-top: 5px; color: var(--treda-muted); font-size: 11px; }
+.treda-setup-guide { padding: 0 7px; }
+.treda-setup-guide h2 { margin: 0 0 10px; font-size: 12px; font-weight: 600; }
+.treda-setup-guide ol { margin: 0 0 0 18px; color: var(--treda-muted); font-size: 12px; line-height: 1.75; }
+.treda-setup-guide li { padding-left: 3px; margin-bottom: 7px; }
+.treda-diagnostics { margin-top: 24px; scroll-margin-top: 50px; }
+.treda-diagnostics > summary > .treda-badge { margin-left: auto; }
+.treda-diagnostics > summary .treda-chevron { margin-left: 0; }
+.treda-diagnostics-toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; padding: 20px 24px; }
+.treda-counts { display: flex; flex-wrap: wrap; gap: 20px; color: var(--treda-muted); font-size: 12px; }
+.treda-counts strong { margin-left: 5px; color: #1d2327; }
+.treda-empty-state { padding: 25px 24px 35px; text-align: center; }
+.treda-empty-state > .dashicons { color: #8c8f94; font-size: 28px; width: 28px; height: 28px; margin-bottom: 8px; }
+.treda-empty-state h3 { margin: 5px 0; font-size: 13px; font-weight: 500; }
+.treda-empty-state p { margin: 5px 0 0; color: var(--treda-muted); font-size: 12px; }
+.treda-table-scroll { overflow-x: auto; }
+.treda-table-scroll table { border: 0; box-shadow: none; min-width: 630px; }
+.treda-table-scroll th { color: var(--treda-muted); font-size: 11px; font-weight: 500; background: #fafafb; border-bottom: 1px solid #eee; padding: 11px 20px; }
+.treda-table-scroll td { border-bottom: 1px solid #f0f0f1; padding: 15px 20px; font-size: 12px; vertical-align: middle; }
+.treda-table-scroll td code { padding: 0; background: none; color: #50575e; font-size: 11px; }
+.treda-table-scroll td .button { min-height: 29px; padding: 0 10px; font-size: 11px; }
+.treda-error-message { max-width: 320px; color: var(--treda-muted); overflow-wrap: anywhere; }
+.treda-retry-confirm { display: block; width: 190px; margin-bottom: 8px; font-size: 11px; line-height: 1.5; }
+.treda-diagnostics .treda-queue-help { padding: 0 24px 20px; margin-top: 15px; }
+.treda-savebar { position: sticky; bottom: 14px; z-index: 10; display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-top: 24px; padding: 17px 22px; background: #fff; border: 1px solid var(--treda-border); border-radius: 8px; box-shadow: 0 3px 14px #0000000b; }
+.treda-savebar strong { font-size: 12px; font-weight: 600; }
+.treda-savebar p { margin: 3px 0 0; font-size: 12px; color: var(--treda-muted); line-height: 1.5; }
+.treda-savebar .button-primary { min-height: 39px; padding: 3px 19px; font-weight: 500; }
+.treda-savebar.is-dirty { border-color: #8ebce0; }
+@media (max-width: 1100px) { .treda-layout { grid-template-columns: minmax(0, 1fr) 285px; gap: 18px; } .treda-status-card, .treda-delivery-card { padding: 18px; } }
+@media (max-width: 960px) { .treda-layout { grid-template-columns: 1fr; } .treda-sidebar { display: grid; grid-template-columns: 1fr 1fr; align-items: start; } .treda-setup-guide { grid-column: 1 / -1; } }
+@media (max-width: 600px) { .treda-settings { padding-top: 10px; } .treda-header { align-items: flex-start; gap: 12px; margin-bottom: 20px; } .treda-header h1 { font-size: 25px; } .treda-header-link { font-size: 0; gap: 0; padding-top: 7px; } .treda-header-link .dashicons { font-size: 21px; } .treda-sidebar { display: flex; } .treda-card-header, .treda-card-body { padding: 18px; } .treda-option { padding: 20px 18px; gap: 16px; } .treda-moderation { padding: 18px; } .treda-disclosure > summary { padding: 18px; gap: 10px; } .treda-disclosure > summary small { font-size: 11px; } .treda-savebar { bottom: 10px; padding: 13px 15px; gap: 12px; } .treda-savebar strong { display: none; } .treda-savebar p { font-size: 11px; } .treda-savebar .button-primary { padding: 3px 12px; font-size: 12px; } .treda-diagnostics-toolbar { padding: 18px; } .treda-diagnostics > summary > .treda-badge { display: none; } }
+@media (prefers-reduced-motion: reduce) { .treda-switch span, .treda-switch span::after { transition: none; } }

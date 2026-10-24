@@ -4,7 +4,7 @@ Tags: telegram, comments, discussion, crossposting
 Requires at least: 6.2
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -108,6 +108,11 @@ Successful incoming jobs have their message payload cleared. Completed and faile
 Deactivation stops the scheduled worker and preserves data. Disconnect the webhook before removing the plugin. By default, uninstall keeps integration data. Clear Keep integration data when deleting the plugin to remove Treda options, tables and integration metadata during uninstall. Core posts and comments remain. Telegram copies and other externally stored data are not removed automatically.
 
 == Changelog ==
+
+= 1.0.2 =
+* Redesign the settings screen with separate connection, synchronization, delivery and diagnostics sections.
+* Add responsive layout, clear status indicators, token visibility control and webhook URL copying.
+* Keep the save action visible and prevent connection actions from using unsaved changes.
 
 = 1.0.1 =
 * Add a native Telegram publishing panel for the WordPress block editor, using the current editor API with a fallback for WordPress 6.2.

@@ -253,6 +253,18 @@ final class Treda_Queue {
 		);
 	}
 
+	public static function counts() {
+		global $wpdb;
+		$counts = array_fill_keys( array( 'pending', 'running', 'done', 'failed', 'uncertain' ), 0 );
+		$rows   = $wpdb->get_results( $wpdb->prepare( 'SELECT status,COUNT(*) AS total FROM %i GROUP BY status', self::table() ) );
+		foreach ( $rows as $row ) {
+			if ( isset( $counts[ $row->status ] ) ) {
+				$counts[ $row->status ] = (int) $row->total;
+			}
+		}
+		return $counts;
+	}
+
 	public static function retry( $id, $acknowledged ) {
 		global $wpdb;
 		return $wpdb->query(
