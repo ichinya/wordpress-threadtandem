@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Treda
  * Description: Publish posts to Telegram and synchronize text comments with a linked discussion group.
- * Version: 1.0.3
+ * Version: 1.0.4
  * Author: Ichi-nya
  * Requires at least: 6.2
  * Requires PHP: 7.4
@@ -14,7 +14,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'TREDA_VERSION', '1.0.3' );
+define( 'TREDA_VERSION', '1.0.4' );
 define( 'TREDA_SCHEMA_VERSION', '3' );
 define( 'TREDA_DIR', plugin_dir_path( __FILE__ ) );
 

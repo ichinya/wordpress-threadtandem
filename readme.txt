@@ -4,7 +4,7 @@ Tags: telegram, comments, discussion, crossposting
 Requires at least: 6.2
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.0.3
+Stable tag: 1.0.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -108,6 +108,10 @@ Successful incoming jobs have their message payload cleared. Completed and faile
 Deactivation stops the scheduled worker and preserves data. Disconnect the webhook before removing the plugin. By default, uninstall keeps integration data. Clear Keep integration data when deleting the plugin to remove Treda options, tables and integration metadata during uninstall. Core posts and comments remain. Telegram copies and other externally stored data are not removed automatically.
 
 == Changelog ==
+
+= 1.0.4 =
+* Link imported comment authors to their original Telegram message, with a small black paper-plane icon.
+* Remove the separate source paragraph below imported comments and respect privacy erasure when rendering author links.
 
 = 1.0.3 =
 * Keep new publications in the queue when saved connection settings need a fresh permission check.

@@ -224,7 +224,7 @@ treda_test_expect(count($export['data']) === 1, 'Verified email privacy export i
 $erasure = Treda_Privacy::erase('identity@example.test');
 treda_test_expect($erasure['items_removed'] && $erasure['items_retained'], 'Privacy erasure removes public identity references and reports retained delivery mappings');
 treda_test_expect(get_comment_meta($anonymous_id, '_treda_origin', true) === 'telegram'
-    && strpos(Treda_Comments::source('', get_comment($anonymous_id)), 't.me/') === false, 'Privacy erasure keeps echo protection without a public Telegram identity link');
+    && strpos(get_comment_author_link($anonymous_id), 't.me/') === false, 'Privacy erasure keeps echo protection without a public Telegram identity link');
 
 wp_delete_comment($comment_id, true);
 $message['edit_date'] = time() + 20;

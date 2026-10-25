@@ -1,13 +1,13 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Treda 1.0.3\n"
+"Project-Id-Version: Treda 1.0.4\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/treda\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Russian\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-25T11:09:16+05:00\n"
+"POT-Creation-Date: 2026-10-25T11:26:44+05:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: treda\n"
@@ -449,63 +449,63 @@ msgstr "У бота уже настроен другой webhook. Использ
 msgid "The bot uses a different webhook. Treda will not change it."
 msgstr "Бот использует другой webhook. Treda не будет его менять."
 
-#: includes/class-treda-comments.php:53
+#: includes/class-treda-comments.php:54
 msgid "Connection settings changed. Save the comment again after checking the connection."
 msgstr "Настройки подключения изменились. После проверки подключения сохраните комментарий ещё раз."
 
-#: includes/class-treda-comments.php:76
+#: includes/class-treda-comments.php:77
 msgid "Could not update the message mapping."
 msgstr "Не удалось обновить связь сообщения."
 
-#: includes/class-treda-comments.php:85
+#: includes/class-treda-comments.php:86
 msgid "Waiting for the linked discussion."
 msgstr "Ожидает связи с обсуждением."
 
-#: includes/class-treda-comments.php:92
+#: includes/class-treda-comments.php:93
 msgid "Waiting for the parent comment. Approve and synchronize it first."
 msgstr "Ожидает родительского комментария. Сначала одобрите и синхронизируйте его."
 
-#: includes/class-treda-comments.php:101
+#: includes/class-treda-comments.php:102
 msgid "via website"
 msgstr "с сайта"
 
-#: includes/class-treda-comments.php:130
+#: includes/class-treda-comments.php:131
 msgid "The message may have been sent, but its mapping could not be saved. Check Telegram before retrying."
 msgstr "Сообщение могло быть отправлено, но сохранить связь не удалось. Перед повтором проверьте Telegram."
 
-#: includes/class-treda-comments.php:151
+#: includes/class-treda-comments.php:152
 msgid "Waiting for the exact parent message mapping."
 msgstr "Ожидает точной связи с родительским сообщением."
 
-#: includes/class-treda-comments.php:161
+#: includes/class-treda-comments.php:162
 msgid "This site requires registered commenters. Telegram-only authors cannot be imported."
 msgstr "На сайте комментировать могут только зарегистрированные пользователи. Авторов только из Telegram импортировать нельзя."
 
-#: includes/class-treda-comments.php:164
+#: includes/class-treda-comments.php:165
 msgid "Comment import requires InnoDB comments, comment metadata and mapping tables."
 msgstr "Для импорта комментариев таблицы комментариев, их метаданных и связей должны использовать InnoDB."
 
-#: includes/class-treda-comments.php:169
+#: includes/class-treda-comments.php:170
 msgid "Could not start the import transaction."
 msgstr "Не удалось начать транзакцию импорта."
 
-#: includes/class-treda-comments.php:207
+#: includes/class-treda-comments.php:208
 msgid "Telegram chat"
 msgstr "Чат Telegram"
 
-#: includes/class-treda-comments.php:223
+#: includes/class-treda-comments.php:224
 msgid "Telegram user"
 msgstr "Пользователь Telegram"
 
-#: includes/class-treda-comments.php:264
+#: includes/class-treda-comments.php:265
 msgid "The comment import could not be committed."
 msgstr "Не удалось сохранить транзакцию импорта комментария."
 
-#: includes/class-treda-comments.php:276
+#: includes/class-treda-comments.php:277
 msgid "Approved comments and the author name will also appear in the linked Telegram discussion."
 msgstr "Одобренный комментарий и имя автора также появятся в связанном обсуждении Telegram."
 
-#: includes/class-treda-comments.php:292
+#: includes/class-treda-comments.php:306
 msgid "From Telegram"
 msgstr "Из Telegram"
 

@@ -11,7 +11,8 @@ final class Treda_Comments {
 		add_filter( 'pre_comment_approved', array( __CLASS__, 'moderate' ), 20, 2 );
 		add_action( 'comment_form_after_fields', array( __CLASS__, 'form_notice' ) );
 		add_action( 'comment_form_logged_in_after', array( __CLASS__, 'form_notice' ) );
-		add_filter( 'comment_text', array( __CLASS__, 'source' ), 20, 2 );
+		add_filter( 'get_comment_author_url', array( __CLASS__, 'author_url' ), 20, 3 );
+		add_filter( 'get_comment_author_link', array( __CLASS__, 'author_link' ), 20, 3 );
 	}
 
 	public static function enabled() {
@@ -277,24 +278,33 @@ final class Treda_Comments {
 		}
 	}
 
-	public static function source( $text, $comment = null ) {
-		if ( $comment instanceof WP_Comment && get_comment_meta( $comment->comment_ID, '_treda_origin', true ) === 'telegram' ) {
-			$link  = Treda_Publisher::link(
-				array(
-					'chat_id'    => get_comment_meta( $comment->comment_ID, '_treda_chat_id', true ),
-					'message_id' => get_comment_meta(
-						$comment->comment_ID,
-						'_treda_message_id',
-						true
-					),
-				)
-			);
-			$label = esc_html__( 'From Telegram', 'treda' );
-			if ( $link ) {
-				$label = '<a href="' . esc_url( $link ) . '" rel="nofollow noopener noreferrer" target="_blank">' . $label . '</a>';
-			}
-			$text .= '<p class="treda-comment-source">' . $label . '</p>';
+	private static function message_url( $comment ) {
+		if ( ! $comment instanceof WP_Comment || get_comment_meta( $comment->comment_ID, '_treda_origin', true ) !== 'telegram' ) {
+			return '';
 		}
-		return $text;
+		$chat = get_comment_meta( $comment->comment_ID, '_treda_chat_id', true );
+		$message = get_comment_meta( $comment->comment_ID, '_treda_message_id', true );
+		if ( ! is_scalar( $chat ) || ! preg_match( '/^-100\d+$/D', (string) $chat )
+			|| ! is_scalar( $message ) || ! ctype_digit( (string) $message ) || (int) $message < 1 ) {
+			return '';
+		}
+		return Treda_Publisher::link( array( 'chat_id' => (string) $chat, 'message_id' => (int) $message ) );
+	}
+
+	public static function author_url( $url, $comment_id, $comment ) {
+		$link = self::message_url( $comment );
+		return $link !== '' ? $link : $url;
+	}
+
+	public static function author_link( $html, $author, $comment_id ) {
+		$link = self::message_url( get_comment( $comment_id ) );
+		if ( $link === '' ) {
+			return $html;
+		}
+		return '<a class="url treda-comment-author" href="' . esc_url( $link )
+			. '" target="_blank" rel="external nofollow ugc noopener noreferrer" aria-label="'
+			. esc_attr( $author . ' — ' . __( 'From Telegram', 'treda' ) ) . '">'
+			. esc_html( $author )
+			. '<svg class="treda-telegram-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="#111" aria-hidden="true" focusable="false" style="display:inline-block;vertical-align:-0.1em;margin-inline-start:0.3em"><path d="M22 2 2 9.5l7 3L18 6l-6.5 8.5 3 7Z"/></svg></a>';
 	}
 }
