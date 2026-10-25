@@ -1,13 +1,13 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Treda 1.0.2\n"
+"Project-Id-Version: Treda 1.0.3\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/treda\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Russian\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-24T19:27:47+05:00\n"
+"POT-Creation-Date: 2026-10-25T11:09:16+05:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: treda\n"
@@ -545,51 +545,47 @@ msgstr "Тип отправителя Telegram"
 msgid "Telegram copies and internal delivery mappings may remain. Contact the site administrator for further removal."
 msgstr "Копии в Telegram и внутренние связи доставки могут сохраняться. Для дальнейшего удаления обратитесь к администратору сайта."
 
-#: includes/class-treda-publisher.php:32
+#: includes/class-treda-publisher.php:33
 msgid "Read the article"
 msgstr "Читать статью"
 
-#: includes/class-treda-publisher.php:54
-msgid "Check the connection in Treda settings."
-msgstr "Проверьте подключение в настройках Treda."
-
-#: includes/class-treda-publisher.php:59
+#: includes/class-treda-publisher.php:64
 msgid "This post is already linked to a different bot or channel. Its mapping cannot be moved automatically."
 msgstr "Запись уже связана с другим ботом или каналом. Перенос связи требует отдельного решения."
 
-#: includes/class-treda-publisher.php:62 includes/class-treda-publisher.php:98
+#: includes/class-treda-publisher.php:67 includes/class-treda-publisher.php:103
 msgid "Could not save the publication mapping index."
 msgstr "Не удалось сохранить индекс связи публикации."
 
-#: includes/class-treda-publisher.php:82
+#: includes/class-treda-publisher.php:87
 msgid "Telegram did not return a publication ID. Check the channel."
 msgstr "Telegram не вернул ID публикации. Проверьте канал."
 
-#: includes/class-treda-publisher.php:95
+#: includes/class-treda-publisher.php:100
 msgid "The message was sent but the mapping could not be saved. Check Telegram before retrying."
 msgstr "Отправка выполнена, но не удалось сохранить связь. Проверьте канал."
 
-#: includes/class-treda-publisher.php:128 assets/editor.js:33
+#: includes/class-treda-publisher.php:133 assets/editor.js:33
 msgid "Treda · Telegram"
 msgstr "Treda · Telegram"
 
-#: includes/class-treda-publisher.php:134 assets/editor.js:35
+#: includes/class-treda-publisher.php:139 assets/editor.js:35
 msgid "Publish to Telegram"
 msgstr "Публиковать в Telegram"
 
-#: includes/class-treda-publisher.php:138 assets/editor.js:45
+#: includes/class-treda-publisher.php:143 assets/editor.js:45
 msgid "Open publication"
 msgstr "Открыть публикацию"
 
-#: includes/class-treda-publisher.php:140 assets/editor.js:46
+#: includes/class-treda-publisher.php:145 assets/editor.js:46
 msgid "No publication is linked yet."
 msgstr "Публикация пока не связана."
 
-#: includes/class-treda-publisher.php:143 assets/editor.js:41
+#: includes/class-treda-publisher.php:148 assets/editor.js:41
 msgid "Automatic publishing is disabled in Treda settings."
 msgstr "Автоматическая публикация выключена в настройках Treda."
 
-#: includes/class-treda-publisher.php:145 assets/editor.js:47
+#: includes/class-treda-publisher.php:150 assets/editor.js:47
 msgid "Saving this post queues its changes in the background."
 msgstr "После сохранения записи изменения попадут в фоновую очередь."
 

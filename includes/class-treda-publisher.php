@@ -16,7 +16,8 @@ final class Treda_Publisher {
 
 	public static function queue( $post_or_id ) {
 		$post = get_post( $post_or_id );
-		if ( ! empty( Treda_Settings::get()['enabled'] ) && Treda_Settings::ready() && self::eligible( $post )
+		$settings = Treda_Settings::get();
+		if ( ! empty( $settings['enabled'] ) && Treda_Settings::token() !== '' && $settings['chat_id'] !== '' && self::eligible( $post )
 			&& ! wp_is_post_revision( $post->ID ) && ! wp_is_post_autosave( $post->ID ) ) {
 			Treda_Queue::post( $post->ID );
 		}
@@ -51,7 +52,11 @@ final class Treda_Publisher {
 		}
 		$connection = Treda_Settings::connection();
 		if ( ! $connection ) {
-			return new WP_Error( 'treda_check', __( 'Check the connection in Treda settings.', 'treda' ), array( 'state' => 'failed' ) );
+			// Revalidate in the worker so changed settings cannot silently discard a new publication.
+			$connection = Treda_API::check();
+			if ( is_wp_error( $connection ) ) {
+				return $connection;
+			}
 		}
 		$binding = get_post_meta( $post->ID, '_treda_publication', true );
 		$binding = is_array( $binding ) ? $binding : array();
