@@ -42,7 +42,7 @@ if ($treda_qa_mode === 'prepare') {
     $path = get_temp_dir() . 'treda-concurrency-' . wp_generate_password(10, false) . '.log';
     file_put_contents($path, '');
     update_option('treda_qa_concurrency_log', $path);
-    $id = wp_insert_post(array('post_title' => 'Treda concurrent worker test', 'post_status' => 'publish', 'comment_status' => 'open'));
+    $id = wp_insert_post(array('post_title' => 'ThreadTandem concurrent worker test', 'post_status' => 'publish', 'comment_status' => 'open'));
     update_option('treda_qa_concurrency_post', $id);
     WP_CLI::success('One outgoing job prepared.');
 } elseif ($treda_qa_mode === 'prepare-import') {

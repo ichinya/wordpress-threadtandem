@@ -12,11 +12,11 @@ final class Treda_Queue {
 
 	public static function activate( $network_wide = false ) {
 		if ( $network_wide ) {
-			wp_die( esc_html__( 'Activate Treda separately on each site, rather than network-wide.', 'treda' ) );
+			wp_die( esc_html__( 'Activate ThreadTandem separately on each site, rather than network-wide.', 'threadtandem-sync-for-telegram' ) );
 		}
 		self::install();
 		if ( get_option( 'treda_schema_version' ) !== TREDA_SCHEMA_VERSION ) {
-			wp_die( esc_html__( 'Treda could not create its database tables.', 'treda' ) );
+			wp_die( esc_html__( 'ThreadTandem could not create its database tables.', 'threadtandem-sync-for-telegram' ) );
 		}
 	}
 
@@ -31,7 +31,7 @@ final class Treda_Queue {
 	public static function schedules( $schedules ) {
 		$schedules['treda_minute'] = array(
 			'interval' => 60,
-			'display'  => __( 'Treda: every minute', 'treda' ),
+			'display'  => __( 'ThreadTandem: every minute', 'threadtandem-sync-for-telegram' ),
 		);
 		return $schedules;
 	}
@@ -142,7 +142,7 @@ final class Treda_Queue {
 				"UPDATE %i SET status=IF(kind='update','pending','uncertain'),lock_token='',
                 last_error=%s,updated_at=%s WHERE status='running' AND locked_at<%s",
 				self::table(),
-				__( 'The worker stopped. Check Telegram before retrying an outgoing operation.', 'treda' ),
+				__( 'The worker stopped. Check Telegram before retrying an outgoing operation.', 'threadtandem-sync-for-telegram' ),
 				$now,
 				gmdate( 'Y-m-d H:i:s', time() - 300 )
 			)
@@ -177,7 +177,7 @@ final class Treda_Queue {
 			$payload = json_decode( $job->payload, true );
 			try {
 				if ( ! is_array( $payload ) ) {
-					$result = new WP_Error( 'treda_payload', __( 'Invalid job data.', 'treda' ), array( 'state' => 'failed' ) );
+					$result = new WP_Error( 'treda_payload', __( 'Invalid job data.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'failed' ) );
 				} elseif ( $job->kind === 'post' ) {
 					$result = Treda_Publisher::publish( $payload );
 				} elseif ( $job->kind === 'comment' ) {
@@ -185,13 +185,13 @@ final class Treda_Queue {
 				} elseif ( $job->kind === 'update' ) {
 					$result = Treda_Webhook::process( $payload );
 				} else {
-					$result = new WP_Error( 'treda_kind', __( 'Unknown job type.', 'treda' ), array( 'state' => 'failed' ) );
+					$result = new WP_Error( 'treda_kind', __( 'Unknown job type.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'failed' ) );
 				}
 			} catch ( Throwable $error ) {
 				$wpdb->query( 'ROLLBACK' );
 				$result = new WP_Error(
 					'treda_exception',
-					__( 'The worker encountered an error. Check diagnostics.', 'treda' ),
+					__( 'The worker encountered an error. Check diagnostics.', 'threadtandem-sync-for-telegram' ),
 					array(
 						'state' => $job->kind === 'update' ? 'failed' : 'uncertain',
 					)

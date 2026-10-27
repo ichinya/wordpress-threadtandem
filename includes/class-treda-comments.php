@@ -51,7 +51,7 @@ final class Treda_Comments {
 			return true;
 		}
 		if ( empty( $payload['connection'] ) || ! hash_equals( Treda_Settings::fingerprint(), $payload['connection'] ) ) {
-			return new WP_Error( 'treda_changed', __( 'Connection settings changed. Save the comment again after checking the connection.', 'treda' ), array( 'state' => 'failed' ) );
+			return new WP_Error( 'treda_changed', __( 'Connection settings changed. Save the comment again after checking the connection.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'failed' ) );
 		}
 		$id      = (int) ( $payload['comment_id'] ?? 0 );
 		$comment = get_comment( $id );
@@ -74,7 +74,7 @@ final class Treda_Comments {
 				return $deleted;
 			}
 			return Treda_Messages::mark_deleted( $mapping->id ) ? true
-				: new WP_Error( 'treda_mapping', __( 'Could not update the message mapping.', 'treda' ), array( 'state' => 'pending' ) );
+				: new WP_Error( 'treda_mapping', __( 'Could not update the message mapping.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'pending' ) );
 		}
 		$post = get_post( $comment->comment_post_ID );
 		if ( ! Treda_Publisher::eligible( $post ) ) {
@@ -83,14 +83,14 @@ final class Treda_Comments {
 		$connection = Treda_Settings::connection();
 		$discussion = get_post_meta( $post->ID, '_treda_discussion', true );
 		if ( ! is_array( $discussion ) || ( $discussion['chat_id'] ?? '' ) !== $connection['discussion_chat_id'] ) {
-			return new WP_Error( 'treda_waiting', __( 'Waiting for the linked discussion.', 'treda' ), array( 'state' => 'pending' ) );
+			return new WP_Error( 'treda_waiting', __( 'Waiting for the linked discussion.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'pending' ) );
 		}
 		$parent_id = (int) $discussion['message_id'];
 		if ( $comment->comment_parent ) {
 			$parent = Treda_Messages::parent_message( $comment->comment_parent, $discussion['chat_id'] );
 			if ( ! $parent || (int) $parent->post_id !== (int) $post->ID ) {
 				self::queue( $comment->comment_parent );
-				return new WP_Error( 'treda_parent', __( 'Waiting for the parent comment. Approve and synchronize it first.', 'treda' ), array( 'state' => 'pending' ) );
+				return new WP_Error( 'treda_parent', __( 'Waiting for the parent comment. Approve and synchronize it first.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'pending' ) );
 			}
 			$parent_id = (int) $parent->message_id;
 		}
@@ -99,7 +99,7 @@ final class Treda_Comments {
 		$params = array(
 			'chat_id'    => $discussion['chat_id'],
 			'parse_mode' => 'HTML',
-			'text'       => '<b>' . esc_html( $author ) . '</b> ' . esc_html__( 'via website', 'treda' ) . "\n" . esc_html( $text ),
+			'text'       => '<b>' . esc_html( $author ) . '</b> ' . esc_html__( 'via website', 'threadtandem-sync-for-telegram' ) . "\n" . esc_html( $text ),
 		);
 		$hash   = hash( 'sha256', wp_json_encode( $params ) );
 		if ( $mapping && hash_equals( $mapping->content_hash, $hash ) ) {
@@ -128,7 +128,7 @@ final class Treda_Comments {
 				'content_hash' => $hash,
 			)
 		) ) {
-			return new WP_Error( 'treda_mapping', __( 'The message may have been sent, but its mapping could not be saved. Check Telegram before retrying.', 'treda' ), array( 'state' => 'uncertain' ) );
+			return new WP_Error( 'treda_mapping', __( 'The message may have been sent, but its mapping could not be saved. Check Telegram before retrying.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'uncertain' ) );
 		}
 		return true;
 	}
@@ -149,7 +149,7 @@ final class Treda_Comments {
 		}
 		$parent = Treda_Messages::find( $chat_id, $reply_id ?: $thread_id );
 		if ( ! $parent || $parent->state !== 'active' ) {
-			return new WP_Error( 'treda_parent', __( 'Waiting for the exact parent message mapping.', 'treda' ), array( 'state' => 'pending' ) );
+			return new WP_Error( 'treda_parent', __( 'Waiting for the exact parent message mapping.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'pending' ) );
 		}
 		if ( $parent->comment_id && ! get_comment( $parent->comment_id ) ) {
 			return true;
@@ -159,15 +159,15 @@ final class Treda_Comments {
 			return true;
 		}
 		if ( get_option( 'comment_registration' ) ) {
-			return new WP_Error( 'treda_registration', __( 'This site requires registered commenters. Telegram-only authors cannot be imported.', 'treda' ), array( 'state' => 'failed' ) );
+			return new WP_Error( 'treda_registration', __( 'This site requires registered commenters. Telegram-only authors cannot be imported.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'failed' ) );
 		}
 		if ( ! Treda_Messages::transactional() ) {
-			return new WP_Error( 'treda_engine', __( 'Comment import requires InnoDB comments, comment metadata and mapping tables.', 'treda' ), array( 'state' => 'failed' ) );
+			return new WP_Error( 'treda_engine', __( 'Comment import requires InnoDB comments, comment metadata and mapping tables.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'failed' ) );
 		}
 		// These direct queries form one import transaction, including core comment APIs.
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		if ( false === $wpdb->query( 'START TRANSACTION' ) ) {
-			return new WP_Error( 'treda_transaction', __( 'Could not start the import transaction.', 'treda' ), array( 'state' => 'pending' ) );
+			return new WP_Error( 'treda_transaction', __( 'Could not start the import transaction.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'pending' ) );
 		}
 		if ( ! Treda_Messages::reserve( $chat_id, $message['message_id'], $post->ID ) ) {
 			return self::rollback();
@@ -205,7 +205,7 @@ final class Treda_Comments {
 		} else {
 			$sender_chat = $message['sender_chat'] ?? array();
 			$sender      = $message['from'] ?? array();
-			$author      = ! empty( $sender_chat ) ? ( $sender_chat['title'] ?? __( 'Telegram chat', 'treda' ) )
+			$author      = ! empty( $sender_chat ) ? ( $sender_chat['title'] ?? __( 'Telegram chat', 'threadtandem-sync-for-telegram' ) )
 				: trim( ( $sender['first_name'] ?? '' ) . ' ' . ( $sender['last_name'] ?? '' ) );
 			$metadata    = array(
 				'_treda_origin'      => 'telegram',
@@ -221,11 +221,11 @@ final class Treda_Comments {
 					wp_slash(
 						array(
 							'comment_post_ID'      => (int) $post->ID,
-							'comment_author'       => sanitize_text_field( $author ?: __( 'Telegram user', 'treda' ) ),
+							'comment_author'       => sanitize_text_field( $author ?: __( 'Telegram user', 'threadtandem-sync-for-telegram' ) ),
 							'comment_author_email' => '',
 							'comment_author_url'   => '',
 							'comment_author_IP'    => '',
-							'comment_agent'        => 'Treda / Telegram',
+							'comment_agent'        => 'ThreadTandem / Telegram',
 							'comment_content'      => $text,
 							'comment_type'         => 'comment',
 							'comment_parent'       => (int) $parent->comment_id,
@@ -262,7 +262,7 @@ final class Treda_Comments {
 		global $wpdb;
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->query( 'ROLLBACK' );
-		return new WP_Error( 'treda_import', __( 'The comment import could not be committed.', 'treda' ), array( 'state' => 'pending' ) );
+		return new WP_Error( 'treda_import', __( 'The comment import could not be committed.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'pending' ) );
 	}
 
 	private static function commit() {
@@ -274,7 +274,7 @@ final class Treda_Comments {
 	public static function form_notice() {
 		$post = get_post();
 		if ( self::enabled() && Treda_Publisher::eligible( $post ) && get_post_meta( $post->ID, '_treda_discussion', true ) ) {
-			echo '<p class="treda-comment-notice">' . esc_html__( 'Approved comments and the author name will also appear in the linked Telegram discussion.', 'treda' ) . '</p>';
+			echo '<p class="treda-comment-notice">' . esc_html__( 'Approved comments and the author name will also appear in the linked Telegram discussion.', 'threadtandem-sync-for-telegram' ) . '</p>';
 		}
 	}
 
@@ -282,13 +282,18 @@ final class Treda_Comments {
 		if ( ! $comment instanceof WP_Comment || get_comment_meta( $comment->comment_ID, '_treda_origin', true ) !== 'telegram' ) {
 			return '';
 		}
-		$chat = get_comment_meta( $comment->comment_ID, '_treda_chat_id', true );
+		$chat    = get_comment_meta( $comment->comment_ID, '_treda_chat_id', true );
 		$message = get_comment_meta( $comment->comment_ID, '_treda_message_id', true );
 		if ( ! is_scalar( $chat ) || ! preg_match( '/^-100\d+$/D', (string) $chat )
 			|| ! is_scalar( $message ) || ! ctype_digit( (string) $message ) || (int) $message < 1 ) {
 			return '';
 		}
-		return Treda_Publisher::link( array( 'chat_id' => (string) $chat, 'message_id' => (int) $message ) );
+		return Treda_Publisher::link(
+			array(
+				'chat_id'    => (string) $chat,
+				'message_id' => (int) $message,
+			)
+		);
 	}
 
 	public static function author_url( $url, $comment_id, $comment ) {
@@ -303,7 +308,7 @@ final class Treda_Comments {
 		}
 		return '<a class="url treda-comment-author" href="' . esc_url( $link )
 			. '" target="_blank" rel="external nofollow ugc noopener noreferrer" aria-label="'
-			. esc_attr( $author . ' — ' . __( 'From Telegram', 'treda' ) ) . '">'
+			. esc_attr( $author . ' — ' . __( 'From Telegram', 'threadtandem-sync-for-telegram' ) ) . '">'
 			. esc_html( $author )
 			. '<svg class="treda-telegram-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="#111" aria-hidden="true" focusable="false" style="display:inline-block;vertical-align:-0.1em;margin-inline-start:0.3em"><path d="M22 2 2 9.5l7 3L18 6l-6.5 8.5 3 7Z"/></svg></a>';
 	}

@@ -16,5 +16,7 @@ wp-config.php
 *.zip
 *.sha256
 *.log
+/languages/*.mo
+/languages/*.json
 .DS_Store
 Thumbs.db

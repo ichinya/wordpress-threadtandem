@@ -77,7 +77,7 @@ final class Treda_Settings {
 				if ( preg_match( '/^\d+:[A-Za-z0-9_-]{20,}$/D', $token ) ) {
 					$new['token'] = $token;
 				} else {
-					add_settings_error( 'treda', 'token', __( 'The token format is invalid. The previous token was kept.', 'treda' ) );
+					add_settings_error( 'treda', 'token', __( 'The token format is invalid. The previous token was kept.', 'threadtandem-sync-for-telegram' ) );
 				}
 			}
 		}
@@ -85,7 +85,7 @@ final class Treda_Settings {
 		if ( $chat === '' || preg_match( '/^(?:-100\d+|@[A-Za-z0-9_]{5,})$/D', $chat ) ) {
 			$new['chat_id'] = $chat;
 		} else {
-			add_settings_error( 'treda', 'chat', __( 'Enter a channel ID starting with -100 or an @username.', 'treda' ) );
+			add_settings_error( 'treda', 'chat', __( 'Enter a channel ID starting with -100 or an @username.', 'threadtandem-sync-for-telegram' ) );
 		}
 		$api   = isset( $input['api_url'] ) && is_string( $input['api_url'] ) ? rtrim( trim( $input['api_url'] ), '/' ) : '';
 		$api   = $api ?: 'https://api.telegram.org';
@@ -93,13 +93,13 @@ final class Treda_Settings {
 		if ( self::valid_https_url( $api ) && ! isset( $parts['query'] ) ) {
 			$new['api_url'] = esc_url_raw( $api, array( 'https' ) );
 		} else {
-			add_settings_error( 'treda', 'api', __( 'The API URL must use HTTPS without credentials or query parameters.', 'treda' ) );
+			add_settings_error( 'treda', 'api', __( 'The API URL must use HTTPS without credentials or query parameters.', 'threadtandem-sync-for-telegram' ) );
 		}
 		$url = isset( $input['webhook_url'] ) && is_string( $input['webhook_url'] ) ? trim( $input['webhook_url'] ) : '';
 		if ( $url === '' || self::valid_https_url( $url ) ) {
 			$new['webhook_url'] = esc_url_raw( $url, array( 'https' ) );
 		} else {
-			add_settings_error( 'treda', 'webhook', __( 'The external webhook URL must use HTTPS.', 'treda' ) );
+			add_settings_error( 'treda', 'webhook', __( 'The external webhook URL must use HTTPS.', 'threadtandem-sync-for-telegram' ) );
 		}
 		return $new;
 	}

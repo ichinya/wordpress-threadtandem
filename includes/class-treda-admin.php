@@ -7,7 +7,7 @@ final class Treda_Admin {
 		add_action(
 			'admin_menu',
 			function () {
-				add_options_page( 'Treda', 'Treda', 'manage_options', 'treda', array( __CLASS__, 'render' ) );
+				add_options_page( 'ThreadTandem', 'ThreadTandem', 'manage_options', 'treda', array( __CLASS__, 'render' ) );
 			}
 		);
 		add_action(
@@ -35,24 +35,24 @@ final class Treda_Admin {
 		if ( $hook !== 'settings_page_treda' ) {
 			return;
 		}
-		wp_enqueue_style( 'treda-admin', plugins_url( 'assets/admin.css', TREDA_DIR . 'treda.php' ), array(), TREDA_VERSION );
-		wp_enqueue_script( 'treda-admin', plugins_url( 'assets/admin.js', TREDA_DIR . 'treda.php' ), array(), TREDA_VERSION, true );
+		wp_enqueue_style( 'treda-admin', plugins_url( 'assets/admin.css', TREDA_FILE ), array(), TREDA_VERSION );
+		wp_enqueue_script( 'treda-admin', plugins_url( 'assets/admin.js', TREDA_FILE ), array(), TREDA_VERSION, true );
 		wp_localize_script(
 			'treda-admin',
 			'tredaAdmin',
 			array(
-				'show'       => __( 'Show', 'treda' ),
-				'hide'       => __( 'Hide', 'treda' ),
-				'copied'     => __( 'Copied', 'treda' ),
-				'copyManual' => __( 'Address selected. Copy it with your keyboard.', 'treda' ),
-				'unsaved'    => __( 'You have unsaved changes. Save them before checking the connection.', 'treda' ),
+				'show'       => __( 'Show', 'threadtandem-sync-for-telegram' ),
+				'hide'       => __( 'Hide', 'threadtandem-sync-for-telegram' ),
+				'copied'     => __( 'Copied', 'threadtandem-sync-for-telegram' ),
+				'copyManual' => __( 'Address selected. Copy it with your keyboard.', 'threadtandem-sync-for-telegram' ),
+				'unsaved'    => __( 'You have unsaved changes. Save them before checking the connection.', 'threadtandem-sync-for-telegram' ),
 			)
 		);
 	}
 
 	public static function action() {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You do not have permission to manage Treda.', 'treda' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'You do not have permission to manage ThreadTandem.', 'threadtandem-sync-for-telegram' ), '', array( 'response' => 403 ) );
 		}
 		check_admin_referer( 'treda_action' );
 		$operation = isset( $_POST['operation'] ) && is_string( $_POST['operation'] ) ? sanitize_key( wp_unslash( $_POST['operation'] ) ) : '';
@@ -60,23 +60,23 @@ final class Treda_Admin {
 		$message   = '';
 		if ( $operation === 'check' ) {
 			$result  = Treda_API::check();
-			$message = __( 'Bot permissions checked. Webhook delivery still needs a real incoming event.', 'treda' );
+			$message = __( 'Bot permissions checked. Webhook delivery still needs a real incoming event.', 'threadtandem-sync-for-telegram' );
 		} elseif ( $operation === 'webhook' ) {
 			$result  = Treda_API::register_webhook();
-			$message = __( 'Webhook registered. Check incoming events in the queue.', 'treda' );
+			$message = __( 'Webhook registered. Check incoming events in the queue.', 'threadtandem-sync-for-telegram' );
 		} elseif ( $operation === 'disconnect' ) {
 			$result  = Treda_API::disconnect_webhook();
-			$message = __( 'The Treda webhook is disconnected.', 'treda' );
+			$message = __( 'The ThreadTandem webhook is disconnected.', 'threadtandem-sync-for-telegram' );
 		} elseif ( $operation === 'run' ) {
 			Treda_Queue::run();
-			$message = __( 'A queue batch was processed. See the results below.', 'treda' );
+			$message = __( 'A queue batch was processed. See the results below.', 'threadtandem-sync-for-telegram' );
 		} elseif ( $operation === 'retry' ) {
 			$id      = isset( $_POST['job_id'] ) && is_scalar( $_POST['job_id'] ) ? absint( $_POST['job_id'] ) : 0;
 			$changed = Treda_Queue::retry( $id, ! empty( $_POST['acknowledge'] ) );
-			$message = $changed ? __( 'The job was queued again.', 'treda' )
-				: __( 'The job was not changed. Confirm a Telegram check before retrying an uncertain result.', 'treda' );
+			$message = $changed ? __( 'The job was queued again.', 'threadtandem-sync-for-telegram' )
+				: __( 'The job was not changed. Confirm a Telegram check before retrying an uncertain result.', 'threadtandem-sync-for-telegram' );
 		} else {
-			$result = new WP_Error( 'treda_action', __( 'Unknown action.', 'treda' ) );
+			$result = new WP_Error( 'treda_action', __( 'Unknown action.', 'threadtandem-sync-for-telegram' ) );
 		}
 		set_transient(
 			'treda_notice_' . get_current_user_id(),

@@ -18,12 +18,12 @@ function treda_editor_request($method, $path, $params = array()) {
 
 $late_observation = null;
 $observe = function ($post) use (&$late_observation) {
-    if ($post->post_title === 'Treda REST disabled at first publication') {
+    if ($post->post_title === 'ThreadTandem REST disabled at first publication') {
         $late_observation = array('disabled' => get_post_meta($post->ID, '_treda_disabled', true), 'job' => treda_test_job('post:' . $post->ID));
     }
 };
 add_action('rest_after_insert_post', $observe, 1, 1);
-$response = treda_editor_request('POST', '/wp/v2/posts', array('title' => 'Treda REST disabled at first publication',
+$response = treda_editor_request('POST', '/wp/v2/posts', array('title' => 'ThreadTandem REST disabled at first publication',
     'status' => 'publish', 'meta' => array('_treda_disabled' => '1')));
 remove_action('rest_after_insert_post', $observe, 1);
 treda_test_expect($response->get_status() === 201, 'Block-editor REST publication accepts the registered preference');

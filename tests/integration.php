@@ -1,7 +1,7 @@
 <?php
 /** Run with wp eval-file, only in an explicitly marked disposable sandbox. */
 if (PHP_SAPI !== 'cli' || !defined('ABSPATH') || !defined('WP_CLI') || !get_option('treda_qa_sandbox')) {
-    exit('A disposable Treda QA WordPress sandbox is required.');
+    exit('A disposable ThreadTandem QA WordPress sandbox is required.');
 }
 
 global $wpdb, $treda_test_checks, $treda_test_calls, $treda_test_message_id, $treda_test_next_error, $treda_test_during_send;
@@ -84,7 +84,7 @@ treda_test_expect(get_option('treda_schema_version') === TREDA_SCHEMA_VERSION, '
 treda_test_expect(Treda_Messages::transactional(), 'Real comment, metadata and mapping tables are InnoDB');
 treda_test_expect(!is_wp_error(Treda_API::check()), 'Channel and discussion bot permissions verified');
 
-$post_id = wp_insert_post(array('post_title' => 'Treda QA post', 'post_excerpt' => 'First excerpt',
+$post_id = wp_insert_post(array('post_title' => 'ThreadTandem QA post', 'post_excerpt' => 'First excerpt',
     'post_content' => 'QA content', 'post_status' => 'publish', 'comment_status' => 'open'));
 treda_test_expect((bool) treda_test_job('post:' . $post_id), 'Native post hook persisted an outbox job');
 Treda_Queue::post($post_id);
@@ -233,7 +233,7 @@ treda_test_incoming(array('update_id' => 112, 'edited_message' => $message));
 treda_test_run();
 treda_test_expect(!get_comment($comment_id), 'Editing in Telegram does not recreate a locally deleted comment');
 
-$other_id = wp_insert_post(array('post_title' => 'Treda QA concurrent edit', 'post_excerpt' => 'Before send', 'post_status' => 'publish'));
+$other_id = wp_insert_post(array('post_title' => 'ThreadTandem QA concurrent edit', 'post_excerpt' => 'Before send', 'post_status' => 'publish'));
 $treda_test_during_send = function () use ($other_id) { wp_update_post(array('ID' => $other_id, 'post_excerpt' => 'Saved during send')); };
 treda_test_run();
 treda_test_run();
@@ -241,7 +241,7 @@ treda_test_expect(treda_test_job('post:' . $other_id)->status === 'done', 'An ed
 $edits = treda_test_methods('editMessageText');
 treda_test_expect(strpos(end($edits)['params']['text'], 'Saved during send') !== false, 'Concurrent save is not lost when the first send completes');
 
-$uncertain_id = wp_insert_post(array('post_title' => 'Treda QA uncertain send', 'post_status' => 'publish'));
+$uncertain_id = wp_insert_post(array('post_title' => 'ThreadTandem QA uncertain send', 'post_status' => 'publish'));
 $treda_test_next_error = new WP_Error('http_request_failed', 'Private transport details');
 treda_test_run();
 treda_test_expect(treda_test_job('post:' . $uncertain_id)->status === 'uncertain', 'Real SQL queue preserves an ambiguous send result');
@@ -249,7 +249,7 @@ Treda_Queue::post($uncertain_id);
 treda_test_expect(treda_test_job('post:' . $uncertain_id)->status === 'uncertain', 'Subsequent saves do not silently resend an ambiguous operation');
 treda_test_expect(Treda_Queue::retry(treda_test_job('post:' . $uncertain_id)->id, false) === 0, 'Manual retry requires explicit acknowledgment for uncertain results');
 
-$pending_id = wp_insert_post(array('post_title' => 'Treda QA unpublished before worker', 'post_status' => 'publish'));
+$pending_id = wp_insert_post(array('post_title' => 'ThreadTandem QA unpublished before worker', 'post_status' => 'publish'));
 wp_update_post(array('ID' => $pending_id, 'post_status' => 'draft'));
 $send_count = count(treda_test_methods('sendMessage'));
 treda_test_run();
@@ -265,7 +265,7 @@ $subscriber = wp_create_user('treda_qa_subscriber_' . wp_generate_password(5, fa
 wp_set_current_user($subscriber);
 ob_start();
 Treda_Admin::render();
-treda_test_expect(ob_get_clean() === '', 'Subscriber cannot render Treda settings');
+treda_test_expect(ob_get_clean() === '', 'Subscriber cannot render ThreadTandem settings');
 wp_set_current_user(0);
 
 remove_filter('pre_http_request', 'treda_test_http', 10);

@@ -16,7 +16,7 @@ $comments_before = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->comments}"
 Treda_Queue::deactivate();
 treda_lifecycle_expect(!wp_next_scheduled('treda_tick'), 'Deactivation must clear its scheduled worker');
 treda_lifecycle_expect($wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $wpdb->esc_like(Treda_Queue::table()))) === Treda_Queue::table(), 'Deactivation must preserve queue data');
-define('WP_UNINSTALL_PLUGIN', 'treda/treda.php');
+define('WP_UNINSTALL_PLUGIN', plugin_basename(TREDA_FILE));
 require TREDA_DIR . 'uninstall.php';
 treda_lifecycle_expect((bool) get_option('treda_settings'), 'Default uninstall must keep settings');
 treda_lifecycle_expect($wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $wpdb->esc_like(Treda_Messages::table()))) === Treda_Messages::table(), 'Default uninstall must preserve mappings');

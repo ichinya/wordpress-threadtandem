@@ -47,7 +47,7 @@ final class Treda_Editor {
 		}
 		wp_enqueue_script(
 			'treda-editor',
-			plugins_url( 'assets/editor.js', TREDA_DIR . 'treda.php' ),
+			plugins_url( 'assets/editor.js', TREDA_FILE ),
 			array( 'wp-plugins', 'wp-editor', 'wp-edit-post', 'wp-element', 'wp-components', 'wp-data', 'wp-i18n' ),
 			TREDA_VERSION,
 			true
@@ -58,6 +58,6 @@ final class Treda_Editor {
 			'publicationUrl'    => $post ? Treda_Publisher::link( get_post_meta( $post->ID, '_treda_publication', true ) ) : '',
 		);
 		wp_add_inline_script( 'treda-editor', 'window.tredaEditor = ' . wp_json_encode( $config ) . ';', 'before' );
-		wp_set_script_translations( 'treda-editor', 'treda', TREDA_DIR . 'languages' );
+		wp_set_script_translations( 'treda-editor', 'threadtandem-sync-for-telegram' );
 	}
 }

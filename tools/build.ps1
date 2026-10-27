@@ -4,26 +4,29 @@ $pluginRoot = Split-Path -Parent $PSScriptRoot
 if (!$OutputDirectory) { $OutputDirectory = Join-Path $pluginRoot 'dist' }
 $OutputDirectory = [IO.Path]::GetFullPath($OutputDirectory)
 New-Item -ItemType Directory -Path $OutputDirectory -Force | Out-Null
-$main = [IO.File]::ReadAllText((Join-Path $pluginRoot 'treda.php'))
+$main = [IO.File]::ReadAllText((Join-Path $pluginRoot 'threadtandem-sync-for-telegram.php'))
 $version = [regex]::Match($main, '(?m)^\s*\* Version:\s*([^\s]+)').Groups[1].Value
 if (!$version) { throw 'Plugin version not found' }
 $stageRoot = Join-Path $OutputDirectory ('build-' + $version + '-' + [guid]::NewGuid().ToString('N').Substring(0,8))
-$packageRoot = Join-Path $stageRoot 'treda'
+$packageRoot = Join-Path $stageRoot 'threadtandem-sync-for-telegram'
 New-Item -ItemType Directory -Path $packageRoot -Force | Out-Null
 # An allowlist prevents tests, credentials and development tools entering the release.
-foreach ($file in @('treda.php','uninstall.php','readme.txt','LICENSE')) {
+foreach ($file in @('threadtandem-sync-for-telegram.php','uninstall.php','readme.txt','LICENSE')) {
     Copy-Item -LiteralPath (Join-Path $pluginRoot $file) -Destination $packageRoot
 }
-foreach ($directory in @('includes','assets','languages')) {
+foreach ($directory in @('includes','assets')) {
     Copy-Item -LiteralPath (Join-Path $pluginRoot $directory) -Destination $packageRoot -Recurse
 }
 $files = Get-ChildItem -LiteralPath $packageRoot -File -Recurse
 foreach ($file in $files) {
+    if ($file.Extension -in @('.po','.mo','.pot') -or $file.Name -match '\.l10n\.php$|-[a-z]{2}_[A-Z]{2}.*\.json$') {
+        throw ('Translation sources and language packs must not enter the WordPress.org ZIP: ' + $file.Name)
+    }
     if ([IO.File]::ReadAllText($file.FullName) -match '(?<![A-Za-z0-9])\d{6,14}:[A-Za-z0-9_-]{30,}(?![A-Za-z0-9])') {
         throw ('Possible embedded bot credential: ' + $file.Name)
     }
 }
-$archivePath = Join-Path $OutputDirectory ('treda-' + $version + '.zip')
+$archivePath = Join-Path $OutputDirectory ('threadtandem-sync-for-telegram-' + $version + '.zip')
 Compress-Archive -LiteralPath $packageRoot -DestinationPath $archivePath -Force
 $hash = (Get-FileHash -LiteralPath $archivePath -Algorithm SHA256).Hash.ToLowerInvariant()
 ($hash + '  ' + [IO.Path]::GetFileName($archivePath)) | Set-Content -LiteralPath ($archivePath + '.sha256') -Encoding ascii

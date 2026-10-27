@@ -1,31 +1,31 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Treda 1.0.4\n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/treda\n"
+"Project-Id-Version: ThreadTandem — Post Publishing and Comment Sync for Telegram 1.1.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/threadtandem-sync-for-telegram\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Russian\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-25T11:26:44+05:00\n"
+"POT-Creation-Date: 2026-10-27T12:10:43+05:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
-"X-Domain: treda\n"
+"X-Domain: threadtandem-sync-for-telegram\n"
 "Language: ru_RU\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 #. Plugin Name of the plugin
-#: treda.php
-msgid "Treda"
-msgstr "Treda"
+#: threadtandem-sync-for-telegram.php
+msgid "ThreadTandem — Post Publishing and Comment Sync for Telegram"
+msgstr "ThreadTandem — публикации и синхронизация комментариев с Telegram"
 
 #. Description of the plugin
-#: treda.php
+#: threadtandem-sync-for-telegram.php
 msgid "Publish posts to Telegram and synchronize text comments with a linked discussion group."
 msgstr "Публикация записей в Telegram и синхронизация текстовых комментариев со связанной группой обсуждений."
 
 #. Author of the plugin
-#: treda.php
+#: threadtandem-sync-for-telegram.php
 msgid "Ichi-nya"
 msgstr "Ichi-nya"
 
@@ -154,8 +154,8 @@ msgid "Keep integration data when deleting the plugin"
 msgstr "Сохранять данные интеграции при удалении плагина"
 
 #: includes/admin-view.php:82
-msgid "If cleared, uninstall removes Treda settings, mappings and queue tables. Posts and comments remain. Disconnect the webhook before deleting the plugin."
-msgstr "Если снять флажок, при удалении плагина будут удалены настройки, связи и таблицы очереди Treda. Записи и комментарии останутся. Перед удалением отключите webhook."
+msgid "If cleared, uninstall removes ThreadTandem settings, mappings and queue tables. Posts and comments remain. Disconnect the webhook before deleting the plugin."
+msgstr "Если снять флажок, при удалении плагина будут удалены настройки, связи и таблицы очереди ThreadTandem. Записи и комментарии останутся. Перед удалением отключите webhook."
 
 #: includes/admin-view.php:87 includes/admin-view.php:89
 msgid "Connection status"
@@ -346,8 +346,8 @@ msgid "You have unsaved changes. Save them before checking the connection."
 msgstr "Есть несохранённые изменения. Сохраните их перед проверкой подключения."
 
 #: includes/class-treda-admin.php:55
-msgid "You do not have permission to manage Treda."
-msgstr "У вас нет прав на управление Treda."
+msgid "You do not have permission to manage ThreadTandem."
+msgstr "У вас нет прав на управление ThreadTandem."
 
 #: includes/class-treda-admin.php:63
 msgid "Bot permissions checked. Webhook delivery still needs a real incoming event."
@@ -358,8 +358,8 @@ msgid "Webhook registered. Check incoming events in the queue."
 msgstr "Webhook зарегистрирован. Проверьте входящие события в очереди."
 
 #: includes/class-treda-admin.php:69
-msgid "The Treda webhook is disconnected."
-msgstr "Webhook Treda отключён."
+msgid "The ThreadTandem webhook is disconnected."
+msgstr "Webhook ThreadTandem отключён."
 
 #: includes/class-treda-admin.php:72
 msgid "A queue batch was processed. See the results below."
@@ -446,8 +446,8 @@ msgid "This bot already uses a different webhook. Use a dedicated bot or disconn
 msgstr "У бота уже настроен другой webhook. Используйте отдельного бота или сначала отключите прежнюю интеграцию."
 
 #: includes/class-treda-api.php:169
-msgid "The bot uses a different webhook. Treda will not change it."
-msgstr "Бот использует другой webhook. Treda не будет его менять."
+msgid "The bot uses a different webhook. ThreadTandem will not change it."
+msgstr "Бот использует другой webhook. ThreadTandem не будет его менять."
 
 #: includes/class-treda-comments.php:54
 msgid "Connection settings changed. Save the comment again after checking the connection."
@@ -505,7 +505,7 @@ msgstr "Не удалось сохранить транзакцию импорт
 msgid "Approved comments and the author name will also appear in the linked Telegram discussion."
 msgstr "Одобренный комментарий и имя автора также появятся в связанном обсуждении Telegram."
 
-#: includes/class-treda-comments.php:306
+#: includes/class-treda-comments.php:311
 msgid "From Telegram"
 msgstr "Из Telegram"
 
@@ -526,8 +526,8 @@ msgid "For a Telegram-only author, contact the site administrator and prove owne
 msgstr "Если автор использует только Telegram, для запроса доступа или удаления данных нужно обратиться к администратору сайта и подтвердить владение этой идентичностью Telegram. Запросы конфиденциальности WordPress по email не позволяют автоматически определить автора только из Telegram."
 
 #: includes/class-treda-privacy.php:30 includes/class-treda-privacy.php:46
-msgid "Treda Telegram metadata"
-msgstr "Метаданные Telegram в Treda"
+msgid "ThreadTandem Telegram metadata"
+msgstr "Метаданные Telegram в ThreadTandem"
 
 #: includes/class-treda-privacy.php:78
 msgid "Telegram comment identities"
@@ -566,8 +566,8 @@ msgid "The message was sent but the mapping could not be saved. Check Telegram b
 msgstr "Отправка выполнена, но не удалось сохранить связь. Проверьте канал."
 
 #: includes/class-treda-publisher.php:133 assets/editor.js:33
-msgid "Treda · Telegram"
-msgstr "Treda · Telegram"
+msgid "ThreadTandem · Telegram"
+msgstr "ThreadTandem · Telegram"
 
 #: includes/class-treda-publisher.php:139 assets/editor.js:35
 msgid "Publish to Telegram"
@@ -582,24 +582,24 @@ msgid "No publication is linked yet."
 msgstr "Публикация пока не связана."
 
 #: includes/class-treda-publisher.php:148 assets/editor.js:41
-msgid "Automatic publishing is disabled in Treda settings."
-msgstr "Автоматическая публикация выключена в настройках Treda."
+msgid "Automatic publishing is disabled in ThreadTandem settings."
+msgstr "Автоматическая публикация выключена в настройках ThreadTandem."
 
 #: includes/class-treda-publisher.php:150 assets/editor.js:47
 msgid "Saving this post queues its changes in the background."
 msgstr "После сохранения записи изменения попадут в фоновую очередь."
 
 #: includes/class-treda-queue.php:15
-msgid "Activate Treda separately on each site, rather than network-wide."
-msgstr "Активируйте Treda отдельно на каждом сайте, а не для всей сети."
+msgid "Activate ThreadTandem separately on each site, rather than network-wide."
+msgstr "Активируйте ThreadTandem отдельно на каждом сайте, а не для всей сети."
 
 #: includes/class-treda-queue.php:19
-msgid "Treda could not create its database tables."
-msgstr "Treda не удалось создать таблицы базы данных."
+msgid "ThreadTandem could not create its database tables."
+msgstr "ThreadTandem не удалось создать таблицы базы данных."
 
 #: includes/class-treda-queue.php:34
-msgid "Treda: every minute"
-msgstr "Treda: каждую минуту"
+msgid "ThreadTandem: every minute"
+msgstr "ThreadTandem: каждую минуту"
 
 #: includes/class-treda-queue.php:145
 msgid "The worker stopped. Check Telegram before retrying an outgoing operation."
@@ -665,6 +665,10 @@ msgstr "Связь публикации требует проверки."
 msgid "Could not save the discussion mapping."
 msgstr "Не удалось сохранить связь обсуждения."
 
-#: treda.php:42
-msgid "Treda could not create its database tables. Check the database permissions."
-msgstr "Treda не удалось создать таблицы базы данных. Проверьте права доступа к базе."
+#: threadtandem-sync-for-telegram.php:25
+msgid "Deactivate the previous plugin network-wide before activating ThreadTandem on this site."
+msgstr "Перед активацией ThreadTandem на этом сайте отключите прежний плагин для всей сети."
+
+#: threadtandem-sync-for-telegram.php:65
+msgid "ThreadTandem could not create its database tables. Check the database permissions."
+msgstr "ThreadTandem не удалось создать таблицы базы данных. Проверьте права доступа к базе."

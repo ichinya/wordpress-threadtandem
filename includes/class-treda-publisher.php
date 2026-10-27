@@ -15,7 +15,7 @@ final class Treda_Publisher {
 	}
 
 	public static function queue( $post_or_id ) {
-		$post = get_post( $post_or_id );
+		$post     = get_post( $post_or_id );
 		$settings = Treda_Settings::get();
 		if ( ! empty( $settings['enabled'] ) && Treda_Settings::token() !== '' && $settings['chat_id'] !== '' && self::eligible( $post )
 			&& ! wp_is_post_revision( $post->ID ) && ! wp_is_post_autosave( $post->ID ) ) {
@@ -30,7 +30,7 @@ final class Treda_Publisher {
 		$title   = self::truncate( $title, 200 );
 		$excerpt = self::truncate( $excerpt, 650 );
 		return '<b>' . esc_html( $title ) . "</b>\n\n" . esc_html( $excerpt )
-			. "\n\n" . '<a href="' . esc_url( get_permalink( $post ) ) . '">' . esc_html__( 'Read the article', 'treda' ) . '</a>';
+			. "\n\n" . '<a href="' . esc_url( get_permalink( $post ) ) . '">' . esc_html__( 'Read the article', 'threadtandem-sync-for-telegram' ) . '</a>';
 	}
 
 	public static function plain( $text ) {
@@ -61,10 +61,10 @@ final class Treda_Publisher {
 		$binding = get_post_meta( $post->ID, '_treda_publication', true );
 		$binding = is_array( $binding ) ? $binding : array();
 		if ( $binding && ( $binding['chat_id'] !== $connection['chat_id'] || $binding['bot_id'] !== $connection['bot_id'] ) ) {
-			return new WP_Error( 'treda_binding', __( 'This post is already linked to a different bot or channel. Its mapping cannot be moved automatically.', 'treda' ), array( 'state' => 'failed' ) );
+			return new WP_Error( 'treda_binding', __( 'This post is already linked to a different bot or channel. Its mapping cannot be moved automatically.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'failed' ) );
 		}
 		if ( ! empty( $binding['message_id'] ) && ! self::save_message_key( $post->ID, $binding ) ) {
-			return new WP_Error( 'treda_index', __( 'Could not save the publication mapping index.', 'treda' ), array( 'state' => 'pending' ) );
+			return new WP_Error( 'treda_index', __( 'Could not save the publication mapping index.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'pending' ) );
 		}
 		$params = array(
 			'chat_id'    => $connection['chat_id'],
@@ -84,7 +84,7 @@ final class Treda_Publisher {
 			return $result;
 		}
 		if ( ! $editing && ( ! is_array( $result ) || empty( $result['message_id'] ) ) ) {
-			return new WP_Error( 'treda_message', __( 'Telegram did not return a publication ID. Check the channel.', 'treda' ), array( 'state' => 'uncertain' ) );
+			return new WP_Error( 'treda_message', __( 'Telegram did not return a publication ID. Check the channel.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'uncertain' ) );
 		}
 		$binding = array_merge(
 			$binding,
@@ -97,10 +97,10 @@ final class Treda_Publisher {
 			)
 		);
 		if ( ! update_post_meta( $post->ID, '_treda_publication', $binding ) ) {
-			return new WP_Error( 'treda_mapping', __( 'The message was sent but the mapping could not be saved. Check Telegram before retrying.', 'treda' ), array( 'state' => 'uncertain' ) );
+			return new WP_Error( 'treda_mapping', __( 'The message was sent but the mapping could not be saved. Check Telegram before retrying.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'uncertain' ) );
 		}
 		if ( ! self::save_message_key( $post->ID, $binding ) ) {
-			return new WP_Error( 'treda_index', __( 'Could not save the publication mapping index.', 'treda' ), array( 'state' => 'pending' ) );
+			return new WP_Error( 'treda_index', __( 'Could not save the publication mapping index.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'pending' ) );
 		}
 		return true;
 	}
@@ -130,24 +130,24 @@ final class Treda_Publisher {
 		if ( $post instanceof WP_Post && Treda_Editor::uses_native_panel( $post ) ) {
 			return;
 		}
-		add_meta_box( 'treda', __( 'Treda · Telegram', 'treda' ), array( __CLASS__, 'render_box' ), 'post', 'side' );
+		add_meta_box( 'treda', __( 'ThreadTandem · Telegram', 'threadtandem-sync-for-telegram' ), array( __CLASS__, 'render_box' ), 'post', 'side' );
 	}
 
 	public static function render_box( $post ) {
 		wp_nonce_field( 'treda_post', 'treda_post_nonce' );
 		$disabled = get_post_meta( $post->ID, '_treda_disabled', true ) === '1';
-		echo '<p><label><input type="checkbox" name="treda_publish" value="1" ' . checked( ! $disabled, true, false ) . '> ' . esc_html__( 'Publish to Telegram', 'treda' ) . '</label></p>';
+		echo '<p><label><input type="checkbox" name="treda_publish" value="1" ' . checked( ! $disabled, true, false ) . '> ' . esc_html__( 'Publish to Telegram', 'threadtandem-sync-for-telegram' ) . '</label></p>';
 		$binding = get_post_meta( $post->ID, '_treda_publication', true );
 		$url     = self::link( $binding );
 		if ( $url ) {
-			echo '<p><a href="' . esc_url( $url ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Open publication', 'treda' ) . '</a></p>';
+			echo '<p><a href="' . esc_url( $url ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Open publication', 'threadtandem-sync-for-telegram' ) . '</a></p>';
 		} else {
-			echo '<p>' . esc_html__( 'No publication is linked yet.', 'treda' ) . '</p>';
+			echo '<p>' . esc_html__( 'No publication is linked yet.', 'threadtandem-sync-for-telegram' ) . '</p>';
 		}
 		if ( empty( Treda_Settings::get()['enabled'] ) ) {
-			echo '<p>' . esc_html__( 'Automatic publishing is disabled in Treda settings.', 'treda' ) . '</p>';
+			echo '<p>' . esc_html__( 'Automatic publishing is disabled in ThreadTandem settings.', 'threadtandem-sync-for-telegram' ) . '</p>';
 		}
-		echo '<p>' . esc_html__( 'Saving this post queues its changes in the background.', 'treda' ) . '</p>';
+		echo '<p>' . esc_html__( 'Saving this post queues its changes in the background.', 'threadtandem-sync-for-telegram' ) . '</p>';
 	}
 
 	public static function save_preference( $id ) {

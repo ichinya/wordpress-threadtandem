@@ -30,21 +30,21 @@
 
 		return el(
 			Panel,
-			{ name: 'treda-telegram', title: __( 'Treda · Telegram', 'treda' ) },
+			{ name: 'treda-telegram', title: __( 'ThreadTandem · Telegram', 'threadtandem-sync-for-telegram' ) },
 			el( wp.components.ToggleControl, {
-				label: __( 'Publish to Telegram', 'treda' ),
+				label: __( 'Publish to Telegram', 'threadtandem-sync-for-telegram' ),
 				checked: state.meta._treda_disabled !== '1',
 				onChange: function ( enabled ) {
 					editPost( { meta: Object.assign( {}, state.meta, { _treda_disabled: enabled ? '0' : '1' } ) } );
 				}
 			} ),
-			! config.publishingEnabled && el( 'p', {}, __( 'Automatic publishing is disabled in Treda settings.', 'treda' ) ),
+			! config.publishingEnabled && el( 'p', {}, __( 'Automatic publishing is disabled in ThreadTandem settings.', 'threadtandem-sync-for-telegram' ) ),
 			config.publicationUrl ? el(
 				'p',
 				{},
-				el( 'a', { href: config.publicationUrl, target: '_blank', rel: 'noopener noreferrer' }, __( 'Open publication', 'treda' ) )
-			) : el( 'p', {}, __( 'No publication is linked yet.', 'treda' ) ),
-			el( 'p', {}, __( 'Saving this post queues its changes in the background.', 'treda' ) )
+				el( 'a', { href: config.publicationUrl, target: '_blank', rel: 'noopener noreferrer' }, __( 'Open publication', 'threadtandem-sync-for-telegram' ) )
+			) : el( 'p', {}, __( 'No publication is linked yet.', 'threadtandem-sync-for-telegram' ) ),
+			el( 'p', {}, __( 'Saving this post queues its changes in the background.', 'threadtandem-sync-for-telegram' ) )
 		);
 	}
 
