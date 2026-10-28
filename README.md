@@ -20,7 +20,7 @@ ThreadTandem связывает публикации WordPress и обсужде
 
 ## Установка
 
-1. Скачайте **threadtandem-sync-for-telegram-1.1.0.zip** из [Releases](https://github.com/ichinya/wordpress-treda/releases/latest).
+1. Скачайте **threadtandem-sync-for-telegram-1.1.0.zip** из [Releases](https://github.com/ichinya/wordpress-threadtandem/releases/latest).
 2. В WordPress откройте **Плагины → Добавить плагин → Загрузить плагин**, установите ZIP и активируйте ThreadTandem.
 3. Откройте **Настройки → ThreadTandem**, сохраните токен отдельного бота и канал.
 4. Назначьте бота администратором канала с правом публикации. Для комментариев привяжите группу обсуждений и назначьте бота её администратором.
