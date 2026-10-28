@@ -33,6 +33,8 @@ ThreadTandem связывает публикации WordPress и обсужде
 
 Основной файл и папка установочного пакета: `threadtandem-sync-for-telegram`. Исходники русских переводов находятся в `languages/` только для разработки и последующего импорта в translate.wordpress.org. Они не входят в ZIP; WordPress загружает опубликованные языковые пакеты автоматически.
 
+Переводы: [Translate WordPress](https://translate.wordpress.org/projects/wp-plugins/threadtandem-sync-for-telegram/). Скриншоты страницы каталога находятся в `wordpress-org-assets/`; подписи заданы в `readme.txt`. Их размещение в SVN описано в [инструкции публикации](docs/wordpress-org.md).
+
 ## Требования
 
 - WordPress **6.2 или новее**; совместимость проверена с веткой **7.1**.

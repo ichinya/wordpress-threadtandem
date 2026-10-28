@@ -8,6 +8,7 @@
 /tests
 /tools
 /languages
+/wordpress-org-assets
 /composer.json
 /composer.lock
 /vendor

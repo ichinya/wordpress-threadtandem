@@ -51,7 +51,7 @@ ThreadTandem is an independent integration and is not affiliated with Telegram o
 
 == Installation ==
 
-1. Upload the treda directory to wp-content/plugins/ or install the ZIP from Plugins > Add New > Upload Plugin.
+1. Upload the threadtandem-sync-for-telegram directory to wp-content/plugins/ or install the ZIP from Plugins > Add New > Upload Plugin.
 2. Activate ThreadTandem on the individual site. Network-wide activation is not supported.
 3. Open Settings > ThreadTandem. Save a dedicated bot token and a channel ID or @username.
 4. Add the bot as a channel administrator with permission to publish. For comments, link a discussion group to the channel and make the bot an administrator of that group too.
@@ -107,6 +107,17 @@ Successful incoming jobs have their message payload cleared. Completed and faile
 = What happens when I deactivate or uninstall ThreadTandem? =
 
 Deactivation stops the scheduled worker and preserves data. Disconnect the webhook before removing the plugin. By default, uninstall keeps integration data. Clear Keep integration data when deleting the plugin to remove ThreadTandem options, tables and integration metadata during uninstall. Core posts and comments remain. Telegram copies and other externally stored data are not removed automatically.
+
+== Screenshots ==
+
+1. Connect a bot and channel, choose what to synchronize, and manage moderation and incoming Telegram events.
+2. Control Telegram publishing for each post from the WordPress block editor sidebar.
+3. Native WordPress comments preserve nested replies. The Telegram author's name and paper-plane icon link to the original message.
+
+== Translations ==
+
+Help translate ThreadTandem at https://translate.wordpress.org/projects/wp-plugins/threadtandem-sync-for-telegram/.
+WordPress.org language packs are installed automatically when an approved translation is available for your site language.
 
 == Changelog ==
 
