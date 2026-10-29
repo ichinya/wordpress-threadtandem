@@ -1,0 +1,76 @@
+name: WordPress.org SVN
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*', '[0-9]*']
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    if: github.event.deleted != true
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    concurrency:
+      group: ${{ github.event_name == 'push' && 'wordpress-org-deploy' || format('wordpress-org-check-{0}', github.ref) }}
+      cancel-in-progress: false
+      queue: max
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install Subversion
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install --yes --no-install-recommends subversion
+
+      - name: Check plugin syntax and isolated tests
+        run: |
+          find . -maxdepth 1 -name '*.php' -print0 | xargs -0 -r -n1 php -l
+          find includes -name '*.php' -print0 | xargs -0 -r -n1 php -l
+          node --check assets/admin.js
+          node --check assets/editor.js
+          php tests/run.php
+
+      - name: Test deployment against local SVN (no credentials or network)
+        run: python3 -m unittest discover -s tests -p 'test_svn_deploy.py' -v
+
+      - name: Build plugin with the release allowlist
+        id: build
+        shell: pwsh
+        run: |
+          $build = & ./tools/build.ps1 -OutputDirectory ./dist
+          "package=$($build.Staging)" >> $env:GITHUB_OUTPUT
+          "archive=$($build.Archive)" >> $env:GITHUB_OUTPUT
+
+      - name: Validate package and release version
+        env:
+          PACKAGE: ${{ steps.build.outputs.package }}
+          SOURCE_REF: ${{ github.ref }}
+          SOURCE_COMMIT: ${{ github.sha }}
+        run: python3 tools/svn_deploy.py validate --package "$PACKAGE" --ref "$SOURCE_REF" --commit "$SOURCE_COMMIT"
+
+      - name: Save checked ZIP and SHA256
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: plugin-${{ github.sha }}
+          path: |
+            ${{ steps.build.outputs.archive }}
+            ${{ steps.build.outputs.archive }}.sha256
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Publish main to trunk or version tag to SVN tags
+        if: github.event_name == 'push'
+        env:
+          WPORG_SVN_PASSWORD: ${{ secrets.WPORG_SVN_PASSWORD }}
+          PACKAGE: ${{ steps.build.outputs.package }}
+          SOURCE_REF: ${{ github.ref }}
+          SOURCE_COMMIT: ${{ github.sha }}
+        run: python3 tools/svn_deploy.py deploy --package "$PACKAGE" --ref "$SOURCE_REF" --commit "$SOURCE_COMMIT"

@@ -12,6 +12,8 @@ wp-config.php
 /dist/
 /vendor/
 /node_modules/
+__pycache__/
+*.pyc
 /.playwright-mcp/
 *.zip
 *.sha256
