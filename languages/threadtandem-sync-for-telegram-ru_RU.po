@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: ThreadTandem — Post Publishing and Comment Sync for Telegram 1.1.0\n"
+"Project-Id-Version: ThreadTandem — Post Publishing and Comment Sync for Telegram 1.1.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/threadtandem-sync-for-telegram\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Russian\n"
@@ -82,8 +82,8 @@ msgid "Telegram channel"
 msgstr "Канал Telegram"
 
 #: includes/admin-view.php:51
-msgid "Use an @username or a channel ID. The linked group is detected automatically."
-msgstr "Укажите @username или ID канала. Группа обсуждений определится автоматически."
+msgid "Use an @username, a t.me link or a channel ID. The linked group is detected automatically."
+msgstr "Укажите @username, ссылку t.me или ID канала. Группа обсуждений определится автоматически."
 
 #: includes/admin-view.php:58
 msgid "What to synchronize"
@@ -622,8 +622,8 @@ msgid "The token format is invalid. The previous token was kept."
 msgstr "Токен имеет неверный формат. Старый токен сохранён."
 
 #: includes/class-treda-settings.php:88
-msgid "Enter a channel ID starting with -100 or an @username."
-msgstr "Укажите ID канала вида -100… или @username."
+msgid "Enter a channel ID starting with -100, an @username or a link like https://t.me/username."
+msgstr "Укажите ID канала вида -100…, @username или ссылку вида https://t.me/username."
 
 #: includes/class-treda-settings.php:96
 msgid "The API URL must use HTTPS without credentials or query parameters."

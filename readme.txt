@@ -4,7 +4,7 @@ Tags: telegram, comments, discussion, crossposting
 Requires at least: 6.2
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -53,7 +53,7 @@ ThreadTandem is an independent integration and is not affiliated with Telegram o
 
 1. Upload the threadtandem-sync-for-telegram directory to wp-content/plugins/ or install the ZIP from Plugins > Add New > Upload Plugin.
 2. Activate ThreadTandem on the individual site. Network-wide activation is not supported.
-3. Open Settings > ThreadTandem. Save a dedicated bot token and a channel ID or @username.
+3. Open Settings > ThreadTandem. Save a dedicated bot token and a channel ID, @username or public link such as https://t.me/username.
 4. Add the bot as a channel administrator with permission to publish. For comments, link a discussion group to the channel and make the bot an administrator of that group too.
 5. Enable the features you want, save, and click Check connection. Publishing and comment synchronization are off by default.
 6. Register the webhook. Telegram must be able to reach your site through public HTTPS. ThreadTandem refuses to replace a different integration webhook.
@@ -120,6 +120,10 @@ Help translate ThreadTandem at https://translate.wordpress.org/projects/wp-plugi
 WordPress.org language packs are installed automatically when an approved translation is available for your site language.
 
 == Changelog ==
+
+= 1.1.1 =
+* Accept public t.me channel links in settings and normalize them to the equivalent @username before validation and saving.
+* Keep existing connection verification when the same channel is entered as a link instead of an @username.
 
 = 1.1.0 =
 * Rename the plugin to ThreadTandem — Post Publishing and Comment Sync for Telegram.

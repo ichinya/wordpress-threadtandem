@@ -48,7 +48,7 @@ $treda_local_webhook = ! Treda_Settings::valid_https_url( $treda_webhook_url )
 					</div>
 					<div class="treda-field"><label for="treda-chat"><?php esc_html_e( 'Telegram channel', 'threadtandem-sync-for-telegram' ); ?></label>
 						<input id="treda-chat" type="text" name="treda_settings[chat_id]" value="<?php echo esc_attr( $settings['chat_id'] ); ?>" placeholder="@channel" aria-describedby="treda-chat-help" spellcheck="false">
-						<p id="treda-chat-help" class="treda-help"><?php esc_html_e( 'Use an @username or a channel ID. The linked group is detected automatically.', 'threadtandem-sync-for-telegram' ); ?></p>
+						<p id="treda-chat-help" class="treda-help"><?php esc_html_e( 'Use an @username, a t.me link or a channel ID. The linked group is detected automatically.', 'threadtandem-sync-for-telegram' ); ?></p>
 					</div>
 				</div>
 			</section>

@@ -141,6 +141,34 @@ foreach (array('https://user:pass@api.example', 'https://api.example?token=x', '
 }
 expect(Treda_Settings::sanitize(array('clear_token' => 1))['token'] === '', 'Explicit token deletion');
 
+foreach (array('@ichi_dev', 'https://t.me/ichi_dev', 'https://t.me/ichi_dev/', 'http://t.me/ichi_dev', 't.me/ichi_dev', " \thttps://t.me/ichi_dev/\r\n", 'HTTPS://T.ME/ichi_dev') as $chat) {
+    $GLOBALS['setting_errors'] = array();
+    $saved = Treda_Settings::sanitize(array('chat_id' => $chat));
+    expect($saved['chat_id'] === '@ichi_dev' && !in_array('chat', $GLOBALS['setting_errors'], true), 'Public channel link and handle have the same saved destination: ' . trim($chat));
+}
+foreach (array('', '-1001234567890', '@Existing_Name') as $chat) {
+    $GLOBALS['setting_errors'] = array();
+    $saved = Treda_Settings::sanitize(array('chat_id' => $chat));
+    expect($saved['chat_id'] === $chat && !in_array('chat', $GLOBALS['setting_errors'], true), 'Existing channel formats remain supported: ' . $chat);
+}
+foreach (array('https://t.me.evil.example/ichi_dev', 'https://evil.example/t.me/ichi_dev', 'https://t.me@evil.example/ichi_dev', 'https://evil.example@t.me/ichi_dev', 'https://t.me:443/ichi_dev', '//t.me/ichi_dev', 'ftp://t.me/ichi_dev', 'https://t.me/ichi_dev/123', 'https://t.me/c/123456/1', 'https://t.me/+invite_hash', 'https://t.me/joinchat/invite_hash', 'https://t.me/ichi_dev?start=value', 'https://t.me/ichi_dev#fragment', 'https://t.me/ichi-dev', 'https://t.me/abcd', 'https://t.me/ichi%5Fdev', 'https://t.me/ichi_dev/extra', 'https://t.me/ichi_dev https://evil.example') as $chat) {
+    $GLOBALS['setting_errors'] = array();
+    $saved = Treda_Settings::sanitize(array('chat_id' => $chat));
+    expect($saved['chat_id'] === $old['chat_id'] && in_array('chat', $GLOBALS['setting_errors'], true), 'Invalid channel URL is rejected and preserves the saved destination: ' . $chat);
+}
+// Equivalent input must not invalidate a verified connection or its already queued jobs.
+$GLOBALS['options']['treda_settings']['chat_id'] = '@ichi_dev';
+Treda_API::check();
+$fingerprint = Treda_Settings::fingerprint();
+$saved = Treda_Settings::sanitize(array('chat_id' => 'https://t.me/ichi_dev', 'enabled' => 1));
+update_option('treda_settings', $saved);
+expect(Treda_Settings::fingerprint() === $fingerprint && Treda_Settings::ready(), 'Saving the equivalent URL preserves the verified connection fingerprint');
+$GLOBALS['requests'] = array();
+Treda_API::check();
+$channel_request = json_decode($GLOBALS['requests'][1][1]['body'], true);
+expect($channel_request['chat_id'] === '@ichi_dev', 'Bot API receives the normalized username instead of the submitted URL');
+reset_fixture();
+
 $post = $GLOBALS['posts'][1];
 expect(Treda_Publisher::eligible($post), 'Public post eligible');
 foreach (array('draft', 'private', 'future', 'trash') as $status) {

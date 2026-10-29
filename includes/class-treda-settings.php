@@ -82,10 +82,14 @@ final class Treda_Settings {
 			}
 		}
 		$chat = isset( $input['chat_id'] ) && is_string( $input['chat_id'] ) ? trim( $input['chat_id'] ) : '';
+		// The Bot API expects an @username; accept the equivalent public channel link in the form.
+		if ( preg_match( '~^(?:https?://)?t\.me/([A-Za-z0-9_]{5,})/?$~iD', $chat, $matches ) ) {
+			$chat = '@' . $matches[1];
+		}
 		if ( $chat === '' || preg_match( '/^(?:-100\d+|@[A-Za-z0-9_]{5,})$/D', $chat ) ) {
 			$new['chat_id'] = $chat;
 		} else {
-			add_settings_error( 'treda', 'chat', __( 'Enter a channel ID starting with -100 or an @username.', 'threadtandem-sync-for-telegram' ) );
+			add_settings_error( 'treda', 'chat', __( 'Enter a channel ID starting with -100, an @username or a link like https://t.me/username.', 'threadtandem-sync-for-telegram' ) );
 		}
 		$api   = isset( $input['api_url'] ) && is_string( $input['api_url'] ) ? rtrim( trim( $input['api_url'] ), '/' ) : '';
 		$api   = $api ?: 'https://api.telegram.org';

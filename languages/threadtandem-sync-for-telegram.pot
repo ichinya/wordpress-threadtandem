@@ -2,7 +2,7 @@
 # This file is distributed under the GPL-2.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: ThreadTandem — Post Publishing and Comment Sync for Telegram 1.1.0\n"
+"Project-Id-Version: ThreadTandem — Post Publishing and Comment Sync for Telegram 1.1.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/threadtandem-sync-for-telegram\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -85,7 +85,7 @@ msgid "Telegram channel"
 msgstr ""
 
 #: includes/admin-view.php:51
-msgid "Use an @username or a channel ID. The linked group is detected automatically."
+msgid "Use an @username, a t.me link or a channel ID. The linked group is detected automatically."
 msgstr ""
 
 #: includes/admin-view.php:58
@@ -637,7 +637,7 @@ msgid "The token format is invalid. The previous token was kept."
 msgstr ""
 
 #: includes/class-treda-settings.php:88
-msgid "Enter a channel ID starting with -100 or an @username."
+msgid "Enter a channel ID starting with -100, an @username or a link like https://t.me/username."
 msgstr ""
 
 #: includes/class-treda-settings.php:96
