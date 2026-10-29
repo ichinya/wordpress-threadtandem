@@ -1,5 +1,7 @@
 # ThreadTandem
 
+![Иконка ThreadTandem](wordpress-org-assets/icon-128x128.png)
+
 ThreadTandem связывает публикации WordPress и обсуждения Telegram. Статья получает анонс в канале, а текстовые комментарии и ответы сохраняют общую ветку на сайте и в связанной группе.
 
 Текущая версия — **1.1.1**. Автор — **Ichi-nya**. Лицензия — [GPLv2 or later](LICENSE).

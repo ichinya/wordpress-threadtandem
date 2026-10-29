@@ -6,6 +6,8 @@ Copy only the PNG files from `wordpress-org-assets/` to the top-level SVN `asset
 
 | File | View |
 | --- | --- |
+| `icon-128x128.png` | Standard plugin directory icon |
+| `icon-256x256.png` | High-DPI plugin directory icon |
 | `screenshot-1.png` | Connection, synchronization and moderation settings |
 | `screenshot-2.png` | Per-post Telegram publishing panel in the block editor |
 | `screenshot-3.png` | Native comment thread with the Telegram author link and nested website reply |
@@ -14,6 +16,10 @@ Copy only the PNG files from `wordpress-org-assets/` to the top-level SVN `asset
 | `screenshot-3-ru.png` | Russian comment thread |
 
 The numbered `Screenshots` entries in `readme.txt` supply the captions. The `-ru` files override the English images in the Russian directory. Set `svn:mime-type` to `image/png` on each PNG.
+
+## Icon
+
+The icon represents two linked conversations on a cobalt background. Generated with the built-in imagegen tool on 2026-10-29. The master and exact generation prompt are retained in `docs/branding/`. The 128px and 256px PNGs are resized exports of the master; both use an opaque background. No official WordPress or Telegram logo is included. Directory icons are distributed separately from the plugin ZIP.
 
 ## Screenshot provenance
 
