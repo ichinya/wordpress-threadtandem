@@ -11,6 +11,8 @@ LICENSE text eol=lf
 *.po text eol=lf
 *.pot text eol=lf
 *.ps1 text eol=lf
+*.py text eol=lf
+*.yml text eol=lf
 *.mo binary
 *.png binary
 *.zip binary
