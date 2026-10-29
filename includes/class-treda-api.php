@@ -70,11 +70,26 @@ final class Treda_API {
 		return new WP_Error( 'treda_api', $messages[ $code ] ?? __( 'Telegram rejected the request.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'failed' ) );
 	}
 
+	/** Keep retry metadata and safe error text while identifying the failed connection step. */
+	private static function check_error( $error, $context, $bot = array() ) {
+		$message = sprintf(
+			/* translators: 1: connection check step, 2: safe Telegram error message. */
+			__( '%1$s: %2$s', 'threadtandem-sync-for-telegram' ),
+			$context,
+			$error->get_error_message()
+		);
+		if ( ! empty( $bot['username'] ) ) {
+			/* translators: %s: Telegram bot username, without the @ prefix. */
+			$message .= ' ' . sprintf( __( 'Bot: @%s.', 'threadtandem-sync-for-telegram' ), $bot['username'] );
+		}
+		return new WP_Error( $error->get_error_code(), $message, $error->get_error_data() );
+	}
+
 	public static function check() {
 		delete_option( 'treda_connection' );
 		$bot = self::call( 'getMe' );
 		if ( is_wp_error( $bot ) ) {
-			return $bot;
+			return self::check_error( $bot, __( 'Bot token check', 'threadtandem-sync-for-telegram' ) );
 		}
 		$settings = Treda_Settings::get();
 		if ( $settings['chat_id'] === '' ) {
@@ -82,7 +97,7 @@ final class Treda_API {
 		}
 		$chat = self::call( 'getChat', array( 'chat_id' => $settings['chat_id'] ) );
 		if ( is_wp_error( $chat ) ) {
-			return $chat;
+			return self::check_error( $chat, __( 'Channel access', 'threadtandem-sync-for-telegram' ), $bot );
 		}
 		if ( ( $chat['type'] ?? '' ) !== 'channel' ) {
 			return new WP_Error( 'treda_mode', __( 'Select a Telegram channel. Forum groups are not supported by this release.', 'threadtandem-sync-for-telegram' ) );
@@ -95,7 +110,7 @@ final class Treda_API {
 			)
 		);
 		if ( is_wp_error( $member ) ) {
-			return $member;
+			return self::check_error( $member, __( 'Channel permissions', 'threadtandem-sync-for-telegram' ), $bot );
 		}
 		if ( ( $member['status'] ?? '' ) !== 'administrator' || empty( $member['can_post_messages'] ) ) {
 			return new WP_Error( 'treda_rights', __( 'Add the bot as a channel administrator with permission to publish.', 'threadtandem-sync-for-telegram' ) );
@@ -121,7 +136,7 @@ final class Treda_API {
 				)
 			);
 			if ( is_wp_error( $group_member ) ) {
-				return $group_member;
+				return self::check_error( $group_member, __( 'Discussion group access', 'threadtandem-sync-for-telegram' ), $bot );
 			}
 			if ( ( $group_member['status'] ?? '' ) !== 'administrator' ) {
 				return new WP_Error( 'treda_group_rights', __( 'Add the bot as an administrator of the linked discussion group.', 'threadtandem-sync-for-telegram' ) );

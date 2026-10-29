@@ -124,6 +124,7 @@ WordPress.org language packs are installed automatically when an approved transl
 = 1.1.1 =
 * Accept public t.me channel links in settings and normalize them to the equivalent @username before validation and saving.
 * Keep existing connection verification when the same channel is entered as a link instead of an @username.
+* Identify whether a connection error concerns the token, channel or linked discussion group, and show the checked bot username when available.
 
 = 1.1.0 =
 * Rename the plugin to ThreadTandem — Post Publishing and Comment Sync for Telegram.

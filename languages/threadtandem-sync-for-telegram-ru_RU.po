@@ -14,6 +14,32 @@ msgstr ""
 "Language: ru_RU\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
+#. translators: 1: connection check step, 2: safe Telegram error message.
+#: includes/class-treda-api.php
+msgid "%1$s: %2$s"
+msgstr "%1$s: %2$s"
+
+#. translators: %s: Telegram bot username, without the @ prefix.
+#: includes/class-treda-api.php
+msgid "Bot: @%s."
+msgstr "Бот: @%s."
+
+#: includes/class-treda-api.php
+msgid "Bot token check"
+msgstr "Проверка токена бота"
+
+#: includes/class-treda-api.php
+msgid "Channel access"
+msgstr "Доступ к каналу"
+
+#: includes/class-treda-api.php
+msgid "Channel permissions"
+msgstr "Права в канале"
+
+#: includes/class-treda-api.php
+msgid "Discussion group access"
+msgstr "Доступ к группе обсуждений"
+
 #. Plugin Name of the plugin
 #: threadtandem-sync-for-telegram.php
 msgid "ThreadTandem — Post Publishing and Comment Sync for Telegram"

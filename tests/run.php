@@ -169,6 +169,27 @@ $channel_request = json_decode($GLOBALS['requests'][1][1]['body'], true);
 expect($channel_request['chat_id'] === '@ichi_dev', 'Bot API receives the normalized username instead of the submitted URL');
 reset_fixture();
 
+$connection_steps = array('Bot token check' => 0, 'Channel access' => 1, 'Channel permissions' => 2, 'Discussion group access' => 3);
+foreach ($connection_steps as $step => $successes) {
+    reset_fixture();
+    $GLOBALS['options']['treda_settings']['comments_enabled'] = 1;
+    $responses = array(response(array('id' => 1234, 'username' => 'treda_test_bot')),
+        response(array('id' => -1001234567890, 'type' => 'channel', 'linked_chat_id' => -1009876543210)),
+        response(array('status' => 'administrator', 'can_post_messages' => true)));
+    $GLOBALS['responses'] = array_slice($responses, 0, $successes);
+    $GLOBALS['responses'][] = array('code' => 403, 'body' => json_encode(array('ok' => false, 'error_code' => 403, 'description' => 'Forbidden private response ' . Treda_Settings::token())));
+    $error = Treda_API::check();
+    expect(is_wp_error($error) && strpos($error->get_error_message(), $step . ':') === 0, 'Connection error identifies the failed step: ' . $step);
+    expect($error->get_error_code() === 'treda_api' && state($error) === 'failed' && !Treda_Settings::connection(), 'Context preserves failure semantics and never verifies a failed connection: ' . $step);
+    expect(strpos($error->get_error_message(), Treda_Settings::token()) === false && (!$successes || strpos($error->get_error_message(), '@treda_test_bot') !== false), 'Context shows bot identity without leaking credentials: ' . $step);
+}
+reset_fixture();
+$GLOBALS['responses'][] = response(array('id' => 1234, 'username' => 'treda_test_bot'));
+$GLOBALS['responses'][] = array('code' => 429, 'body' => json_encode(array('ok' => false, 'error_code' => 429, 'parameters' => array('retry_after' => 90))));
+$error = Treda_API::check();
+expect($error->get_error_code() === 'treda_rate_limit' && state($error) === 'pending' && $error->get_error_data()['delay'] === 90, 'Connection context retains retry delays for the queue worker');
+reset_fixture();
+
 $post = $GLOBALS['posts'][1];
 expect(Treda_Publisher::eligible($post), 'Public post eligible');
 foreach (array('draft', 'private', 'future', 'trash') as $status) {
