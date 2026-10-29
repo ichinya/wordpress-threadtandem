@@ -99,7 +99,7 @@ class SVN:
             command += ["--username", self.username, "--password-from-stdin"]
         env = {k: v for k, v in os.environ.items() if k != "WPORG_SVN_PASSWORD"}
         result = subprocess.run(command, input=self.password + "\n" if self.password else None,
-                                capture_output=True, text=True, encoding="utf-8", env=env)
+                                capture_output=True, text=True, encoding="utf-8", errors="replace", env=env)
         if result.returncode:
             error = result.stderr
             if self.password:

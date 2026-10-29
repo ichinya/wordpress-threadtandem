@@ -16,7 +16,7 @@ SVNADMIN = os.environ.get("SVNADMIN_BINARY", "svnadmin")
 
 
 def run(*args):
-    return subprocess.run(list(map(str, args)), capture_output=True, text=True, encoding="utf-8", check=True).stdout.strip()
+    return subprocess.run(list(map(str, args)), capture_output=True, text=True, encoding="utf-8", errors="replace", check=True).stdout.strip()
 
 
 def package(root, version, text="fixture"):
