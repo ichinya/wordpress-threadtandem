@@ -974,3 +974,7 @@ msgstr ""
 #: threadtandem-sync-for-telegram.php:69
 msgid "ThreadTandem could not create its database tables. Check the database permissions."
 msgstr ""
+
+#: includes/class-treda-publisher.php
+msgid "Telegram connection settings changed after this job was queued. Nothing was sent. Check the current bot and channel, then queue this post again from the Synchronization page."
+msgstr ""

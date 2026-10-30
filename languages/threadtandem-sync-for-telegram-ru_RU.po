@@ -950,3 +950,6 @@ msgstr "Перед активацией ThreadTandem на этом сайте о
 #: threadtandem-sync-for-telegram.php:69
 msgid "ThreadTandem could not create its database tables. Check the database permissions."
 msgstr "ThreadTandem не удалось создать таблицы базы данных. Проверьте права доступа к базе."
+#: includes/class-treda-publisher.php
+msgid "Telegram connection settings changed after this job was queued. Nothing was sent. Check the current bot and channel, then queue this post again from the Synchronization page."
+msgstr "Настройки подключения Telegram изменились после добавления задания в очередь. Ничего не отправлено. Проверьте текущего бота и канал, затем повторно отправьте запись со страницы синхронизации."

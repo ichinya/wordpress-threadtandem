@@ -268,7 +268,28 @@ reset_fixture();
 $stale = payload();
 $GLOBALS['options']['treda_settings']['token'] = '1234:' . str_repeat('b', 30);
 expect(!Treda_Settings::ready(), 'Changed credentials invalidate verification');
-expect(Treda_Publisher::publish($stale) === true && !$GLOBALS['requests'], 'Obsolete queued connection not used');
+$result = Treda_Publisher::publish($stale);
+expect(state($result) === 'failed' && $result->get_error_code() === 'treda_connection_changed' && !$GLOBALS['requests'], 'Changed credentials fail visibly without using the obsolete queued connection');
+expect(strpos($result->get_error_message(), Treda_Settings::token()) === false, 'Connection-change diagnostic never includes credentials');
+$GLOBALS['wpdb'] = new class extends EventStorageDouble {
+    public $prepared_args = array();
+    public function prepare($sql, ...$args) { $this->prepared_args = $args; return $sql; }
+};
+$finish = new ReflectionMethod(Treda_Queue::class, 'finish');
+$finish->setAccessible(true);
+$finish->invoke(null, (object) array('kind' => 'post', 'revision' => 1, 'attempts' => 1, 'id' => 1), 'test-lock', $result);
+expect($GLOBALS['wpdb']->prepared_args[2] === 'failed' && $GLOBALS['wpdb']->prepared_args[3] === 'failed' && $GLOBALS['wpdb']->prepared_args[4] === $result->get_error_message(), 'Queue persists changed connection as a failed job with its diagnostic instead of Done');
+foreach (array('chat_id' => '@another_channel', 'api_url' => 'https://bot-api.example', 'comments_enabled' => 1) as $key => $value) {
+    reset_fixture();
+    $stale = payload();
+    $GLOBALS['options']['treda_settings'][$key] = $value;
+    $result = Treda_Publisher::publish($stale);
+    expect(state($result) === 'failed' && $result->get_error_code() === 'treda_connection_changed' && !$GLOBALS['requests'] && get_post_meta(1, '_treda_publication', true) === '', 'Changed ' . $key . ' cannot report successful delivery or retarget queued posts');
+}
+reset_fixture();
+$result = Treda_Publisher::publish(array('post_id' => 1));
+expect(state($result) === 'failed' && !$GLOBALS['requests'], 'Missing queued connection is reported instead of successful delivery');
+expect(Treda_Publisher::publish(payload()) === true && count($GLOBALS['requests']) === 1 && get_post_meta(1, '_treda_publication', true)['message_id'] === 42, 'Explicitly queued current connection can still publish and save the mapping');
 reset_fixture();
 Treda_Publisher::publish(payload());
 $binding = get_post_meta(1, '_treda_publication', true);

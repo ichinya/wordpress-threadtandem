@@ -55,7 +55,7 @@ final class Treda_Publisher {
 
 	private static function deliver( $payload ) {
 		if ( empty( $payload['connection'] ) || ! hash_equals( Treda_Settings::fingerprint(), $payload['connection'] ) ) {
-			return true; // Settings changed after this job was queued.
+			return new WP_Error( 'treda_connection_changed', __( 'Telegram connection settings changed after this job was queued. Nothing was sent. Check the current bot and channel, then queue this post again from the Synchronization page.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'failed' ) );
 		}
 		$post = get_post( (int) ( $payload['post_id'] ?? 0 ) );
 		if ( empty( Treda_Settings::get()['enabled'] ) || ! self::eligible( $post ) ) {
