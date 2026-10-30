@@ -2,13 +2,14 @@
 /**
  * Plugin Name: ThreadTandem — Post Publishing and Comment Sync for Telegram
  * Description: Publish posts to Telegram and synchronize text comments with a linked discussion group.
- * Version: 1.1.1
+ * Version: 1.2.0
  * Author: Ichi-nya
  * Requires at least: 6.2
  * Requires PHP: 7.4
  * License: GPL-2.0-or-later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: threadtandem-sync-for-telegram
+ * Domain Path: /languages
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -42,19 +43,24 @@ if ( defined( 'TREDA_VERSION' ) ) {
 }
 
 // Keep storage identifiers and the existing webhook route compatible with earlier releases.
-define( 'TREDA_VERSION', '1.1.1' );
+define( 'TREDA_VERSION', '1.2.0' );
 define( 'TREDA_SCHEMA_VERSION', '3' );
 define( 'TREDA_DIR', plugin_dir_path( __FILE__ ) );
 define( 'TREDA_FILE', __FILE__ );
 
-foreach ( array( 'settings', 'api', 'queue', 'publisher', 'editor', 'messages', 'comments', 'webhook', 'privacy', 'admin' ) as $treda_component ) {
+foreach ( array( 'settings', 'api', 'queue', 'media', 'publisher', 'editor', 'messages', 'comments', 'sync', 'bulk', 'webhook', 'privacy', 'admin' ) as $treda_component ) {
 	require_once TREDA_DIR . 'includes/class-treda-' . $treda_component . '.php';
 }
 unset( $treda_component );
 
+add_action( 'change_locale', array( 'Treda_Settings', 'load_translations' ) );
 add_action(
 	'init',
 	function () {
+		// Bundled translations also support standalone installs and WordPress 6.2, without a downloaded language pack.
+		// phpcs:ignore PluginCheck.CodeAnalysis.DiscouragedFunctions.load_plugin_textdomainFound -- The bundled fallback is intentional.
+		load_plugin_textdomain( 'threadtandem-sync-for-telegram', false, dirname( plugin_basename( TREDA_FILE ) ) . '/languages' );
+		Treda_Settings::load_translations();
 		if ( get_option( 'treda_schema_version' ) !== TREDA_SCHEMA_VERSION ) {
 			Treda_Queue::install();
 		}
@@ -75,6 +81,8 @@ add_action(
 		Treda_Privacy::hooks();
 		if ( is_admin() ) {
 			Treda_Admin::hooks();
+			Treda_Sync::hooks();
+			Treda_Bulk::hooks();
 		}
 	}
 );

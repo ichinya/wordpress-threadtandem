@@ -44,6 +44,12 @@ class EventStorageDouble {
     public $writes = 0;
     public function prepare($sql, ...$args) { return $sql; }
     public function query($sql) { $this->writes++; return $this->result; }
+    public function get_var($sql) { return '1'; }
+}
+// These cases exercise text publishing; real HTML/photo handling is covered in posters.php.
+class WP_HTML_Tag_Processor {
+    public function __construct($html) {}
+    public function next_tag($tag) { return false; }
 }
 
 function is_wp_error($value) { return $value instanceof WP_Error; }
@@ -66,6 +72,12 @@ function esc_html($text) { return htmlspecialchars($text, ENT_QUOTES, 'UTF-8'); 
 function add_settings_error($setting, $code, $message) { $GLOBALS['setting_errors'][] = $code; }
 function wp_json_encode($value) { return json_encode($value, JSON_UNESCAPED_UNICODE); }
 function wp_strip_all_tags($text) { return strip_tags($text); }
+function sanitize_text_field($text) { return trim(strip_tags($text)); }
+function switch_to_locale($locale) { return false; }
+function restore_previous_locale() { return false; }
+function get_current_user_id() { return 1; }
+function get_post_thumbnail_id($id) { return 0; }
+function delete_post_meta($id, $key) { unset($GLOBALS['meta'][$id][$key]); return true; }
 function strip_shortcodes($text) { return preg_replace('/\[[^\]]*\]/', '', $text); }
 function wp_html_excerpt($text, $length, $more) {
     preg_match_all('/./us', strip_tags($text), $characters);
@@ -102,7 +114,7 @@ function wp_safe_remote_post($url, $args) {
     );
     return response($results[$method]);
 }
-foreach (array('settings', 'api', 'queue', 'publisher', 'messages', 'comments', 'webhook') as $component) {
+foreach (array('settings', 'api', 'queue', 'media', 'publisher', 'messages', 'comments', 'sync', 'webhook') as $component) {
     require dirname(__DIR__) . '/includes/class-treda-' . $component . '.php';
 }
 

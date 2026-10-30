@@ -2,6 +2,22 @@
 defined( 'ABSPATH' ) || exit;
 
 final class Treda_Settings {
+	/** Fill new bundled strings even while an older WordPress.org language pack is installed. */
+	public static function load_translations( $locale = null ) {
+		$locale = $locale ?: determine_locale();
+		if ( ! in_array( $locale, array( 'ru_RU', 'en_US' ), true ) ) {
+			return;
+		}
+		$domain = 'threadtandem-sync-for-telegram';
+		$filename = $domain . '-' . $locale . '.mo';
+		$official = WP_LANG_DIR . '/plugins/' . $filename;
+		if ( is_readable( $official ) ) {
+			load_textdomain( $domain, $official, $locale );
+		}
+		// WordPress keeps earlier translations and fills missing entries from this catalog.
+		load_textdomain( $domain, TREDA_DIR . 'languages/' . $filename, $locale );
+	}
+
 	public static function get() {
 		return wp_parse_args(
 			get_option( 'treda_settings', array() ),
@@ -10,12 +26,30 @@ final class Treda_Settings {
 				'api_url'             => 'https://api.telegram.org',
 				'chat_id'             => '',
 				'webhook_url'         => '',
+				'article_link_text'   => '',
 				'enabled'             => 0,
+				'import_enabled'      => 0,
 				'comments_enabled'    => 0,
 				'telegram_moderation' => 1,
 				'retain_data'         => 1,
 			)
 		);
+	}
+
+	/** Public Telegram text follows the site language, independently of the administrator. */
+	public static function default_article_link_text() {
+		$switched = switch_to_locale( get_option( 'WPLANG' ) ?: 'en_US' );
+		try {
+			return __( 'Read the article', 'threadtandem-sync-for-telegram' );
+		} finally {
+			if ( $switched ) { restore_previous_locale(); }
+		}
+	}
+
+	public static function article_link_text() {
+		$value = self::get()['article_link_text'];
+		$text  = is_string( $value ) ? trim( sanitize_text_field( $value ) ) : '';
+		return $text === '' ? self::default_article_link_text() : wp_html_excerpt( $text, 100, '' );
 	}
 
 	public static function token() {
@@ -66,9 +100,13 @@ final class Treda_Settings {
 		}
 		$new                        = $old;
 		$new['enabled']             = empty( $input['enabled'] ) ? 0 : 1;
+		$new['import_enabled']      = empty( $input['import_enabled'] ) ? 0 : 1;
 		$new['comments_enabled']    = empty( $input['comments_enabled'] ) ? 0 : 1;
 		$new['telegram_moderation'] = empty( $input['telegram_moderation'] ) ? 0 : 1;
 		$new['retain_data']         = empty( $input['retain_data'] ) ? 0 : 1;
+		if ( array_key_exists( 'article_link_text', $input ) && is_string( $input['article_link_text'] ) ) {
+			$new['article_link_text'] = wp_html_excerpt( trim( sanitize_text_field( $input['article_link_text'] ) ), 100, '' );
+		}
 		if ( ! defined( 'TREDA_BOT_TOKEN' ) ) {
 			$token = isset( $input['token'] ) && is_string( $input['token'] ) ? trim( $input['token'] ) : '';
 			if ( ! empty( $input['clear_token'] ) ) {

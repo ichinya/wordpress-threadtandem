@@ -58,6 +58,6 @@ final class Treda_Editor {
 			'publicationUrl'    => $post ? Treda_Publisher::link( get_post_meta( $post->ID, '_treda_publication', true ) ) : '',
 		);
 		wp_add_inline_script( 'treda-editor', 'window.tredaEditor = ' . wp_json_encode( $config ) . ';', 'before' );
-		wp_set_script_translations( 'treda-editor', 'threadtandem-sync-for-telegram' );
+		wp_set_script_translations( 'treda-editor', 'threadtandem-sync-for-telegram', TREDA_DIR . 'languages' );
 	}
 }

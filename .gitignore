@@ -18,5 +18,9 @@ wp-config.php
 *.log
 /languages/*.mo
 /languages/*.json
+!/languages/threadtandem-sync-for-telegram-ru_RU.mo
+!/languages/threadtandem-sync-for-telegram-ru_RU-*.json
+!/languages/threadtandem-sync-for-telegram-en_US.mo
+!/languages/threadtandem-sync-for-telegram-en_US-*.json
 .DS_Store
 Thumbs.db

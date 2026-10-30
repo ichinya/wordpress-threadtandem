@@ -1,0 +1,61 @@
+<?php
+/** Offline JPEG/PNG selection, multipart and existing-message update coverage. */
+require __DIR__ . '/article-link-text.php';
+add_filter( 'pre_http_request', 'treda_test_http', 10, 3 );
+$settings = Treda_Settings::get(); $settings['article_link_text'] = ''; update_option( 'treda_settings', $settings );
+$fixtures = array();
+foreach ( array( 'wp-includes/images/w-logo-blue-white-bg.png', 'wp-admin/images/wordpress-logo.png' ) as $index => $source ) {
+	$bytes = file_get_contents( ABSPATH . $source );
+	$upload = wp_upload_bits( 'qa-poster-' . $index . '.png', null, $bytes );
+	treda_test_expect( ! $upload['error'], 'Disposable poster fixture ' . $index . ' is available in uploads' );
+	$attachment = wp_insert_attachment( array( 'post_title' => 'QA poster ' . $index, 'post_mime_type' => 'image/png', 'guid' => $upload['url'], 'post_status' => 'inherit' ), $upload['file'] );
+	$fixtures[] = array( 'id' => $attachment, 'bytes' => $bytes, 'url' => $upload['url'] );
+}
+$post = wp_insert_post( array( 'post_title' => 'Poster & caption QA', 'post_excerpt' => 'A short announcement', 'post_content' => '<img class="wp-image-' . $fixtures[1]['id'] . '" src="' . esc_url( $fixtures[1]['url'] ) . '">', 'post_status' => 'publish', 'meta_input' => array( '_thumbnail_id' => $fixtures[0]['id'] ) ) );
+$media = Treda_Media::for_post( get_post( $post ) );
+treda_test_expect( is_array( $media ) && $media['hash'] === hash( 'sha256', $fixtures[0]['bytes'] ), 'Featured image takes priority over the first content image' );
+$before = count( treda_test_methods( 'sendPhoto' ) );
+treda_test_run();
+$sent = treda_test_methods( 'sendPhoto' ); $last = end( $sent );
+$binding = get_post_meta( $post, '_treda_publication', true );
+treda_test_expect( count( $sent ) === $before + 1 && $binding['media_type'] === 'photo', 'Queue sends a poster as sendPhoto and persists photo message identity' );
+treda_test_expect( $last['params']['photo'] === 'attach://photo' && $last['files']['photo']['data'] === $fixtures[0]['bytes'], 'Multipart upload contains exact local file bytes, without an inaccessible local URL' );
+treda_test_expect( strpos( $last['params']['caption'], 'Poster &amp; caption QA' ) !== false && strpos( $last['params']['caption'], '\\"' ) === false && strpos( $last['params']['caption'], '</a>' ) !== false, 'Caption preserves valid escaped HTML and the article link' );
+$calls = count( $treda_test_calls ); Treda_Queue::post( $post ); treda_test_run();
+treda_test_expect( count( $treda_test_calls ) === $calls, 'Repeated unchanged poster job does not send or edit again' );
+wp_update_post( array( 'ID' => $post, 'post_excerpt' => 'Changed caption' ) ); treda_test_run();
+$edits = treda_test_methods( 'editMessageCaption' ); $last = end( $edits );
+treda_test_expect( (int) $last['params']['message_id'] === (int) $binding['message_id'] && strpos( $last['params']['caption'], 'Changed caption' ) !== false && ! $last['files'], 'Text changes edit the existing photo caption without uploading the same image again' );
+update_post_meta( $post, '_thumbnail_id', $fixtures[1]['id'] ); Treda_Queue::post( $post ); treda_test_run();
+$edits = treda_test_methods( 'editMessageMedia' ); $last = end( $edits ); $input = json_decode( $last['params']['media'], true );
+treda_test_expect( (int) $last['params']['message_id'] === (int) $binding['message_id'] && $last['files']['photo']['data'] === $fixtures[1]['bytes'] && $input['type'] === 'photo', 'Replacing a poster edits media in the same channel message' );
+$legacy = wp_insert_post( array( 'post_title' => 'Existing text-only announcement QA', 'post_status' => 'publish' ) ); treda_test_run();
+$text_binding = get_post_meta( $legacy, '_treda_publication', true );
+update_post_meta( $legacy, '_thumbnail_id', $fixtures[0]['id'] ); Treda_Queue::post( $legacy ); treda_test_run();
+$edits = treda_test_methods( 'editMessageMedia' ); $last = end( $edits );
+treda_test_expect( (int) $last['params']['message_id'] === (int) $text_binding['message_id'] && count( treda_test_methods( 'sendPhoto' ) ) === $before + 1, 'Adding a poster upgrades an existing text message without duplicating its discussion' );
+$fallback = wp_insert_post( array( 'post_title' => 'First content image QA', 'post_status' => 'draft', 'post_content' => '<img class="wp-image-' . $fixtures[1]['id'] . '" src="' . esc_url( $fixtures[1]['url'] ) . '"><img src="' . esc_url( $fixtures[0]['url'] ) . '">' ) );
+treda_test_expect( Treda_Media::for_post( get_post( $fallback ) )['hash'] === hash( 'sha256', $fixtures[1]['bytes'] ), 'Without a featured image, the first WordPress content image is selected' );
+wp_update_post( array( 'ID' => $fallback, 'post_content' => '<img src="' . esc_url( $fixtures[0]['url'] ) . '">' ) );
+treda_test_expect( Treda_Media::for_post( get_post( $fallback ) )['hash'] === hash( 'sha256', $fixtures[0]['bytes'] ), 'A local uploads URL is resolved to its file even without an attachment class' );
+wp_update_post( array( 'ID' => $fallback, 'post_content' => '<img src="http://127.0.0.1/private.png">' ) );
+treda_test_expect( is_wp_error( Treda_Media::for_post( get_post( $fallback ) ) ), 'Private network image URLs cannot be passed to Telegram' );
+$outside = wp_insert_attachment( array( 'post_title' => 'Outside uploads QA', 'post_mime_type' => 'image/png' ), ABSPATH . 'wp-admin/images/wordpress-logo.png' );
+update_post_meta( $fallback, '_thumbnail_id', $outside );
+treda_test_expect( is_wp_error( Treda_Media::for_post( get_post( $fallback ) ) ), 'A forged attachment path cannot read image files outside uploads' );
+$long = clone get_post( $post ); $long->post_title = str_repeat( '🚀', 250 ); $long->post_excerpt = str_repeat( '🙂 & <unsafe> ', 300 );
+$settings['article_link_text'] = str_repeat( '📖', 100 ); update_option( 'treda_settings', $settings );
+$caption = Treda_Media::caption( $long ); $visible = html_entity_decode( wp_strip_all_tags( $caption ), ENT_QUOTES, 'UTF-8' );
+preg_match_all( '/./us', $visible, $characters ); $units = 0;
+foreach ( $characters[0] as $character ) { $units += strlen( $character ) === 4 ? 2 : 1; }
+treda_test_expect( $units <= 1024 && strpos( $caption, '</a>' ) !== false, 'Emoji-heavy caption stays within 1024 UTF-16 units without breaking HTML or removing the link' );
+$settings['article_link_text'] = ''; update_option( 'treda_settings', $settings );
+delete_post_meta( $post, '_thumbnail_id' ); wp_update_post( array( 'ID' => $post, 'post_content' => '', 'post_excerpt' => 'Image removed from website' ) ); treda_test_run();
+$edits = treda_test_methods( 'editMessageCaption' ); $last = end( $edits );
+treda_test_expect( (int) $last['params']['message_id'] === (int) $binding['message_id'], 'Removing a website poster retains the Telegram message and discussion while updating its caption' );
+$uncertain = wp_insert_post( array( 'post_title' => 'Uncertain photo QA', 'post_status' => 'publish', 'meta_input' => array( '_thumbnail_id' => $fixtures[0]['id'] ) ) );
+$treda_test_next_error = new WP_Error( 'test_timeout', 'Timeout fixture' ); treda_test_run();
+treda_test_expect( treda_test_job( 'post:' . $uncertain )->status === 'uncertain', 'A photo upload timeout is not automatically resent and duplicated' );
+remove_filter( 'pre_http_request', 'treda_test_http', 10 );
+echo wp_json_encode( array( 'wordpress' => get_bloginfo( 'version' ), 'php' => PHP_VERSION, 'checks' => $treda_test_checks ), JSON_PRETTY_PRINT ) . PHP_EOL;
+WP_CLI::success( count( $treda_test_checks ) . ' checks passed, including posters and multipart uploads.' );

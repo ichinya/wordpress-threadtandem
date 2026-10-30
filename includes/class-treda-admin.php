@@ -7,7 +7,7 @@ final class Treda_Admin {
 		add_action(
 			'admin_menu',
 			function () {
-				add_options_page( 'ThreadTandem', 'ThreadTandem', 'manage_options', 'treda', array( __CLASS__, 'render' ) );
+				add_options_page( 'ThreadTandem', 'ThreadTandem', 'manage_options', 'threadtandem', array( __CLASS__, 'render' ) );
 			}
 		);
 		add_action(
@@ -29,13 +29,53 @@ final class Treda_Admin {
 		);
 		add_action( 'admin_post_treda_action', array( __CLASS__, 'action' ) );
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'assets' ) );
+		// Run before WordPress rejects an unregistered legacy page in includes/menu.php.
+		add_action( 'admin_menu', array( __CLASS__, 'redirect_legacy_page' ), 99 );
+	}
+
+	public static function redirect_legacy_page() {
+		global $pagenow;
+		if ( $pagenow !== 'options-general.php' || ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+		// Query parameters select an existing admin page; no settings or queue jobs are changed.
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
+		$page = isset( $_GET['page'] ) && is_string( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : '';
+		$legacy = array( 'treda' => 'threadtandem', 'treda-sync' => 'threadtandem-sync' );
+		if ( ! isset( $legacy[ $page ] ) ) {
+			return;
+		}
+		$args = array( 'page' => $legacy[ $page ] );
+		foreach ( array( 'view', 's', 'paged', 'bulk' ) as $key ) {
+			if ( isset( $_GET[ $key ] ) && is_string( $_GET[ $key ] ) ) {
+				$args[ $key ] = sanitize_text_field( wp_unslash( $_GET[ $key ] ) );
+			}
+		}
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+		wp_safe_redirect( add_query_arg( $args, admin_url( 'options-general.php' ) ) );
+		exit;
+	}
+
+	public static function navigation( $active ) {
+		$tabs = array(
+			'settings' => array( 'page' => 'threadtandem', 'label' => __( 'Settings and queue', 'threadtandem-sync-for-telegram' ) ),
+			'sync' => array( 'page' => 'threadtandem-sync', 'label' => __( 'Post synchronization', 'threadtandem-sync-for-telegram' ) ),
+		);
+		echo '<nav class="treda-page-tabs" aria-label="ThreadTandem">';
+		foreach ( $tabs as $key => $tab ) {
+			echo '<a href="' . esc_url( add_query_arg( 'page', $tab['page'], admin_url( 'options-general.php' ) ) ) . '"' . ( $key === $active ? ' aria-current="page"' : '' ) . '>' . esc_html( $tab['label'] ) . '</a>';
+		}
+		echo '</nav>';
 	}
 
 	public static function assets( $hook ) {
-		if ( $hook !== 'settings_page_treda' ) {
+		if ( ! in_array( $hook, array( 'settings_page_threadtandem', 'settings_page_threadtandem-sync' ), true ) ) {
 			return;
 		}
-		wp_enqueue_style( 'treda-admin', plugins_url( 'assets/admin.css', TREDA_FILE ), array(), TREDA_VERSION );
+		wp_enqueue_style( 'treda-admin', plugins_url( 'assets/admin.css', TREDA_FILE ), array(), (string) filemtime( TREDA_DIR . 'assets/admin.css' ) );
+		if ( $hook !== 'settings_page_threadtandem' ) {
+			return;
+		}
 		wp_enqueue_script( 'treda-admin', plugins_url( 'assets/admin.js', TREDA_FILE ), array(), TREDA_VERSION, true );
 		wp_localize_script(
 			'treda-admin',
@@ -67,6 +107,9 @@ final class Treda_Admin {
 		} elseif ( $operation === 'disconnect' ) {
 			$result  = Treda_API::disconnect_webhook();
 			$message = __( 'The ThreadTandem webhook is disconnected.', 'threadtandem-sync-for-telegram' );
+		} elseif ( $operation === 'recover' ) {
+			$result = Treda_API::recover_updates();
+			$message = __( 'Pending Telegram events were received and the webhook was restored. Process the queue to import them.', 'threadtandem-sync-for-telegram' );
 		} elseif ( $operation === 'run' ) {
 			Treda_Queue::run();
 			$message = __( 'A queue batch was processed. See the results below.', 'threadtandem-sync-for-telegram' );
@@ -86,7 +129,7 @@ final class Treda_Admin {
 			),
 			60
 		);
-		wp_safe_redirect( admin_url( 'options-general.php?page=treda' ) );
+		wp_safe_redirect( admin_url( 'options-general.php?page=threadtandem' ) );
 		exit;
 	}
 

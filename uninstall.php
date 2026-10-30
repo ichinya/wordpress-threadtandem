@@ -14,13 +14,13 @@ function treda_uninstall_site() {
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- Explicitly opted-in removal of plugin-owned tables on uninstall.
 		$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $wpdb->prefix . $suffix ) );
 	}
-	foreach ( array( '_treda_disabled', '_treda_publication', '_treda_message_key', '_treda_discussion' ) as $key ) {
+	foreach ( array( '_treda_disabled', '_treda_publication', '_treda_message_key', '_treda_discussion', '_treda_sync_pending', '_treda_sync_ignored', '_treda_import_hash', '_treda_import_detached' ) as $key ) {
 		delete_post_meta_by_key( $key );
 	}
 	foreach ( array( '_treda_origin', '_treda_sender_id', '_treda_sender_type', '_treda_message_id', '_treda_chat_id' ) as $key ) {
 		delete_metadata( 'comment', 0, $key, '', true );
 	}
-	foreach ( array( 'treda_settings', 'treda_connection', 'treda_schema_version', 'treda_webhook_secret' ) as $key ) {
+	foreach ( array( 'treda_settings', 'treda_connection', 'treda_schema_version', 'treda_webhook_secret', 'treda_import_author' ) as $key ) {
 		delete_option( $key );
 	}
 	// Core posts and comments, including imported text, remain site content.

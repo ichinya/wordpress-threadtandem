@@ -2,9 +2,9 @@
 Contributors: ichi-nya
 Tags: telegram, comments, discussion, crossposting
 Requires at least: 6.2
-Tested up to: 7.1
+Tested up to: 7.1.4
 Requires PHP: 7.4
-Stable tag: 1.1.1
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -19,6 +19,11 @@ ThreadTandem is independently developed and is not affiliated with or endorsed b
 Features:
 
 * Publish text announcements for public posts and update the same message when the exported title, excerpt or link changes.
+* Customize the article link text in settings. Russian sites default to "Читать статью" even without an installed plugin language pack.
+* Import new channel text posts and media captions as WordPress drafts through the background queue.
+* Recover up to 100 pending events after a delivery outage, acknowledging only events durably accepted by the queue and restoring the webhook afterwards.
+* Review unmatched publications under Settings > ThreadTandem synchronization: ignore, link to an existing article, or queue a website article for delivery.
+* Preserve WordPress as the source for linked articles; Telegram edits update untouched imported drafts only. Matching keeps the original source draft available.
 * Disable Telegram publishing for an individual post. Drafts, private posts and password-protected posts are excluded.
 * Control publishing in the block editor sidebar on WordPress 7.1, with a classic-editor fallback.
 * Copy text replies from linked Telegram discussions into native WordPress comments.
@@ -30,9 +35,9 @@ Features:
 * Process deliveries in a database queue with duplicate detection, worker leases, rate-limit delays and visible diagnostics.
 * Keep uncertain outgoing results for manual investigation instead of silently sending duplicate messages.
 * Configure a separate HTTPS Bot API server and an optional external webhook URL.
-* Translation-ready interface using WordPress.org language packs.
+* English interface and bundled Russian translations, including block-editor controls. Also supports WordPress.org language packs.
 
-This release supports text posts and comments. Telegram Login, forum topics, attachments, automatic historical import and moderation commands in Telegram are not included.
+This release supports text posts and comments. Media captions can be imported as text, without downloading attachments. Telegram Login, forum topics, attachments, automatic historical import and moderation commands in Telegram are not included.
 Long announcements and website comments are shortened to fit Telegram; their complete original text remains on the website.
 
 = External service: Telegram =
@@ -41,7 +46,7 @@ ThreadTandem uses the Telegram Bot API, normally at https://api.telegram.org. Yo
 
 ThreadTandem contacts Telegram when you check the connection, manage the webhook, or process enabled synchronization jobs. It sends the bot token, chat and message identifiers, published post titles, excerpts and links. When comment synchronization is enabled, approved website comment text and the comment author display name are also sent. Comment email addresses and IP addresses are not sent.
 
-Telegram delivers discussion messages to your webhook. Eligible text replies are stored in WordPress with their display names, numeric sender identities, chat/message identifiers and reply relationships. Inform participants before enabling import, including participants of private groups. The comment form informs website visitors that approved comments and their names will also appear in Telegram.
+Telegram delivers channel publications and discussion messages to your webhook. When channel import is enabled, new text publications and media captions are stored as drafts with their channel/message identifiers and dates. Eligible text replies are stored in WordPress with their display names, numeric sender identities, chat/message identifiers and reply relationships. Inform participants before enabling import, including participants of private groups. The comment form informs website visitors that approved comments and their names will also appear in Telegram.
 
 Telegram service terms: https://telegram.org/tos
 Telegram privacy policy: https://telegram.org/privacy
@@ -118,8 +123,21 @@ Deactivation stops the scheduled worker and preserves data. Disconnect the webho
 
 Help translate ThreadTandem at https://translate.wordpress.org/projects/wp-plugins/threadtandem-sync-for-telegram/.
 WordPress.org language packs are installed automatically when an approved translation is available for your site language.
+English is the source language. Russian translations are included with the plugin and follow the WordPress site or user language, without requiring a separate download.
 
 == Changelog ==
+
+= 1.2.0 =
+* Include complete Russian and English PHP and block-editor translations, including fallback for older language packs.
+* Add editable article link text for Telegram announcements with a Russian default on Russian sites.
+* Apply custom link text when creating or updating the same announcement through the queue.
+* Add queued channel-to-WordPress imports as drafts, with safe text formatting and duplicate protection.
+* Add publication matching, ignore/restore controls and queued manual delivery on a synchronization page.
+* Keep linked website articles authoritative and preserve manually edited drafts.
+* Subscribe to channel publication and edit events while preserving existing comment delivery.
+* Include a featured image or the first post image in Telegram announcements, with direct uploads for local JPEG and PNG files.
+* Add archive sending through the queue, behind a collapsed panel and a separate confirmation screen.
+* Rename settings URLs to page=threadtandem and page=threadtandem-sync, with redirects from the previous URLs.
 
 = 1.1.1 =
 * Accept public t.me channel links in settings and normalize them to the equivalent @username before validation and saving.

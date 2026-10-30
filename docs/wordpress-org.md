@@ -31,6 +31,10 @@ The Russian interface uses a locally compiled development language pack. It does
 
 Project: https://translate.wordpress.org/projects/wp-plugins/threadtandem-sync-for-telegram/
 
-The Russian source file is `languages/threadtandem-sync-for-telegram-ru_RU.po`. Review it as a fluent speaker before submitting it to the Russian translation project. Translations must be approved by a locale translation editor before WordPress.org distributes a language pack. Do not bundle the development PO/MO files with the directory release.
+The plugin includes complete `ru_RU` and `en_US` catalogs: PO sources, compiled MO files and block-editor JSON files. English remains the source language. No separate download is required for either interface. WordPress selects the administrator's profile language; "Site Default" follows Settings → General → Site Language. WordPress.org language packs retain their normal lookup priority. Approval on WordPress.org is still required for the directory description and centrally distributed language packs.
+
+After changing source strings, run `wp i18n make-pot . languages/threadtandem-sync-for-telegram.pot --exclude=dist,tests,tools,docs,wordpress-org-assets,languages --slug=threadtandem-sync-for-telegram`. Update the Russian PO, then run `php tools/sync-translations.php /path/to/wordpress` to align both catalogs and remove stale strings. Regenerate the tracked runtime files with `wp i18n make-mo languages` and `wp i18n make-json languages --no-purge`. The build allowlist includes both language catalogs. Do not increment the version or prepare a release until the owner explicitly requests it.
+
+The default article-link label in Telegram follows the site's language, independently of the administrator's interface language. Leave the field empty for that default; a custom label stays exactly as saved.
 
 Official asset requirements: https://developer.wordpress.org/plugins/wordpress-org/plugin-assets/

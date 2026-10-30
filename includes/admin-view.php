@@ -15,6 +15,7 @@ $treda_local_webhook = ! Treda_Settings::valid_https_url( $treda_webhook_url )
 			<p><?php esc_html_e( 'Publishing and comments in Telegram.', 'threadtandem-sync-for-telegram' ); ?></p></div>
 		<a class="treda-header-link" href="#treda-diagnostics"><span class="dashicons dashicons-chart-bar" aria-hidden="true"></span><?php esc_html_e( 'Queue and diagnostics', 'threadtandem-sync-for-telegram' ); ?></a>
 	</header>
+	<?php Treda_Admin::navigation( 'settings' ); ?>
 	<?php // WordPress options-head.php already renders Settings API notices. ?>
 	<?php if ( $notice ) : ?>
 		<div class="notice <?php echo $notice['error'] ? 'notice-error' : 'notice-success'; ?> inline"><p><?php echo esc_html( $notice['text'] ); ?></p></div>
@@ -60,6 +61,16 @@ $treda_local_webhook = ! Treda_Settings::valid_https_url( $treda_webhook_url )
 				<div class="treda-option"><div><label id="treda-publish-label" for="treda-publish-enabled" class="treda-option-title"><?php esc_html_e( 'Post publishing', 'threadtandem-sync-for-telegram' ); ?></label>
 					<p id="treda-publish-help"><?php esc_html_e( 'Send public posts to your channel and update their announcements when you edit them.', 'threadtandem-sync-for-telegram' ); ?></p></div>
 					<label class="treda-switch"><input id="treda-publish-enabled" type="checkbox" role="switch" name="treda_settings[enabled]" value="1" <?php checked( $settings['enabled'], 1 ); ?> aria-labelledby="treda-publish-label" aria-describedby="treda-publish-help"><span aria-hidden="true"></span></label>
+				</div>
+				<p class="treda-help treda-poster-help"><?php esc_html_e( 'Announcements include the featured image, or the first image in the post when no featured image is set. Local JPEG and PNG files are uploaded directly to Telegram.', 'threadtandem-sync-for-telegram' ); ?></p>
+				<div class="treda-card-body"><div class="treda-field"><label for="treda-article-link-text"><?php esc_html_e( 'Article link text', 'threadtandem-sync-for-telegram' ); ?></label>
+					<input id="treda-article-link-text" type="text" name="treda_settings[article_link_text]" value="<?php echo esc_attr( $settings['article_link_text'] ); ?>" maxlength="100" placeholder="<?php echo esc_attr( Treda_Settings::default_article_link_text() ); ?>" aria-describedby="treda-article-link-help">
+					<p id="treda-article-link-help" class="treda-help"><?php esc_html_e( 'Text below the Telegram announcement that links to the article. Leave blank for the default in the site language. Maximum 100 characters.', 'threadtandem-sync-for-telegram' ); ?></p>
+					<p class="treda-help"><?php esc_html_e( 'Applies to new announcements and queued updates. To update an existing announcement, use Send on the Post synchronization page.', 'threadtandem-sync-for-telegram' ); ?></p>
+				</div></div>
+				<div class="treda-option"><div><label id="treda-import-label" for="treda-import-enabled" class="treda-option-title"><?php esc_html_e( 'Import channel posts as drafts', 'threadtandem-sync-for-telegram' ); ?></label>
+					<p id="treda-import-help"><?php esc_html_e( 'Receive new Telegram posts and edits. Review drafts and link existing articles on the Post synchronization page.', 'threadtandem-sync-for-telegram' ); ?></p></div>
+					<label class="treda-switch"><input id="treda-import-enabled" type="checkbox" role="switch" name="treda_settings[import_enabled]" value="1" <?php checked( $settings['import_enabled'], 1 ); ?> aria-labelledby="treda-import-label" aria-describedby="treda-import-help"><span aria-hidden="true"></span></label>
 				</div>
 				<div class="treda-option"><div><label id="treda-comments-label" for="treda-comments-enabled" class="treda-option-title"><?php esc_html_e( 'Comment synchronization', 'threadtandem-sync-for-telegram' ); ?></label>
 					<p id="treda-comments-help"><?php esc_html_e( 'Keep text replies in one conversation, whether they are written on the website or in Telegram.', 'threadtandem-sync-for-telegram' ); ?></p></div>
@@ -108,6 +119,8 @@ $treda_local_webhook = ! Treda_Settings::valid_https_url( $treda_webhook_url )
 					?>
 					<p class="treda-callout treda-callout-warning"><?php esc_html_e( 'A public HTTPS address is needed to receive events. Set it in Advanced settings when testing locally.', 'threadtandem-sync-for-telegram' ); ?></p><?php endif; ?>
 				<div class="treda-action-row"><?php self::action_form( 'webhook', __( 'Connect events', 'threadtandem-sync-for-telegram' ), 'secondary', ! $connection || $treda_local_webhook ); ?><?php self::action_form( 'disconnect', __( 'Disconnect', 'threadtandem-sync-for-telegram' ), 'link-delete', ! $connection ); ?></div>
+				<?php self::action_form( 'recover', __( 'Receive pending events', 'threadtandem-sync-for-telegram' ), 'secondary', ! $connection || $treda_local_webhook ); ?>
+				<p class="treda-help"><?php esc_html_e( 'Use after a delivery outage. Receives up to 100 pending events, then restores the webhook. Telegram retains events for up to 24 hours.', 'threadtandem-sync-for-telegram' ); ?></p>
 				<details class="treda-endpoint"><summary><?php esc_html_e( 'Webhook endpoint:', 'threadtandem-sync-for-telegram' ); ?></summary><div class="treda-input-group"><input id="treda-endpoint" type="text" readonly value="<?php echo esc_attr( $treda_webhook_url ); ?>" aria-label="<?php esc_attr_e( 'Webhook endpoint:', 'threadtandem-sync-for-telegram' ); ?>"><button type="button" class="button" data-treda-copy="treda-endpoint"><?php esc_html_e( 'Copy', 'threadtandem-sync-for-telegram' ); ?></button></div><span class="treda-copy-status" role="status" aria-live="polite"></span></details>
 			</section>
 

@@ -3,19 +3,34 @@ defined( 'ABSPATH' ) || exit;
 
 final class Treda_API {
 	/** Errors deliberately contain no remote body, token or request URL. */
-	public static function call( $method, $params = array(), $creates_message = false ) {
+	public static function call( $method, $params = array(), $creates_message = false, $files = array() ) {
 		$settings = Treda_Settings::get();
 		$token    = Treda_Settings::token();
 		if ( $token === '' ) {
 			return new WP_Error( 'treda_token', __( 'Save the bot token first.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'failed' ) );
+		}
+		$content_type = 'application/json';
+		$body = wp_json_encode( (object) $params );
+		if ( $files ) {
+			$boundary = 'ThreadTandem' . wp_generate_password( 32, false, false );
+			$content_type = 'multipart/form-data; boundary=' . $boundary;
+			$body = '';
+			foreach ( $params as $name => $value ) {
+				$body .= '--' . $boundary . "\r\nContent-Disposition: form-data; name=\"" . sanitize_key( $name ) . "\"\r\n\r\n" . ( is_scalar( $value ) ? (string) $value : wp_json_encode( $value ) ) . "\r\n";
+			}
+			foreach ( $files as $name => $file ) {
+				$filename = str_replace( array( '"', "\r", "\n" ), '', sanitize_file_name( $file['name'] ) );
+				$body .= '--' . $boundary . "\r\nContent-Disposition: form-data; name=\"" . sanitize_key( $name ) . '"; filename="' . $filename . "\"\r\nContent-Type: " . $file['type'] . "\r\n\r\n" . $file['data'] . "\r\n";
+			}
+			$body .= '--' . $boundary . "--\r\n";
 		}
 		$response = wp_safe_remote_post(
 			$settings['api_url'] . '/bot' . $token . '/' . $method,
 			array(
 				'timeout'             => 15,
 				'redirection'         => 0,
-				'headers'             => array( 'Content-Type' => 'application/json' ),
-				'body'                => wp_json_encode( (object) $params ),
+				'headers'             => array( 'Content-Type' => $content_type ),
+				'body'                => $body,
 				'limit_response_size' => 262144,
 			)
 		);
@@ -33,7 +48,7 @@ final class Treda_API {
 		if ( $status === 200 && is_array( $body ) && ! empty( $body['ok'] ) && array_key_exists( 'result', $body ) ) {
 			return $body['result'];
 		}
-		if ( $method === 'editMessageText' && is_array( $body ) && isset( $body['description'] )
+		if ( in_array( $method, array( 'editMessageText', 'editMessageMedia', 'editMessageCaption' ), true ) && is_array( $body ) && isset( $body['description'] )
 			&& strpos( $body['description'], 'message is not modified' ) !== false && $status === 400 ) {
 			return true;
 		}
@@ -161,12 +176,16 @@ final class Treda_API {
 		if ( ! empty( $info['url'] ) && $info['url'] !== $url ) {
 			return new WP_Error( 'treda_conflict', __( 'This bot already uses a different webhook. Use a dedicated bot or disconnect the previous integration first.', 'threadtandem-sync-for-telegram' ) );
 		}
+		if ( get_current_user_id() ) {
+			update_option( 'treda_import_author', get_current_user_id(), false );
+		}
 		return self::call(
 			'setWebhook',
 			array(
 				'url'                  => $url,
 				'secret_token'         => Treda_Settings::secret(),
-				'allowed_updates'      => array( 'message', 'edited_message' ),
+				'allowed_updates'      => array( 'message', 'edited_message', 'channel_post', 'edited_channel_post' ),
+				'max_connections'      => 1,
 				'drop_pending_updates' => false,
 			)
 		);
@@ -184,5 +203,42 @@ final class Treda_API {
 			return new WP_Error( 'treda_conflict', __( 'The bot uses a different webhook. ThreadTandem will not change it.', 'threadtandem-sync-for-telegram' ) );
 		}
 		return self::call( 'deleteWebhook', array( 'drop_pending_updates' => false ) );
+	}
+
+	/** Recover one pending batch after a delivery outage; acknowledge only durable receipts. */
+	public static function recover_updates() {
+		if ( ! Treda_Settings::ready() ) {
+			return new WP_Error( 'treda_connection', __( 'Check the connection first.', 'threadtandem-sync-for-telegram' ) );
+		}
+		$disconnected = self::disconnect_webhook();
+		if ( is_wp_error( $disconnected ) ) { return $disconnected; }
+		$result = true;
+		try {
+			$updates = self::call( 'getUpdates', array( 'limit' => 100, 'timeout' => 0 ) );
+			if ( is_wp_error( $updates ) || ! is_array( $updates ) ) {
+				$result = is_wp_error( $updates ) ? $updates : new WP_Error( 'treda_update', __( 'Invalid Telegram update.', 'threadtandem-sync-for-telegram' ) );
+			} else {
+				$last = -1;
+				foreach ( $updates as $update ) {
+					$request = new WP_REST_Request( 'POST', '/treda/v1/webhook' );
+					$request->set_header( 'Content-Type', 'application/json' );
+					$request->set_body( wp_json_encode( $update ) );
+					$accepted = Treda_Webhook::receive( $request );
+					if ( is_wp_error( $accepted ) || $accepted->get_status() >= 300 ) {
+						$result = is_wp_error( $accepted ) ? $accepted : new WP_Error( 'treda_storage', __( 'Could not store the Telegram update.', 'threadtandem-sync-for-telegram' ) );
+						break;
+					}
+					$last = max( $last, $update['update_id'] );
+				}
+				if ( $result === true && $last >= 0 ) {
+					// A response may include the next update; it remains unconfirmed for webhook delivery.
+					$ack = self::call( 'getUpdates', array( 'offset' => $last + 1, 'limit' => 1, 'timeout' => 0 ) );
+					if ( is_wp_error( $ack ) ) { $result = $ack; }
+				}
+			}
+		} finally {
+			$restored = self::register_webhook();
+		}
+		return is_wp_error( $restored ) ? $restored : $result;
 	}
 }

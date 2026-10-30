@@ -17,12 +17,18 @@ foreach ($file in @('threadtandem-sync-for-telegram.php','uninstall.php','readme
 foreach ($directory in @('includes','assets')) {
     Copy-Item -LiteralPath (Join-Path $pluginRoot $directory) -Destination $packageRoot -Recurse
 }
+$languageRoot = Join-Path $packageRoot 'languages'
+New-Item -ItemType Directory -Path $languageRoot -Force | Out-Null
+# Runtime translations are checked into source; rebuild them from PO after editing translations.
+$editorHash = [BitConverter]::ToString([Security.Cryptography.MD5]::Create().ComputeHash([Text.Encoding]::UTF8.GetBytes('assets/editor.js'))).Replace('-','').ToLowerInvariant()
+foreach ($locale in @('ru_RU','en_US')) {
+    foreach ($language in @("threadtandem-sync-for-telegram-$locale.po","threadtandem-sync-for-telegram-$locale.mo","threadtandem-sync-for-telegram-$locale-$editorHash.json")) {
+        Copy-Item -LiteralPath (Join-Path $pluginRoot ('languages/' + $language)) -Destination $languageRoot
+    }
+}
 $files = Get-ChildItem -LiteralPath $packageRoot -File -Recurse
 foreach ($file in $files) {
-    if ($file.Extension -in @('.po','.mo','.pot') -or $file.Name -match '\.l10n\.php$|-[a-z]{2}_[A-Z]{2}.*\.json$') {
-        throw ('Translation sources and language packs must not enter the WordPress.org ZIP: ' + $file.Name)
-    }
-    if ([IO.File]::ReadAllText($file.FullName) -match '(?<![A-Za-z0-9])\d{6,14}:[A-Za-z0-9_-]{30,}(?![A-Za-z0-9])') {
+    if ($file.Extension -ne '.mo' -and [IO.File]::ReadAllText($file.FullName) -match '(?<![A-Za-z0-9])\d{6,14}:[A-Za-z0-9_-]{30,}(?![A-Za-z0-9])') {
         throw ('Possible embedded bot credential: ' + $file.Name)
     }
 }

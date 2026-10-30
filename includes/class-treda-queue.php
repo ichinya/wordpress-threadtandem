@@ -73,7 +73,7 @@ final class Treda_Queue {
 	}
 
 	/** A single mutable job serializes each local entity, including concurrent edits. */
-	private static function local( $kind, $id ) {
+	private static function local( $kind, $id, $connection = null ) {
 		global $wpdb;
 		$now = gmdate( 'Y-m-d H:i:s' );
 		return false !== $wpdb->query(
@@ -90,7 +90,7 @@ final class Treda_Queue {
 				wp_json_encode(
 					array(
 						$kind . '_id' => (int) $id,
-						'connection'  => Treda_Settings::fingerprint(),
+						'connection'  => $connection ?? Treda_Settings::fingerprint(),
 					)
 				),
 				$now,
@@ -99,12 +99,19 @@ final class Treda_Queue {
 		);
 	}
 
-	public static function post( $post_id ) {
-		return self::local( 'post', $post_id );
+	public static function post( $post_id, $connection = null ) {
+		return self::local( 'post', $post_id, $connection );
 	}
 
 	public static function comment( $comment_id ) {
 		return self::local( 'comment', $comment_id );
+	}
+
+	public static function bulk( $preview ) {
+		global $wpdb;
+		$payload = array( 'after' => 0, 'through' => $preview['through'], 'connection' => $preview['connection'], 'user_id' => $preview['user_id'] );
+		$now = gmdate( 'Y-m-d H:i:s' );
+		return false !== $wpdb->query( $wpdb->prepare( "INSERT INTO %i (job_key,kind,payload,available_at,updated_at,last_error) VALUES (%s,'bulk',%s,%s,%s,'') ON DUPLICATE KEY UPDATE id=id", self::table(), 'bulk:' . $preview['request'], wp_json_encode( $payload ), $now, $now ) );
 	}
 
 	/** A duplicate preserves its durable receipt, without hiding other SQL errors. */
@@ -139,7 +146,7 @@ final class Treda_Queue {
 		$now = gmdate( 'Y-m-d H:i:s' );
 		$wpdb->query(
 			$wpdb->prepare(
-				"UPDATE %i SET status=IF(kind='update','pending','uncertain'),lock_token='',
+				"UPDATE %i SET status=IF(kind IN ('update','bulk'),'pending','uncertain'),lock_token='',
                 last_error=%s,updated_at=%s WHERE status='running' AND locked_at<%s",
 				self::table(),
 				__( 'The worker stopped. Check Telegram before retrying an outgoing operation.', 'threadtandem-sync-for-telegram' ),
@@ -184,6 +191,8 @@ final class Treda_Queue {
 					$result = Treda_Comments::publish( $payload );
 				} elseif ( $job->kind === 'update' ) {
 					$result = Treda_Webhook::process( $payload );
+				} elseif ( $job->kind === 'bulk' ) {
+					$result = Treda_Bulk::process( $job, $token, $payload );
 				} else {
 					$result = new WP_Error( 'treda_kind', __( 'Unknown job type.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'failed' ) );
 				}
@@ -193,7 +202,7 @@ final class Treda_Queue {
 					'treda_exception',
 					__( 'The worker encountered an error. Check diagnostics.', 'threadtandem-sync-for-telegram' ),
 					array(
-						'state' => $job->kind === 'update' ? 'failed' : 'uncertain',
+						'state' => in_array( $job->kind, array( 'update', 'bulk' ), true ) ? 'failed' : 'uncertain',
 					)
 				);
 			}
@@ -213,6 +222,7 @@ final class Treda_Queue {
 		$state = 'done';
 		$error = '';
 		$delay = 0;
+		if ( $job->kind === 'bulk' && $result === 'continue' ) { $state = 'pending'; $delay = 1; }
 		if ( is_wp_error( $result ) ) {
 			$data  = $result->get_error_data();
 			$state = $data['state'] ?? 'failed';
@@ -227,7 +237,7 @@ final class Treda_Queue {
 			$wpdb->prepare(
 				"UPDATE %i SET status=IF(revision<>%d AND %s<>'uncertain','pending',%s),
                 last_error=%s,available_at=%s,updated_at=%s,lock_token='',locked_at=NULL,
-                payload=IF(kind='update' AND %s='done','{}',payload)
+                payload=IF(kind IN ('update','bulk') AND %s='done','{}',payload)
              WHERE id=%d AND status='running' AND lock_token=%s",
 				self::table(),
 				$job->revision,

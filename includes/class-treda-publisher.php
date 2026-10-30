@@ -30,7 +30,7 @@ final class Treda_Publisher {
 		$title   = self::truncate( $title, 200 );
 		$excerpt = self::truncate( $excerpt, 650 );
 		return '<b>' . esc_html( $title ) . "</b>\n\n" . esc_html( $excerpt )
-			. "\n\n" . '<a href="' . esc_url( get_permalink( $post ) ) . '">' . esc_html__( 'Read the article', 'threadtandem-sync-for-telegram' ) . '</a>';
+			. "\n\n" . '<a href="' . esc_url( get_permalink( $post ) ) . '">' . esc_html( Treda_Settings::article_link_text() ) . '</a>';
 	}
 
 	public static function plain( $text ) {
@@ -43,6 +43,17 @@ final class Treda_Publisher {
 	}
 
 	public static function publish( $payload ) {
+		if ( ! Treda_Sync::lock() ) {
+			return new WP_Error( 'treda_busy', __( 'Another synchronization job is running.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'pending' ) );
+		}
+		try {
+			return self::deliver( $payload );
+		} finally {
+			Treda_Sync::unlock();
+		}
+	}
+
+	private static function deliver( $payload ) {
 		if ( empty( $payload['connection'] ) || ! hash_equals( Treda_Settings::fingerprint(), $payload['connection'] ) ) {
 			return true; // Settings changed after this job was queued.
 		}
@@ -66,20 +77,41 @@ final class Treda_Publisher {
 		if ( ! empty( $binding['message_id'] ) && ! self::save_message_key( $post->ID, $binding ) ) {
 			return new WP_Error( 'treda_index', __( 'Could not save the publication mapping index.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'pending' ) );
 		}
+		$media = Treda_Media::for_post( $post );
+		if ( is_wp_error( $media ) ) { return $media; }
+		$photo = $media || in_array( $binding['media_type'] ?? '', array( 'photo', 'caption' ), true );
 		$params = array(
 			'chat_id'    => $connection['chat_id'],
-			'text'       => self::text( $post ),
 			'parse_mode' => 'HTML',
 		);
+		$params[ $photo ? 'caption' : 'text' ] = $photo ? Treda_Media::caption( $post ) : self::text( $post );
+		// Preserve the hash of old text-only messages; photo hashes include the actual file bytes.
+		if ( ! $photo ) { $params = array( 'chat_id' => $connection['chat_id'], 'text' => $params['text'], 'parse_mode' => 'HTML' ); }
+		$photo_hash = $media ? $media['hash'] : ( $binding['photo_hash'] ?? '' );
+		if ( $photo ) { $params['photo_hash'] = $photo_hash; }
 		$hash   = hash( 'sha256', wp_json_encode( $params ) );
 		if ( ! empty( $binding['hash'] ) && hash_equals( $binding['hash'], $hash ) ) {
 			return true;
 		}
 		$editing = ! empty( $binding['message_id'] );
+		unset( $params['photo_hash'] );
+		$files = array();
+		$method = $editing ? 'editMessageText' : 'sendMessage';
+		if ( $photo ) {
+			$changed = $media && ( ( $binding['media_type'] ?? '' ) !== 'photo' || ( $binding['photo_hash'] ?? '' ) !== $photo_hash );
+			$method = $editing ? ( $changed ? 'editMessageMedia' : 'editMessageCaption' ) : 'sendPhoto';
+			if ( ! $editing || $changed ) {
+				$reference = $media['reference']; $files = $media['files'];
+				if ( $editing ) {
+					$params['media'] = wp_json_encode( array( 'type' => 'photo', 'media' => $reference, 'caption' => $params['caption'], 'parse_mode' => 'HTML' ) );
+					unset( $params['caption'], $params['parse_mode'] );
+				} else { $params['photo'] = $reference; }
+			}
+		}
 		if ( $editing ) {
 			$params['message_id'] = (int) $binding['message_id'];
 		}
-		$result = Treda_API::call( $editing ? 'editMessageText' : 'sendMessage', $params, ! $editing );
+		$result = Treda_API::call( $method, $params, ! $editing, $files );
 		if ( is_wp_error( $result ) ) {
 			return $result;
 		}
@@ -93,6 +125,8 @@ final class Treda_Publisher {
 				'chat_id'    => $connection['chat_id'],
 				'message_id' => $editing ? $binding['message_id'] : (int) $result['message_id'],
 				'hash'       => $hash,
+				'media_type' => $photo ? ( $media ? 'photo' : ( $binding['media_type'] ?? 'photo' ) ) : 'text',
+				'photo_hash' => $photo_hash,
 				'updated_at' => time(),
 			)
 		);
@@ -100,6 +134,9 @@ final class Treda_Publisher {
 			return new WP_Error( 'treda_mapping', __( 'The message was sent but the mapping could not be saved. Check Telegram before retrying.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'uncertain' ) );
 		}
 		if ( ! self::save_message_key( $post->ID, $binding ) ) {
+			return new WP_Error( 'treda_index', __( 'Could not save the publication mapping index.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'pending' ) );
+		}
+		if ( ! Treda_Sync::site_origin( $post->ID, $binding ) ) {
 			return new WP_Error( 'treda_index', __( 'Could not save the publication mapping index.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'pending' ) );
 		}
 		return true;

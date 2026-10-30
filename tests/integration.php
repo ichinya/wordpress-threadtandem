@@ -24,7 +24,19 @@ function treda_test_http($pre, $args, $url) {
     }
     $method = basename(wp_parse_url($url, PHP_URL_PATH));
     $params = json_decode($args['body'], true);
-    $treda_test_calls[] = array('method' => $method, 'params' => $params);
+    $files = array();
+    if (strpos($args['headers']['Content-Type'] ?? '', 'multipart/form-data; boundary=') === 0) {
+        $params = array();
+        $boundary = substr($args['headers']['Content-Type'], strlen('multipart/form-data; boundary='));
+        foreach(explode('--' . $boundary, $args['body']) as $part) {
+            $pair = explode("\r\n\r\n", $part, 2);
+            if(count($pair) !== 2 || !preg_match('/name="([^"]+)"/', $pair[0], $field)) { continue; }
+            $value = substr($pair[1], -2) === "\r\n" ? substr($pair[1], 0, -2) : $pair[1];
+            if(preg_match('/filename="([^"]+)"/', $pair[0], $filename)) { $files[$field[1]] = array('name'=>$filename[1], 'data'=>$value); }
+            else { $params[$field[1]] = $value; }
+        }
+    }
+    $treda_test_calls[] = array('method' => $method, 'params' => $params, 'files' => $files);
     if ($treda_test_next_error) {
         $error = $treda_test_next_error;
         $treda_test_next_error = null;
@@ -38,8 +50,10 @@ function treda_test_http($pre, $args, $url) {
     $results = array('getMe' => array('id' => 9988, 'username' => 'treda_qa_bot'),
         'getChat' => array('id' => -1001111111111, 'type' => 'channel', 'title' => 'QA channel', 'linked_chat_id' => -1002222222222),
         'getChatMember' => array('status' => 'administrator', 'can_post_messages' => true),
-        'getWebhookInfo' => array('url' => ''), 'setWebhook' => true, 'deleteWebhook' => true, 'deleteMessage' => true,
+        'getWebhookInfo' => array('url' => ''), 'getUpdates' => array(), 'setWebhook' => true, 'deleteWebhook' => true, 'deleteMessage' => true,
         'sendMessage' => array('message_id' => ++$treda_test_message_id), 'editMessageText' => array('message_id' => $params['message_id'] ?? 0));
+    if ($method === 'sendPhoto') { $results[$method] = array('message_id'=>++$treda_test_message_id, 'photo'=>array(array('file_id'=>'qa-photo-' . $treda_test_message_id))); }
+    if ($method === 'editMessageMedia' || $method === 'editMessageCaption') { $results[$method] = array('message_id'=>$params['message_id']); }
     return array('headers' => array(), 'response' => array('code' => 200, 'message' => 'OK'),
         'body' => wp_json_encode(array('ok' => true, 'result' => $results[$method])), 'cookies' => array());
 }

@@ -40,6 +40,14 @@ final class Treda_Webhook {
 			return new WP_Error( 'treda_update', __( 'Invalid Telegram update.', 'threadtandem-sync-for-telegram' ), array( 'status' => 400 ) );
 		}
 		$connection = Treda_Settings::connection();
+		$channel_message = $update['channel_post'] ?? $update['edited_channel_post'] ?? null;
+		if ( $channel_message !== null ) {
+			if ( ! Treda_Sync::accepts( $channel_message ) ) {
+				return new WP_REST_Response( array( 'ok' => true, 'ignored' => true ), 200 );
+			}
+			return Treda_Queue::event( $update ) ? new WP_REST_Response( array( 'ok' => true ), 200 )
+				: new WP_Error( 'treda_storage', __( 'Could not store the Telegram update.', 'threadtandem-sync-for-telegram' ), array( 'status' => 503 ) );
+		}
 		$message    = $update['message'] ?? $update['edited_message'] ?? array();
 		if ( ! is_array( $message ) || empty( $message['message_id'] ) || ! is_int( $message['message_id'] )
 			|| ! isset( $message['date'] ) || ! is_int( $message['date'] ) || $message['date'] <= 0 ) {
@@ -85,6 +93,10 @@ final class Treda_Webhook {
 			return true;
 		}
 		$connection = Treda_Settings::connection();
+		$channel_message = $payload['update']['channel_post'] ?? $payload['update']['edited_channel_post'] ?? null;
+		if ( $channel_message !== null ) {
+			return Treda_Sync::import( $channel_message, (int) ( $payload['update']['update_id'] ?? 0 ) );
+		}
 		$message    = $payload['update']['message'] ?? $payload['update']['edited_message'] ?? array();
 		if ( empty( $connection['discussion_chat_id'] )
 			|| (string) ( $message['chat']['id'] ?? '' ) !== $connection['discussion_chat_id'] ) {
@@ -99,7 +111,7 @@ final class Treda_Webhook {
 			return true;
 		}
 		$publication = Treda_Messages::find( $connection['chat_id'], (int) $origin['message_id'] );
-		if ( ! $publication || $publication->origin !== 'publication' ) {
+		if ( ! $publication || ! in_array( $publication->origin, array( 'publication', 'channel' ), true ) ) {
 			return new WP_Error( 'treda_waiting', __( 'Waiting for the exact publication mapping. The forward may have arrived before the API response.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'pending' ) );
 		}
 		$post = get_post( $publication->post_id );
