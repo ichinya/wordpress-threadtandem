@@ -7,8 +7,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-29T15:37:44+05:00\n"
-"PO-Revision-Date: 2026-10-29 10:37+0000\n"
+"POT-Creation-Date: 2026-10-31T15:53:38+05:00\n"
+"PO-Revision-Date: 2026-10-31 12:09+0000\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: threadtandem-sync-for-telegram\n"
 "Language: en_US\n"
@@ -33,7 +33,7 @@ msgstr "Ichi-nya"
 msgid "Publishing and comments in Telegram."
 msgstr "Publishing and comments in Telegram."
 
-#: includes/admin-view.php:16 includes/admin-view.php:136
+#: includes/admin-view.php:16 includes/admin-view.php:142
 msgid "Queue and diagnostics"
 msgstr "Queue and diagnostics"
 
@@ -65,7 +65,7 @@ msgstr "Leave blank to keep the saved token"
 msgid "Paste the token from BotFather"
 msgstr "Paste the token from BotFather"
 
-#: includes/admin-view.php:42 includes/class-treda-admin.php:59
+#: includes/admin-view.php:42 includes/class-treda-admin.php:84
 msgid "Show"
 msgstr "Show"
 
@@ -77,7 +77,7 @@ msgstr "Create a dedicated bot with @BotFather and paste its token."
 msgid "Remove the saved token"
 msgstr "Remove the saved token"
 
-#: includes/admin-view.php:50 includes/admin-view.php:103
+#: includes/admin-view.php:50 includes/admin-view.php:109
 #: includes/class-treda-bulk.php:82
 msgid "Telegram channel"
 msgstr "Telegram channel"
@@ -102,319 +102,354 @@ msgstr "Post publishing"
 msgid "Send public posts to your channel and update their announcements when you edit them."
 msgstr "Send public posts to your channel and update their announcements when you edit them."
 
-#: includes/admin-view.php:66
+#: includes/admin-view.php:65
+msgid "Publication format"
+msgstr "Publication format"
+
+#: includes/admin-view.php:67
+msgid "Link with preview"
+msgstr "Link with preview"
+
+#: includes/admin-view.php:68
+msgid "Photo with description"
+msgstr "Photo with description"
+
+#: includes/admin-view.php:70
+msgid "Link: Telegram creates a preview of the article. Photo: upload the featured image or first content image with a description and link. Without an image, send a link preview."
+msgstr "Link: Telegram creates a preview of the article. Photo: upload the featured image or first content image with a description and link. Without an image, send a link preview."
+
+#: includes/admin-view.php:71
+msgid "Changing this setting does not resend the archive. Use Send to update an announcement. An existing photo is kept when switching to link previews, preserving its comments."
+msgstr "Changing this setting does not resend the archive. Use Send to update an announcement. An existing photo is kept when switching to link previews, preserving its comments."
+
+#: includes/admin-view.php:72
 msgid "Article link text"
 msgstr "Article link text"
 
-#: includes/admin-view.php:68
+#: includes/admin-view.php:74
 msgid "Text below the Telegram announcement that links to the article. Leave blank for the default in the site language. Maximum 100 characters."
 msgstr "Text below the Telegram announcement that links to the article. Leave blank for the default in the site language. Maximum 100 characters."
 
-#: includes/admin-view.php:69
+#: includes/admin-view.php:75
 msgid "Applies to new announcements and queued updates. To update an existing announcement, use Send on the Post synchronization page."
 msgstr "Applies to new announcements and queued updates. To update an existing announcement, use Send on the Post synchronization page."
 
-#: includes/admin-view.php:71
+#: includes/admin-view.php:77
 msgid "Import channel posts as drafts"
 msgstr "Import channel posts as drafts"
 
-#: includes/admin-view.php:72
+#: includes/admin-view.php:78
 msgid "Receive new Telegram posts and edits. Review drafts and link existing articles on the Post synchronization page."
 msgstr "Receive new Telegram posts and edits. Review drafts and link existing articles on the Post synchronization page."
 
-#: includes/admin-view.php:75
+#: includes/admin-view.php:81
 msgid "Comment synchronization"
 msgstr "Comment synchronization"
 
-#: includes/admin-view.php:76
+#: includes/admin-view.php:82
 msgid "Keep text replies in one conversation, whether they are written on the website or in Telegram."
 msgstr "Keep text replies in one conversation, whether they are written on the website or in Telegram."
 
-#: includes/admin-view.php:79
+#: includes/admin-view.php:85
 msgid "Hold new Telegram comments for moderation"
 msgstr "Hold new Telegram comments for moderation"
 
-#: includes/admin-view.php:80
+#: includes/admin-view.php:86
 msgid "Website comments are sent after approval. Edited Telegram messages return to moderation."
 msgstr "Website comments are sent after approval. Edited Telegram messages return to moderation."
 
-#: includes/admin-view.php:81
+#: includes/admin-view.php:87
 msgid "Inform group members that their messages may also appear on your website."
 msgstr "Inform group members that their messages may also appear on your website."
 
-#: includes/admin-view.php:85
+#: includes/admin-view.php:91
 msgid "This site requires registered commenters. Telegram-only authors cannot be imported while that setting is enabled."
 msgstr "This site requires registered commenters. Telegram-only authors cannot be imported while that setting is enabled."
 
-#: includes/admin-view.php:89
+#: includes/admin-view.php:95
 msgid "Advanced settings"
 msgstr "Advanced settings"
 
-#: includes/admin-view.php:89
+#: includes/admin-view.php:95
 msgid "API server, external address and uninstall options"
 msgstr "API server, external address and uninstall options"
 
-#: includes/admin-view.php:91
+#: includes/admin-view.php:97
 msgid "Telegram API server"
 msgstr "Telegram API server"
 
-#: includes/admin-view.php:91
+#: includes/admin-view.php:97
 msgid "An HTTPS Bot API server or compatible proxy. Used for all requests. WordPress may reject private addresses and nonstandard ports."
 msgstr "An HTTPS Bot API server or compatible proxy. Used for all requests. WordPress may reject private addresses and nonstandard ports."
 
-#: includes/admin-view.php:92
+#: includes/admin-view.php:98
 msgid "External webhook URL"
 msgstr "External webhook URL"
 
-#: includes/admin-view.php:92
+#: includes/admin-view.php:98
 msgid "Optional public HTTPS address forwarding to the REST endpoint. Preserve the request body and secret header. A .local hostname cannot receive Telegram webhooks."
 msgstr "Optional public HTTPS address forwarding to the REST endpoint. Preserve the request body and secret header. A .local hostname cannot receive Telegram webhooks."
 
-#: includes/admin-view.php:93
+#: includes/admin-view.php:99
 msgid "Keep integration data when deleting the plugin"
 msgstr "Keep integration data when deleting the plugin"
 
-#: includes/admin-view.php:93
+#: includes/admin-view.php:99
 msgid "If cleared, uninstall removes ThreadTandem settings, mappings and queue tables. Posts and comments remain. Disconnect the webhook before deleting the plugin."
 msgstr "If cleared, uninstall removes ThreadTandem settings, mappings and queue tables. Posts and comments remain. Disconnect the webhook before deleting the plugin."
 
-#: includes/admin-view.php:98 includes/admin-view.php:100
+#: includes/admin-view.php:104 includes/admin-view.php:106
 msgid "Connection status"
 msgstr "Connection status"
 
-#: includes/admin-view.php:100
+#: includes/admin-view.php:106
 msgid "Verified"
 msgstr "Verified"
 
-#: includes/admin-view.php:100
+#: includes/admin-view.php:106
 msgid "Not verified"
 msgstr "Not verified"
 
-#: includes/admin-view.php:103
+#: includes/admin-view.php:109
 msgid "Discussion group ID:"
 msgstr "Discussion group ID:"
 
-#: includes/admin-view.php:103
+#: includes/admin-view.php:109
 msgid "Not linked"
 msgstr "Not linked"
 
-#: includes/admin-view.php:107
+#: includes/admin-view.php:113
 msgid "Last checked:"
 msgstr "Last checked:"
 
-#: includes/admin-view.php:109
+#: includes/admin-view.php:115
 msgid "Save your bot and channel, then check their permissions."
 msgstr "Save your bot and channel, then check their permissions."
 
-#: includes/admin-view.php:111
+#: includes/admin-view.php:117
 msgid "Check connection"
 msgstr "Check connection"
 
-#: includes/admin-view.php:112
+#: includes/admin-view.php:118
 msgid "Save changes before checking the connection."
 msgstr "Save changes before checking the connection."
 
-#: includes/admin-view.php:115
+#: includes/admin-view.php:121
 msgid "Telegram events"
 msgstr "Telegram events"
 
-#: includes/admin-view.php:116
+#: includes/admin-view.php:122
 msgid "Enable incoming events so Telegram replies can reach your website."
 msgstr "Enable incoming events so Telegram replies can reach your website."
 
-#: includes/admin-view.php:120
+#: includes/admin-view.php:126
 msgid "A public HTTPS address is needed to receive events. Set it in Advanced settings when testing locally."
 msgstr "A public HTTPS address is needed to receive events. Set it in Advanced settings when testing locally."
 
-#: includes/admin-view.php:121
+#: includes/admin-view.php:127
 msgid "Connect events"
 msgstr "Connect events"
 
-#: includes/admin-view.php:121
+#: includes/admin-view.php:127
 msgid "Disconnect"
 msgstr "Disconnect"
 
-#: includes/admin-view.php:122
+#: includes/admin-view.php:128
 msgid "Receive pending events"
 msgstr "Receive pending events"
 
-#: includes/admin-view.php:123
+#: includes/admin-view.php:129
 msgid "Use after a delivery outage. Receives up to 100 pending events, then restores the webhook. Telegram retains events for up to 24 hours."
 msgstr "Use after a delivery outage. Receives up to 100 pending events, then restores the webhook. Telegram retains events for up to 24 hours."
 
-#: includes/admin-view.php:124
+#: includes/admin-view.php:130
 msgid "Webhook endpoint:"
 msgstr "Webhook endpoint:"
 
-#: includes/admin-view.php:124
+#: includes/admin-view.php:130
 msgid "Copy"
 msgstr "Copy"
 
-#: includes/admin-view.php:127
+#: includes/admin-view.php:133
 msgid "Before connecting"
 msgstr "Before connecting"
 
-#: includes/admin-view.php:127
+#: includes/admin-view.php:133
 msgid "Create a dedicated bot in BotFather."
 msgstr "Create a dedicated bot in BotFather."
 
-#: includes/admin-view.php:127
+#: includes/admin-view.php:133
 msgid "Make the bot a channel administrator with permission to publish."
 msgstr "Make the bot a channel administrator with permission to publish."
 
-#: includes/admin-view.php:127
+#: includes/admin-view.php:133
 msgid "Link a discussion group and add the bot as its administrator."
 msgstr "Link a discussion group and add the bot as its administrator."
 
-#: includes/admin-view.php:136
+#: includes/admin-view.php:142
 msgid "Delivery history and jobs that need attention"
 msgstr "Delivery history and jobs that need attention"
 
-#: includes/admin-view.php:136
+#: includes/admin-view.php:142 includes/admin-view.php:147
 msgid "Needs attention"
 msgstr "Needs attention"
 
-#: includes/admin-view.php:136
+#: includes/admin-view.php:142
 msgid "In progress"
 msgstr "In progress"
 
-#: includes/admin-view.php:137 includes/admin-view.php:144
+#: includes/admin-view.php:143 includes/admin-view.php:150
+#: includes/admin-view.php:167
 msgid "Queued"
 msgstr "Queued"
 
-#: includes/admin-view.php:137 includes/admin-view.php:147
+#: includes/admin-view.php:143 includes/admin-view.php:148
+#: includes/admin-view.php:170
 msgid "Failed"
 msgstr "Failed"
 
-#: includes/admin-view.php:137 includes/admin-view.php:148
+#: includes/admin-view.php:143 includes/admin-view.php:149
+#: includes/admin-view.php:171
 msgid "Result unknown"
 msgstr "Result unknown"
 
-#: includes/admin-view.php:137
+#: includes/admin-view.php:143
 msgid "Process queue now"
 msgstr "Process queue now"
 
-#: includes/admin-view.php:139
-msgid "The queue is empty."
-msgstr "The queue is empty."
+#: includes/admin-view.php:144
+msgid "Delivery status filters"
+msgstr "Delivery status filters"
 
-#: includes/admin-view.php:139
-msgid "Publish a post or approve a comment to see its delivery here."
-msgstr "Publish a post or approve a comment to see its delivery here."
-
-#: includes/admin-view.php:141
-msgid "Recent delivery jobs"
-msgstr "Recent delivery jobs"
-
-#: includes/admin-view.php:141
-msgid "Job"
-msgstr "Job"
-
-#: includes/admin-view.php:141
-msgid "Status"
-msgstr "Status"
-
-#: includes/admin-view.php:141
-msgid "Attempts"
-msgstr "Attempts"
-
-#: includes/admin-view.php:141
-msgid "Message"
-msgstr "Message"
-
-#: includes/admin-view.php:141
-msgid "Action"
-msgstr "Action"
-
-#: includes/admin-view.php:145
+#: includes/admin-view.php:151 includes/admin-view.php:168
 msgid "Running"
 msgstr "Running"
 
-#: includes/admin-view.php:146
+#: includes/admin-view.php:152 includes/admin-view.php:169
 msgid "Done"
 msgstr "Done"
 
-#: includes/admin-view.php:160
+#: includes/admin-view.php:153
+msgid "All jobs"
+msgstr "All jobs"
+
+#: includes/admin-view.php:162
+msgid "No jobs match this filter."
+msgstr "No jobs match this filter."
+
+#: includes/admin-view.php:162
+msgid "The queue is empty."
+msgstr "The queue is empty."
+
+#: includes/admin-view.php:164
+msgid "Recent delivery jobs"
+msgstr "Recent delivery jobs"
+
+#: includes/admin-view.php:164
+msgid "Job"
+msgstr "Job"
+
+#: includes/admin-view.php:164
+msgid "Status"
+msgstr "Status"
+
+#: includes/admin-view.php:164
+msgid "Attempts"
+msgstr "Attempts"
+
+#: includes/admin-view.php:164
+msgid "Message"
+msgstr "Message"
+
+#: includes/admin-view.php:164
+msgid "Action"
+msgstr "Action"
+
+#: includes/admin-view.php:183
 msgid "I checked Telegram and accept the risk of a duplicate."
 msgstr "I checked Telegram and accept the risk of a duplicate."
 
-#: includes/admin-view.php:160
+#: includes/admin-view.php:183
 msgid "Retry"
 msgstr "Retry"
 
-#: includes/admin-view.php:164
+#: includes/admin-view.php:189 includes/class-treda-sync.php:348
+msgid "Pagination"
+msgstr "Pagination"
+
+#: includes/admin-view.php:192
 msgid "WP-Cron processes small batches. Low-traffic sites may need a system cron. An uncertain result requires checking Telegram before retrying."
 msgstr "WP-Cron processes small batches. Low-traffic sites may need a system cron. An uncertain result requires checking Telegram before retrying."
 
-#: includes/admin-view.php:167
+#: includes/admin-view.php:195
 msgid "Settings changes"
 msgstr "Settings changes"
 
-#: includes/admin-view.php:167
+#: includes/admin-view.php:195
 msgid "Changes take effect after you save the settings."
 msgstr "Changes take effect after you save the settings."
 
-#: includes/admin-view.php:167
+#: includes/admin-view.php:195
 msgid "Save settings"
 msgstr "Save settings"
 
-#: includes/class-treda-admin.php:36
+#: includes/class-treda-admin.php:61
 msgid "Settings and queue"
 msgstr "Settings and queue"
 
-#: includes/class-treda-admin.php:37
+#: includes/class-treda-admin.php:62
 msgid "Post synchronization"
 msgstr "Post synchronization"
 
-#: includes/class-treda-admin.php:60
+#: includes/class-treda-admin.php:85
 msgid "Hide"
 msgstr "Hide"
 
-#: includes/class-treda-admin.php:61
+#: includes/class-treda-admin.php:86
 msgid "Copied"
 msgstr "Copied"
 
-#: includes/class-treda-admin.php:62
+#: includes/class-treda-admin.php:87
 msgid "Address selected. Copy it with your keyboard."
 msgstr "Address selected. Copy it with your keyboard."
 
-#: includes/class-treda-admin.php:63
+#: includes/class-treda-admin.php:88
 msgid "You have unsaved changes. Save them before checking the connection."
 msgstr "You have unsaved changes. Save them before checking the connection."
 
-#: includes/class-treda-admin.php:70
+#: includes/class-treda-admin.php:95
 msgid "You do not have permission to manage ThreadTandem."
 msgstr "You do not have permission to manage ThreadTandem."
 
-#: includes/class-treda-admin.php:78
+#: includes/class-treda-admin.php:103
 msgid "Bot permissions checked. Webhook delivery still needs a real incoming event."
 msgstr "Bot permissions checked. Webhook delivery still needs a real incoming event."
 
-#: includes/class-treda-admin.php:81
+#: includes/class-treda-admin.php:106
 msgid "Webhook registered. Check incoming events in the queue."
 msgstr "Webhook registered. Check incoming events in the queue."
 
-#: includes/class-treda-admin.php:84
+#: includes/class-treda-admin.php:109
 msgid "The ThreadTandem webhook is disconnected."
 msgstr "The ThreadTandem webhook is disconnected."
 
-#: includes/class-treda-admin.php:87
+#: includes/class-treda-admin.php:112
 msgid "Pending Telegram events were received and the webhook was restored. Process the queue to import them."
 msgstr "Pending Telegram events were received and the webhook was restored. Process the queue to import them."
 
-#: includes/class-treda-admin.php:90
+#: includes/class-treda-admin.php:115
 msgid "A queue batch was processed. See the results below."
 msgstr "A queue batch was processed. See the results below."
 
-#: includes/class-treda-admin.php:94
+#: includes/class-treda-admin.php:119
 msgid "The job was queued again."
 msgstr "The job was queued again."
 
-#: includes/class-treda-admin.php:95
+#: includes/class-treda-admin.php:120
 msgid "The job was not changed. Confirm a Telegram check before retrying an uncertain result."
 msgstr "The job was not changed. Confirm a Telegram check before retrying an uncertain result."
 
-#: includes/class-treda-admin.php:97
+#: includes/class-treda-admin.php:122
 msgid "Unknown action."
 msgstr "Unknown action."
 
@@ -422,105 +457,105 @@ msgstr "Unknown action."
 msgid "Save the bot token first."
 msgstr "Save the bot token first."
 
-#: includes/class-treda-api.php:41
+#: includes/class-treda-api.php:42
 msgid "The send result is unknown. Check Telegram before retrying."
 msgstr "The send result is unknown. Check Telegram before retrying."
 
-#: includes/class-treda-api.php:42
+#: includes/class-treda-api.php:43
 msgid "Could not connect to Telegram."
 msgstr "Could not connect to Telegram."
 
-#: includes/class-treda-api.php:64
+#: includes/class-treda-api.php:65
 msgid "Telegram has limited the request rate."
 msgstr "Telegram has limited the request rate."
 
-#: includes/class-treda-api.php:74
+#: includes/class-treda-api.php:75
 msgid "Telegram did not confirm the operation result."
 msgstr "Telegram did not confirm the operation result."
 
-#: includes/class-treda-api.php:81
+#: includes/class-treda-api.php:82
 msgid "Telegram rejected the parameters. Check the destination and bot permissions."
 msgstr "Telegram rejected the parameters. Check the destination and bot permissions."
 
-#: includes/class-treda-api.php:82
+#: includes/class-treda-api.php:83
 msgid "Telegram rejected the bot token."
 msgstr "Telegram rejected the bot token."
 
-#: includes/class-treda-api.php:83
+#: includes/class-treda-api.php:84
 msgid "The bot does not have access or permission to send messages."
 msgstr "The bot does not have access or permission to send messages."
 
-#: includes/class-treda-api.php:85
+#: includes/class-treda-api.php:86
 msgid "Telegram rejected the request."
 msgstr "Telegram rejected the request."
 
 #. translators: 1: connection check step, 2: safe Telegram error message.
-#: includes/class-treda-api.php:92
+#: includes/class-treda-api.php:93
 msgid "%1$s: %2$s"
 msgstr "%1$s: %2$s"
 
 #. translators: %s: Telegram bot username, without the @ prefix.
-#: includes/class-treda-api.php:98
+#: includes/class-treda-api.php:99
 msgid "Bot: @%s."
 msgstr "Bot: @%s."
 
-#: includes/class-treda-api.php:107
+#: includes/class-treda-api.php:108
 msgid "Bot token check"
 msgstr "Bot token check"
 
-#: includes/class-treda-api.php:111
+#: includes/class-treda-api.php:112
 msgid "Save the channel before checking the connection."
 msgstr "Save the channel before checking the connection."
 
-#: includes/class-treda-api.php:115
+#: includes/class-treda-api.php:116
 msgid "Channel access"
 msgstr "Channel access"
 
-#: includes/class-treda-api.php:118
+#: includes/class-treda-api.php:119
 msgid "Select a Telegram channel. Forum groups are not supported by this release."
 msgstr "Select a Telegram channel. Forum groups are not supported by this release."
 
-#: includes/class-treda-api.php:128
+#: includes/class-treda-api.php:129
 msgid "Channel permissions"
 msgstr "Channel permissions"
 
-#: includes/class-treda-api.php:131
+#: includes/class-treda-api.php:132
 msgid "Add the bot as a channel administrator with permission to publish."
 msgstr "Add the bot as a channel administrator with permission to publish."
 
-#: includes/class-treda-api.php:144
+#: includes/class-treda-api.php:145
 msgid "Link a discussion group to the channel before enabling comment synchronization."
 msgstr "Link a discussion group to the channel before enabling comment synchronization."
 
-#: includes/class-treda-api.php:154
+#: includes/class-treda-api.php:155
 msgid "Discussion group access"
 msgstr "Discussion group access"
 
-#: includes/class-treda-api.php:157
+#: includes/class-treda-api.php:158
 msgid "Add the bot as an administrator of the linked discussion group."
 msgstr "Add the bot as an administrator of the linked discussion group."
 
-#: includes/class-treda-api.php:166 includes/class-treda-api.php:211
+#: includes/class-treda-api.php:167 includes/class-treda-api.php:212
 msgid "Check the connection first."
 msgstr "Check the connection first."
 
-#: includes/class-treda-api.php:170
+#: includes/class-treda-api.php:171
 msgid "The webhook requires a public HTTPS URL."
 msgstr "The webhook requires a public HTTPS URL."
 
-#: includes/class-treda-api.php:177
+#: includes/class-treda-api.php:178
 msgid "This bot already uses a different webhook. Use a dedicated bot or disconnect the previous integration first."
 msgstr "This bot already uses a different webhook. Use a dedicated bot or disconnect the previous integration first."
 
-#: includes/class-treda-api.php:203
+#: includes/class-treda-api.php:204
 msgid "The bot uses a different webhook. ThreadTandem will not change it."
 msgstr "The bot uses a different webhook. ThreadTandem will not change it."
 
-#: includes/class-treda-api.php:219 includes/class-treda-webhook.php:40
+#: includes/class-treda-api.php:220 includes/class-treda-webhook.php:40
 msgid "Invalid Telegram update."
 msgstr "Invalid Telegram update."
 
-#: includes/class-treda-api.php:228 includes/class-treda-webhook.php:49
+#: includes/class-treda-api.php:229 includes/class-treda-webhook.php:49
 #: includes/class-treda-webhook.php:86
 msgid "Could not store the Telegram update."
 msgstr "Could not store the Telegram update."
@@ -578,19 +613,23 @@ msgstr "Includes all public published posts, regardless of the current search or
 msgid "The next step shows the channel and post count. Nothing is queued until you confirm."
 msgstr "The next step shows the channel and post count. Nothing is queued until you confirm."
 
-#: includes/class-treda-bulk.php:100
+#: includes/class-treda-bulk.php:99
+msgid "New announcements are sent from oldest to newest by publication date. An earlier failed or uncertain send pauses later new announcements."
+msgstr "New announcements are sent from oldest to newest by publication date. An earlier failed or uncertain send pauses later new announcements."
+
+#: includes/class-treda-bulk.php:101
 msgid "Send all posts to the Telegram channel"
 msgstr "Send all posts to the Telegram channel"
 
-#: includes/class-treda-bulk.php:102
+#: includes/class-treda-bulk.php:103
 msgid "Enable post publishing and verify the Telegram connection first."
 msgstr "Enable post publishing and verify the Telegram connection first."
 
-#: includes/class-treda-bulk.php:110
+#: includes/class-treda-bulk.php:111
 msgid "Bulk sending stopped because permissions or connection settings changed."
 msgstr "Bulk sending stopped because permissions or connection settings changed."
 
-#: includes/class-treda-bulk.php:135
+#: includes/class-treda-bulk.php:146
 msgid "Could not prepare the bulk queue. Check database diagnostics."
 msgstr "Could not prepare the bulk queue. Check database diagnostics."
 
@@ -698,48 +737,57 @@ msgstr "Telegram sender type"
 msgid "Telegram copies and internal delivery mappings may remain. Contact the site administrator for further removal."
 msgstr "Telegram copies and internal delivery mappings may remain. Contact the site administrator for further removal."
 
-#: includes/class-treda-publisher.php:47
+#: includes/class-treda-publisher.php:29
+msgid "The article URL is too long for this Telegram message."
+msgstr "The article URL is too long for this Telegram message."
+
+#: includes/class-treda-publisher.php:79
 msgid "Another synchronization job is running."
 msgstr "Another synchronization job is running."
 
-#: includes/class-treda-publisher.php:75
+#: includes/class-treda-publisher.php:90
+msgid "Telegram connection settings changed after this job was queued. Nothing was sent. Check the current bot and channel, then queue this post again from the Synchronization page."
+msgstr "Telegram connection settings changed after this job was queued. Nothing was sent. Check the current bot and channel, then queue this post again from the Synchronization page."
+
+#: includes/class-treda-publisher.php:107
 msgid "This post is already linked to a different bot or channel. Its mapping cannot be moved automatically."
 msgstr "This post is already linked to a different bot or channel. Its mapping cannot be moved automatically."
 
-#: includes/class-treda-publisher.php:78 includes/class-treda-publisher.php:137
-#: includes/class-treda-publisher.php:140
+#: includes/class-treda-publisher.php:110
+#: includes/class-treda-publisher.php:172
+#: includes/class-treda-publisher.php:175
 msgid "Could not save the publication mapping index."
 msgstr "Could not save the publication mapping index."
 
-#: includes/class-treda-publisher.php:119
+#: includes/class-treda-publisher.php:154
 msgid "Telegram did not return a publication ID. Check the channel."
 msgstr "Telegram did not return a publication ID. Check the channel."
 
-#: includes/class-treda-publisher.php:134
+#: includes/class-treda-publisher.php:169
 msgid "The message was sent but the mapping could not be saved. Check Telegram before retrying."
 msgstr "The message was sent but the mapping could not be saved. Check Telegram before retrying."
 
-#: includes/class-treda-publisher.php:170 assets/editor.js:33
+#: includes/class-treda-publisher.php:205 assets/editor.js:33
 msgid "ThreadTandem · Telegram"
 msgstr "ThreadTandem · Telegram"
 
-#: includes/class-treda-publisher.php:176 assets/editor.js:35
+#: includes/class-treda-publisher.php:211 assets/editor.js:35
 msgid "Publish to Telegram"
 msgstr "Publish to Telegram"
 
-#: includes/class-treda-publisher.php:180 assets/editor.js:45
+#: includes/class-treda-publisher.php:215 assets/editor.js:45
 msgid "Open publication"
 msgstr "Open publication"
 
-#: includes/class-treda-publisher.php:182 assets/editor.js:46
+#: includes/class-treda-publisher.php:217 assets/editor.js:46
 msgid "No publication is linked yet."
 msgstr "No publication is linked yet."
 
-#: includes/class-treda-publisher.php:185 assets/editor.js:41
+#: includes/class-treda-publisher.php:220 assets/editor.js:41
 msgid "Automatic publishing is disabled in ThreadTandem settings."
 msgstr "Automatic publishing is disabled in ThreadTandem settings."
 
-#: includes/class-treda-publisher.php:187 assets/editor.js:47
+#: includes/class-treda-publisher.php:222 assets/editor.js:47
 msgid "Saving this post queues its changes in the background."
 msgstr "Saving this post queues its changes in the background."
 
@@ -759,35 +807,39 @@ msgstr "ThreadTandem: every minute"
 msgid "The worker stopped. Check Telegram before retrying an outgoing operation."
 msgstr "The worker stopped. Check Telegram before retrying an outgoing operation."
 
-#: includes/class-treda-queue.php:187
+#: includes/class-treda-queue.php:209
 msgid "Invalid job data."
 msgstr "Invalid job data."
 
-#: includes/class-treda-queue.php:197
+#: includes/class-treda-queue.php:219
 msgid "Unknown job type."
 msgstr "Unknown job type."
 
-#: includes/class-treda-queue.php:203
+#: includes/class-treda-queue.php:225
 msgid "The worker encountered an error. Check diagnostics."
 msgstr "The worker encountered an error. Check diagnostics."
 
-#: includes/class-treda-settings.php:27
+#: includes/class-treda-settings.php:44
 msgid "Read the article"
 msgstr "Read the article"
 
-#: includes/class-treda-settings.php:102
+#: includes/class-treda-settings.php:116
+msgid "Select a supported publication format. The previous value was kept."
+msgstr "Select a supported publication format. The previous value was kept."
+
+#: includes/class-treda-settings.php:130
 msgid "The token format is invalid. The previous token was kept."
 msgstr "The token format is invalid. The previous token was kept."
 
-#: includes/class-treda-settings.php:114
+#: includes/class-treda-settings.php:142
 msgid "Enter a channel ID starting with -100, an @username or a link like https://t.me/username."
 msgstr "Enter a channel ID starting with -100, an @username or a link like https://t.me/username."
 
-#: includes/class-treda-settings.php:122
+#: includes/class-treda-settings.php:150
 msgid "The API URL must use HTTPS without credentials or query parameters."
 msgstr "The API URL must use HTTPS without credentials or query parameters."
 
-#: includes/class-treda-settings.php:128
+#: includes/class-treda-settings.php:156
 msgid "The external webhook URL must use HTTPS."
 msgstr "The external webhook URL must use HTTPS."
 
@@ -915,10 +967,6 @@ msgstr "No linked articles."
 msgid "No ignored publications."
 msgstr "No ignored publications."
 
-#: includes/class-treda-sync.php:348
-msgid "Pagination"
-msgstr "Pagination"
-
 #: includes/class-treda-webhook.php:29
 msgid "The connection needs to be checked."
 msgstr "The connection needs to be checked."
@@ -943,57 +991,6 @@ msgstr "Could not save the discussion mapping."
 msgid "Deactivate the previous plugin network-wide before activating ThreadTandem on this site."
 msgstr "Deactivate the previous plugin network-wide before activating ThreadTandem on this site."
 
-#: threadtandem-sync-for-telegram.php:69
+#: threadtandem-sync-for-telegram.php:71
 msgid "ThreadTandem could not create its database tables. Check the database permissions."
 msgstr "ThreadTandem could not create its database tables. Check the database permissions."
-
-#: includes/class-treda-publisher.php
-msgid "Telegram connection settings changed after this job was queued. Nothing was sent. Check the current bot and channel, then queue this post again from the Synchronization page."
-msgstr "Telegram connection settings changed after this job was queued. Nothing was sent. Check the current bot and channel, then queue this post again from the Synchronization page."
-
-#: includes/admin-view.php:65
-msgid "Announcements are plain text with a visible article URL and a link preview. Telegram generates the preview from the public article page."
-msgstr "Announcements are plain text with a visible article URL and a link preview. Telegram generates the preview from the public article page."
-
-#: includes/class-treda-publisher.php:29
-msgid "The article URL is too long for this Telegram message."
-msgstr "The article URL is too long for this Telegram message."
-
-#: includes/admin-view.php
-msgid "All jobs"
-msgstr "All jobs"
-
-#: includes/admin-view.php
-msgid "Delivery status filters"
-msgstr "Delivery status filters"
-
-#: includes/admin-view.php
-msgid "No jobs match this filter."
-msgstr "No jobs match this filter."
-#: includes/class-treda-bulk.php
-msgid "New announcements are sent from oldest to newest by publication date. An earlier failed or uncertain send pauses later new announcements."
-msgstr "New announcements are sent from oldest to newest by publication date. An earlier failed or uncertain send pauses later new announcements."
-
-#: includes/admin-view.php includes/class-treda-settings.php
-msgid "Publication format"
-msgstr "Publication format"
-
-#: includes/admin-view.php includes/class-treda-settings.php
-msgid "Link with preview"
-msgstr "Link with preview"
-
-#: includes/admin-view.php includes/class-treda-settings.php
-msgid "Photo with description"
-msgstr "Photo with description"
-
-#: includes/admin-view.php includes/class-treda-settings.php
-msgid "Link: Telegram creates a preview of the article. Photo: upload the featured image or first content image with a description and link. Without an image, send a link preview."
-msgstr "Link: Telegram creates a preview of the article. Photo: upload the featured image or first content image with a description and link. Without an image, send a link preview."
-
-#: includes/admin-view.php includes/class-treda-settings.php
-msgid "Changing this setting does not resend the archive. Use Send to update an announcement. An existing photo is kept when switching to link previews, preserving its comments."
-msgstr "Changing this setting does not resend the archive. Use Send to update an announcement. An existing photo is kept when switching to link previews, preserving its comments."
-
-#: includes/admin-view.php includes/class-treda-settings.php
-msgid "Select a supported publication format. The previous value was kept."
-msgstr "Select a supported publication format. The previous value was kept."

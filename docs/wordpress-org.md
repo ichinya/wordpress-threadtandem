@@ -25,7 +25,9 @@ The icon represents two linked conversations on a cobalt background. Generated w
 
 Captured on 2026-10-28 from the actual ThreadTandem 1.1.0 interface in a disposable WordPress 7.1.3 / PHP 8.4 installation. The editor uses Twenty Twenty-Five; native comments use Twenty Twenty-One. Settings and conversation data are demonstration fixtures; connection status is seeded rather than a new Telegram API verification. External HTTP, email and WP-Cron were disabled. The fixtures use example.org and invented bot/channel/group identifiers. Screenshots contain no real token or private conversation. The images are cropped browser captures, with no replacement controls or interface text.
 
-The Russian interface uses a locally compiled development language pack. It does not establish that the Russian translation has already been approved on WordPress.org.
+The original Russian captures used a locally compiled development language pack. They do not establish that a translation has been approved on WordPress.org.
+
+The English and Russian settings images (`screenshot-1.png` and `screenshot-1-ru.png`) were refreshed on 2026-10-31 from the actual 1.3.0 settings renderer in the same disposable installation. They show the publication-format selector, draft import, navigation tabs and pending-event recovery. Read-only option filters supply a demonstration connection (`example_bot`, `example_channel` and invented chat IDs); no real token or private conversation is included. Saved configuration is unchanged, and no Telegram request is made. The captures use the bundled language catalogs and the site's matching language. The block-editor and comment-thread images remain the original captures described above.
 
 ## Translations
 
@@ -36,5 +38,7 @@ The plugin includes complete `ru_RU` and `en_US` catalogs: PO sources, compiled 
 After changing source strings, run `wp i18n make-pot . languages/threadtandem-sync-for-telegram.pot --exclude=dist,tests,tools,docs,wordpress-org-assets,languages --slug=threadtandem-sync-for-telegram`. Update the Russian PO, then run `php tools/sync-translations.php /path/to/wordpress` to align both catalogs and remove stale strings. Regenerate the tracked runtime files with `wp i18n make-mo languages` and `wp i18n make-json languages --no-purge`. The build allowlist includes both language catalogs. Do not increment the version or prepare a release until the owner explicitly requests it.
 
 The default article-link label in Telegram follows the site's language, independently of the administrator's interface language. Leave the field empty for that default; a custom label stays exactly as saved.
+
+The 2026-10-31 audit compared a freshly extracted source template with both PO/MO catalogs: all 242 current strings and all 6 block-editor JSON strings were present, with matching compiled translations and placeholders. Two obsolete strings were removed. The site/profile language-selection and older-language-pack fallback checks passed on WordPress 7.1.3 / PHP 8.4 and WordPress 6.2 / PHP 8.0 (56 checks per installation).
 
 Official asset requirements: https://developer.wordpress.org/plugins/wordpress-org/plugin-assets/

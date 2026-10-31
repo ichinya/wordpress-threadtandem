@@ -19,7 +19,8 @@ $original_switcher = $GLOBALS['wp_locale_switcher'];
 $original_locale = get_locale();
 $temporary_pack = null;
 try {
-	$assert( TREDA_VERSION === '1.2.0', 'Working version remains 1.2.0' );
+	$plugin_header = get_file_data( TREDA_FILE, array( 'version' => 'Version' ) );
+	$assert( TREDA_VERSION === $plugin_header['version'], 'Runtime version matches the plugin header' );
 	$template = new PO();
 	$assert( $template->import_from_file( TREDA_DIR . 'languages/' . $domain . '.pot' ), 'Current source template is readable' );
 	foreach ( array( 'ru_RU', 'en_US' ) as $locale ) {
