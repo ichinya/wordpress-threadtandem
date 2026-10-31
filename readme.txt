@@ -4,7 +4,7 @@ Tags: telegram, comments, discussion, crossposting
 Requires at least: 6.2
 Tested up to: 7.1.4
 Requires PHP: 7.4
-Stable tag: 1.2.0
+Stable tag: 1.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -127,6 +127,16 @@ WordPress.org language packs are installed automatically when an approved transl
 English is the source language. Russian translations are included with the plugin and follow the WordPress site or user language, without requiring a separate download.
 
 == Changelog ==
+
+= 1.3.0 =
+* Add a choice between link previews and photo announcements with plain-text descriptions, preserving existing settings by default.
+* Upload local posters directly, update captions and images without duplicate messages, and allow longer upload processing time.
+* Keep existing photos and discussions when switching back to link previews; format changes do not resend the archive.
+* Send new announcements in publication-date order, oldest first, and wait for earlier delayed, failed or uncertain sends.
+* Preserve chronological bulk cursors across batches and continue previously queued archive operations safely.
+* Show failed and uncertain delivery jobs first, with status filters and pagination in diagnostics.
+* Report jobs queued for an old Telegram connection as failed instead of silently marking them done.
+* Include Russian and English translations for publication formats and queue guidance.
 
 = 1.2.0 =
 * Include complete Russian and English PHP and block-editor translations, including fallback for older language packs.
