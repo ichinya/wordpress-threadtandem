@@ -109,7 +109,7 @@ final class Treda_Queue {
 
 	public static function bulk( $preview ) {
 		global $wpdb;
-		$payload = array( 'after' => 0, 'through' => $preview['through'], 'connection' => $preview['connection'], 'user_id' => $preview['user_id'] );
+		$payload = array( 'after' => 0, 'after_date' => '0000-00-00 00:00:00', 'order' => 'date_asc', 'through' => $preview['through'], 'connection' => $preview['connection'], 'user_id' => $preview['user_id'] );
 		$now = gmdate( 'Y-m-d H:i:s' );
 		return false !== $wpdb->query( $wpdb->prepare( "INSERT INTO %i (job_key,kind,payload,available_at,updated_at,last_error) VALUES (%s,'bulk',%s,%s,%s,'') ON DUPLICATE KEY UPDATE id=id", self::table(), 'bulk:' . $preview['request'], wp_json_encode( $payload ), $now, $now ) );
 	}
@@ -156,11 +156,33 @@ final class Treda_Queue {
 		);
 		$started = microtime( true );
 		for ( $i = 0; $i < 3 && microtime( true ) - $started < 35; $i++ ) {
+			// Only the oldest new announcement may be claimed, including while it is delayed
+			// or owned by another worker. Edits, ineligible posts and incoming events can proceed.
 			$job = $wpdb->get_row(
 				$wpdb->prepare(
-					"SELECT * FROM %i WHERE status='pending' AND available_at<=%s ORDER BY id LIMIT 1",
+					"SELECT j.* FROM %i AS j LEFT JOIN %i AS current_post ON j.kind='post' AND current_post.ID=CAST(SUBSTRING(j.job_key,6) AS UNSIGNED)
+					 WHERE j.status='pending' AND j.available_at<=%s
+					 AND (j.kind<>'post' OR current_post.ID IS NULL OR current_post.post_type<>'post'
+					 OR current_post.post_status<>'publish' OR current_post.post_password<>''
+					 OR EXISTS (SELECT 1 FROM %i AS current_meta WHERE current_meta.post_id=current_post.ID
+					 AND ((current_meta.meta_key='_treda_disabled' AND current_meta.meta_value='1')
+					 OR (current_meta.meta_key='_treda_publication' AND current_meta.meta_value NOT IN ('','a:0:{}'))))
+					 OR j.id=(
+					 SELECT q.id FROM %i AS q INNER JOIN %i AS p ON p.ID=CAST(SUBSTRING(q.job_key,6) AS UNSIGNED)
+					 WHERE q.kind='post' AND q.status IN ('pending','running','failed','uncertain')
+					 AND p.post_type='post' AND p.post_status='publish' AND p.post_password=''
+					 AND NOT EXISTS (SELECT 1 FROM %i AS pm WHERE pm.post_id=p.ID
+					 AND ((pm.meta_key='_treda_disabled' AND pm.meta_value='1')
+					 OR (pm.meta_key='_treda_publication' AND pm.meta_value NOT IN ('','a:0:{}'))))
+					 ORDER BY p.post_date ASC,p.ID ASC,q.id ASC LIMIT 1))
+					 ORDER BY j.id LIMIT 1",
 					self::table(),
-					gmdate( 'Y-m-d H:i:s' )
+					$wpdb->posts,
+					gmdate( 'Y-m-d H:i:s' ),
+					$wpdb->postmeta,
+					self::table(),
+					$wpdb->posts,
+					$wpdb->postmeta
 				)
 			);
 			if ( ! $job ) {

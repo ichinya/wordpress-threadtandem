@@ -970,3 +970,6 @@ msgstr "Фильтры состояния доставки"
 #: includes/admin-view.php
 msgid "No jobs match this filter."
 msgstr "Заданий с таким состоянием нет."
+#: includes/class-treda-bulk.php
+msgid "New announcements are sent from oldest to newest by publication date. An earlier failed or uncertain send pauses later new announcements."
+msgstr "Новые анонсы отправляются по дате публикации: от старых к новым. Ошибка или неизвестный результат ранней отправки приостанавливают следующие новые анонсы."

@@ -96,6 +96,7 @@ final class Treda_Bulk {
 			echo '<div class="notice notice-' . ( $notice === 'queued' ? 'success' : 'error' ) . ' inline"><p>' . ( $notice === 'queued' ? esc_html__( 'Bulk sending was queued. Progress is available in Queue and diagnostics.', 'threadtandem-sync-for-telegram' ) : esc_html__( 'Bulk sending was not started. Check the connection and available posts, then confirm again.', 'threadtandem-sync-for-telegram' ) ) . '</p></div>';
 		}
 		echo '<details class="treda-card treda-disclosure treda-bulk"><summary><span class="dashicons dashicons-upload" aria-hidden="true"></span><span>' . esc_html__( 'Bulk sending', 'threadtandem-sync-for-telegram' ) . '<small>' . esc_html__( 'Send the published archive to your channel', 'threadtandem-sync-for-telegram' ) . '</small></span><span class="dashicons dashicons-arrow-down-alt2 treda-chevron" aria-hidden="true"></span></summary><div class="treda-card-body"><p>' . esc_html__( 'Includes all public published posts, regardless of the current search or page. Drafts, password-protected, ignored posts and posts with synchronization disabled are skipped. Linked announcements are updated.', 'threadtandem-sync-for-telegram' ) . '</p><p class="treda-help">' . esc_html__( 'The next step shows the channel and post count. Nothing is queued until you confirm.', 'threadtandem-sync-for-telegram' ) . '</p>';
+		echo '<p class="treda-help">' . esc_html__( 'New announcements are sent from oldest to newest by publication date. An earlier failed or uncertain send pauses later new announcements.', 'threadtandem-sync-for-telegram' ) . '</p>';
 		self::form( 'preview' );
 		submit_button( __( 'Send all posts to the Telegram channel', 'threadtandem-sync-for-telegram' ), 'secondary', '', false, ! self::allowed() || ! self::ready() ? array( 'disabled' => true ) : array() );
 		echo '</form>';
@@ -116,20 +117,30 @@ final class Treda_Bulk {
 			$owned = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM %i WHERE id=%d AND status='running' AND lock_token=%s FOR UPDATE", Treda_Queue::table(), $job->id, $token ) );
 			if ( ! $owned ) { throw new RuntimeException(); }
 			// Same eligibility as prepare(), bounded by the confirmed archive and durable cursor.
-			$ids = $wpdb->get_col( $wpdb->prepare(
-				"SELECT p.ID FROM %i AS p WHERE p.post_type='post' AND p.post_status='publish' AND p.post_password=''
-				 AND p.ID>%d AND p.ID<=%d AND NOT EXISTS (
+			// New exports use publication dates. Keep in-flight legacy ID cursors resumable.
+			$by_date = ( $payload['order'] ?? '' ) === 'date_asc';
+			$posts = $wpdb->get_results( $wpdb->prepare(
+				"SELECT p.ID,p.post_date FROM %i AS p WHERE p.post_type='post' AND p.post_status='publish' AND p.post_password=''
+				 AND ((%d=0 AND p.ID>%d) OR (%d=1 AND (p.post_date>%s OR (p.post_date=%s AND p.ID>%d))))
+				 AND p.ID<=%d AND NOT EXISTS (
 				 SELECT 1 FROM %i AS pm WHERE pm.post_id=p.ID
-				 AND pm.meta_key IN ('_treda_disabled','_treda_sync_ignored','_treda_sync_pending','_treda_import_detached') AND pm.meta_value='1') ORDER BY p.ID ASC LIMIT 100",
-				$wpdb->posts, (int) ( $payload['after'] ?? 0 ), (int) $payload['through'], $wpdb->postmeta
+				 AND pm.meta_key IN ('_treda_disabled','_treda_sync_ignored','_treda_sync_pending','_treda_import_detached') AND pm.meta_value='1')
+				 ORDER BY CASE WHEN %d=1 THEN p.post_date END ASC,p.ID ASC LIMIT 100",
+				$wpdb->posts, (int) $by_date, (int) ( $payload['after'] ?? 0 ), (int) $by_date,
+				$payload['after_date'] ?? '0000-00-00 00:00:00', $payload['after_date'] ?? '0000-00-00 00:00:00', (int) ( $payload['after'] ?? 0 ),
+				(int) $payload['through'], $wpdb->postmeta, (int) $by_date
 			) );
 			if ( $wpdb->last_error ) { throw new RuntimeException(); }
-			foreach ( $ids as $id ) {
-				if ( user_can( $payload['user_id'], 'edit_post', (int) $id ) && ! Treda_Queue::post( $id, $payload['connection'] ) ) { throw new RuntimeException(); }
+			foreach ( $posts as $post ) {
+				if ( user_can( $payload['user_id'], 'edit_post', (int) $post->ID ) && ! Treda_Queue::post( $post->ID, $payload['connection'] ) ) { throw new RuntimeException(); }
 			}
-			if ( $ids ) { $payload['after'] = (int) end( $ids ); }
+			if ( $posts ) {
+				$last = end( $posts );
+				$payload['after'] = (int) $last->ID;
+				if ( $by_date ) { $payload['after_date'] = $last->post_date; }
+			}
 			if ( false === $wpdb->query( $wpdb->prepare( 'UPDATE %i SET payload=%s,attempts=0 WHERE id=%d AND lock_token=%s', Treda_Queue::table(), wp_json_encode( $payload ), $job->id, $token ) ) || false === $wpdb->query( 'COMMIT' ) ) { throw new RuntimeException(); }
-			return count( $ids ) === 100 ? 'continue' : true;
+			return count( $posts ) === 100 ? 'continue' : true;
 		} catch ( Throwable $error ) {
 			$wpdb->query( 'ROLLBACK' );
 			return new WP_Error( 'treda_bulk_database', __( 'Could not prepare the bulk queue. Check database diagnostics.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'pending' ) );

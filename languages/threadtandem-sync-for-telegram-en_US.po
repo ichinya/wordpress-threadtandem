@@ -970,3 +970,6 @@ msgstr "Delivery status filters"
 #: includes/admin-view.php
 msgid "No jobs match this filter."
 msgstr "No jobs match this filter."
+#: includes/class-treda-bulk.php
+msgid "New announcements are sent from oldest to newest by publication date. An earlier failed or uncertain send pauses later new announcements."
+msgstr "New announcements are sent from oldest to newest by publication date. An earlier failed or uncertain send pauses later new announcements."
