@@ -1,0 +1,455 @@
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2026-10-29 11:26:45+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n % 10 == 1 && n % 100 != 11) ? 0 : ((n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14)) ? 1 : 2);\n"
+"X-Generator: GlotPress/4.1.0\n"
+"Language: ru\n"
+"Project-Id-Version: Plugins - ThreadTandem — Post Publishing and Comment Sync for Telegram - Stable Readme (latest release)\n"
+
+#. Short description.
+#, gp-priority: high
+msgid "Publish posts to Telegram and synchronize text comments with a linked discussion group, using native WordPress comments and moderation."
+msgstr "Публикуйте записи в Telegram и синхронизируйте текстовые комментарии со связанной группой обсуждений, используя стандартные комментарии и модерацию WordPress."
+
+#. Plugin name.
+#, gp-priority: high
+msgid "ThreadTandem — Post Publishing and Comment Sync for Telegram"
+msgstr "ThreadTandem — публикация записей и синхронизация комментариев с Telegram"
+
+#. Found in description paragraph.
+msgid ""
+"Incoming synchronization supports text posts and comments. Media captions can be imported as text, without downloading attachments. Downloading incoming attachments, Telegram Login, forum topics, automatic historical import and moderation commands in Telegram are not included.\n"
+"Long announcements and website comments are shortened to fit Telegram; their complete original text remains on the website.\n"
+"Link previews are the default. Photo mode falls back to a link preview when no image is available. Local JPEG/PNG posters are uploaded directly, up to 10 MB. Existing text announcements can be updated with a photo without changing their message ID. An existing photo is kept when switching to link previews or removing the poster, preserving its discussion. Format changes do not resend the archive; use Send on the synchronization page to queue an existing announcement. Link previews depend on Telegram and require a publicly accessible article URL."
+msgstr ""
+"Входящая синхронизация поддерживает текстовые записи и комментарии. Подписи к медиафайлам можно импортировать как текст без загрузки вложений. Загрузка входящих вложений, вход через Telegram, темы форумов, автоматический импорт истории и команды модерации в Telegram не поддерживаются.\n"
+"Длинные анонсы и комментарии с сайта сокращаются с учётом ограничений Telegram; полный исходный текст остаётся на сайте.\n"
+"По умолчанию используются ссылки с предпросмотром. Если картинки нет, вместо публикации с фото отправляется ссылка с предпросмотром. Локальные постеры JPEG/PNG размером до 10 МБ загружаются напрямую. В существующий текстовый анонс можно добавить фото без изменения идентификатора сообщения. При переключении на предпросмотр ссылок или удалении постера уже отправленное фото сохраняется вместе с обсуждением. Смена формата не запускает повторную отправку архива; чтобы поставить обновление существующего анонса в очередь, нажмите «Отправить» на странице синхронизации. Предпросмотр ссылок зависит от Telegram и требует общедоступного URL статьи."
+
+#. Found in description list item.
+msgid "Choose link previews or photos with descriptions. Link previews use a plain-text announcement and visible article URL; Telegram generates the card from the public article page. Photo mode uploads the featured image or first content image with a plain-text description and link."
+msgstr "Выбирайте ссылки с предпросмотром или картинки с описанием. В первом режиме отправляется анонс обычным текстом с видимым URL статьи, а Telegram создаёт карточку по общедоступной странице. Во втором режиме миниатюра записи или первая картинка из текста загружается с описанием обычным текстом и ссылкой."
+
+#. Found in description paragraph.
+msgid ""
+"Help translate ThreadTandem at https://translate.wordpress.org/projects/wp-plugins/threadtandem-sync-for-telegram/.\n"
+"WordPress.org language packs are installed automatically when an approved translation is available for your site language.\n"
+"English is the source language. Russian translations are included with the plugin and follow the WordPress site or user language, without requiring a separate download."
+msgstr ""
+"Помогите перевести ThreadTandem: https://translate.wordpress.org/projects/wp-plugins/threadtandem-sync-for-telegram/.\n"
+"Языковые пакеты WordPress.org устанавливаются автоматически, когда для языка сайта доступен одобренный перевод.\n"
+"Исходный язык плагина — английский. Русский перевод включён в плагин и выбирается по языку сайта или профиля пользователя WordPress без отдельной загрузки."
+
+#. Found in description paragraph.
+msgid "Telegram delivers channel publications and discussion messages to your webhook. When channel import is enabled, new text publications and media captions are stored as drafts with their channel/message identifiers and dates. Eligible text replies are stored in WordPress with their display names, numeric sender identities, chat/message identifiers and reply relationships. Inform participants before enabling import, including participants of private groups. The comment form informs website visitors that approved comments and their names will also appear in Telegram."
+msgstr "Telegram передаёт публикации канала и сообщения обсуждения на ваш вебхук. Если импорт из канала включён, новые текстовые публикации и подписи к медиафайлам сохраняются в черновиках вместе с идентификаторами канала и сообщения и датами. Подходящие текстовые ответы сохраняются в WordPress с отображаемыми именами, числовыми идентификаторами отправителей, идентификаторами чатов и сообщений и связями между ответами. Перед включением импорта сообщите об этом участникам, в том числе участникам закрытых групп. Форма комментариев уведомляет посетителей сайта, что одобренные комментарии и имена их авторов также появятся в Telegram."
+
+#. Found in description list item.
+msgid "English interface and bundled Russian translations, including block-editor controls. Also supports WordPress.org language packs."
+msgstr "Английский интерфейс и встроенный русский перевод, включая элементы управления в редакторе блоков. Также поддерживаются языковые пакеты WordPress.org."
+
+#. Found in description list item.
+msgid "Preserve WordPress as the source for linked articles; Telegram edits update untouched imported drafts only. Matching keeps the original source draft available."
+msgstr "Для связанных статей основным источником остаётся WordPress; изменения из Telegram обновляют только импортированные черновики, которые ещё не редактировались на сайте. После привязки исходный черновик сохраняется."
+
+#. Found in description list item.
+msgid "Review unmatched publications under Settings &gt; ThreadTandem synchronization: ignore, link to an existing article, or queue a website article for delivery."
+msgstr "Просматривайте несвязанные публикации в разделе «Настройки &gt; ThreadTandem» на вкладке «Синхронизация записей»: исключайте их, привязывайте к существующим статьям или ставьте записи сайта в очередь на отправку."
+
+#. Found in description list item.
+msgid "Recover up to 100 pending events after a delivery outage, acknowledging only events durably accepted by the queue and restoring the webhook afterwards."
+msgstr "Получайте до 100 накопленных событий после сбоя доставки: плагин подтверждает только события, надёжно сохранённые в очереди, а затем восстанавливает вебхук."
+
+#. Found in description list item.
+msgid "Import new channel text posts and media captions as WordPress drafts through the background queue."
+msgstr "Импортируйте новые текстовые публикации канала и подписи к медиафайлам в черновики WordPress через фоновую очередь."
+
+#. Found in description list item.
+msgid "Customize the article link text in settings. Russian sites default to \"Читать статью\" even without an installed plugin language pack."
+msgstr "Настраивайте текст ссылки на статью. На русскоязычных сайтах по умолчанию используется «Читать статью» даже без установленного языкового пакета плагина."
+
+#. Found in installation list item.
+msgid "Open Settings &gt; ThreadTandem. Save a dedicated bot token and a channel ID, @username or public link such as https://t.me/username."
+msgstr "Откройте «Настройки &gt; ThreadTandem». Сохраните токен отдельного бота и ID канала, @username или общедоступную ссылку, например https://t.me/username."
+
+#. Found in faq paragraph.
+msgid "Deactivation stops the scheduled worker and preserves data. Disconnect the webhook before removing the plugin. By default, uninstall keeps integration data. Clear Keep integration data when deleting the plugin to remove ThreadTandem options, tables and integration metadata during uninstall. Core posts and comments remain. Telegram copies and other externally stored data are not removed automatically."
+msgstr "Деактивация останавливает запланированную обработку очереди и сохраняет данные. Перед удалением плагина отключите вебхук. По умолчанию данные интеграции сохраняются при удалении. Чтобы при удалении плагина удалить настройки, таблицы и метаданные интеграции ThreadTandem, снимите флажок «Сохранять данные интеграции при удалении плагина». Сами записи и комментарии WordPress останутся. Копии в Telegram и другие данные, хранящиеся во внешних сервисах, автоматически не удаляются."
+
+#. Found in faq paragraph.
+msgid "Successful incoming jobs have their message payload cleared. Completed and failed incoming job records are removed after seven days. Comment content is native site content; message mappings remain until integration data is removed. The Privacy Policy Guide includes suggested ThreadTandem text. Additional sender metadata participates in email-based WordPress privacy tools when a matching comment email exists. Telegram-only authors have no email supplied by Telegram and must contact the site administrator to verify their identity for access or removal requests."
+msgstr "После успешной обработки входящего задания его содержимое сообщения очищается. Записи о завершённых и неудачных входящих заданиях удаляются через семь дней. Тексты комментариев хранятся как обычное содержимое сайта, а связи между сообщениями сохраняются до удаления данных интеграции. В руководстве по политике конфиденциальности есть рекомендуемый текст о ThreadTandem. Дополнительные метаданные отправителя учитываются инструментами WordPress для работы с персональными данными по адресу электронной почты, если у комментария указан соответствующий адрес. Telegram не передаёт адреса электронной почты авторов, которые пишут только в Telegram. Для запроса доступа к данным или их удаления таким авторам нужно обратиться к администратору сайта и подтвердить свою личность."
+
+#. Found in faq paragraph.
+msgid "New settings need a new connection check. Existing post mappings are not silently moved to another bot or channel. An old queued job may need to be saved again after a connection change. Historical remapping is outside this release."
+msgstr "После изменения настроек нужно повторно проверить подключение. Существующие связи записей не переносятся автоматически на другого бота или канал. После смены подключения старое задание в очереди может потребоваться сохранить заново. Перенос связей ранее опубликованных записей в этой версии не предусмотрен."
+
+#. Found in faq paragraph.
+msgid "Moderation or deletion of an imported Telegram comment affects its WordPress copy. It does not delete the participant's original Telegram message. Telegram does not deliver ordinary group message deletions to Bot API clients, so those deletions cannot automatically remove the WordPress copy."
+msgstr "Модерация или удаление комментария, импортированного из Telegram, затрагивает его копию в WordPress. Исходное сообщение участника в Telegram при этом не удаляется. Telegram не сообщает клиентам Bot API об удалении обычных сообщений в группах, поэтому такое удаление не может автоматически удалить копию в WordPress."
+
+#. Found in faq paragraph.
+msgid "Website comments are sent only after approval. Unapproving, spamming, trashing or deleting a website-origin comment attempts to remove its bot-authored Telegram copy. Telegram may reject removal because of permissions or message age; the queue reports that failure."
+msgstr "Комментарии с сайта отправляются только после одобрения. При отмене одобрения, пометке как спам, перемещении в корзину или удалении комментария с сайта плагин пытается удалить его копию, опубликованную ботом в Telegram. Telegram может отклонить удаление из-за прав доступа или давности сообщения; ошибка отобразится в очереди."
+
+#. Found in faq paragraph.
+msgid "Only text messages in the configured discussion group that belong to an exactly mapped post thread or reply chain. Unmatched parents wait rather than being assigned to another post. Bot messages, commands, media and unrelated chat messages are not imported. A site requiring registered commenters cannot import Telegram-only authors."
+msgstr "Только текстовые сообщения из указанной в настройках группы обсуждений, которые относятся к точно сопоставленной ветке записи или цепочке ответов. Если родительское сообщение ещё не сопоставлено, комментарий ожидает обработки и не привязывается к другой записи. Сообщения ботов, команды, медиафайлы и посторонние сообщения чата не импортируются. Если сайт разрешает комментировать только зарегистрированным пользователям, импорт комментариев от авторов из Telegram невозможен."
+
+#. Found in faq paragraph.
+msgid "Yes, through the advanced HTTPS API URL setting. All requests use it. WordPress safe HTTP rules may reject private IP addresses and nonstandard ports. HTTP endpoints and URLs containing credentials or query parameters are rejected."
+msgstr "Да, в дополнительных настройках можно указать HTTPS-адрес API. Он будет использоваться для всех запросов. Правила безопасных HTTP-запросов WordPress могут блокировать частные IP-адреса и нестандартные порты. Адреса с протоколом HTTP, учётными данными или параметрами запроса не допускаются."
+
+#. Found in faq paragraph.
+msgid "Outgoing API checks and sends can work locally. Incoming Telegram events require a public HTTPS route to the REST endpoint. The external webhook URL option does not create a tunnel. A proxy must preserve the request body and X-Telegram-Bot-Api-Secret-Token header."
+msgstr "Проверка API и отправка сообщений могут работать локально. Для входящих событий Telegram нужен общедоступный HTTPS-адрес конечной точки REST API. Настройка внешнего URL вебхука сама по себе не создаёт туннель. Прокси-сервер должен сохранять тело запроса и заголовок X-Telegram-Bot-Api-Secret-Token."
+
+#. Found in faq paragraph.
+msgid "A timeout may occur after Telegram accepted a message. ThreadTandem marks this as Result unknown and does not automatically repeat it. Check Telegram before using the administrator retry control. A manual retry can create a duplicate; automatic reconciliation is not provided."
+msgstr "Время ожидания может истечь уже после того, как Telegram принял сообщение. ThreadTandem помечает такой результат как «Результат неизвестен» и не повторяет отправку автоматически. Прежде чем запускать повторную отправку в панели администратора, проверьте Telegram. Повторная отправка вручную может создать дубликат; автоматическая сверка результатов не предусмотрена."
+
+#. Found in faq paragraph.
+msgid "WP-Cron depends on site visits. ThreadTandem schedules a batch about once a minute and handles up to three jobs per batch. Configure a server cron for wp-cron.php when predictable delivery matters. Rate limits and unresolved parent mappings delay individual jobs."
+msgstr "Работа WP-Cron зависит от посещений сайта. ThreadTandem планирует обработку очереди примерно раз в минуту и выполняет до трёх заданий за один запуск. Если важна предсказуемая доставка, настройте запуск wp-cron.php через серверный cron. Ограничения частоты запросов и отсутствие связи с родительским сообщением могут задерживать отдельные задания."
+
+#. Found in faq paragraph.
+msgid "No. Visitors read native WordPress comments. Network work runs in the background queue or through explicit administrator actions."
+msgstr "Нет. Посетители читают обычные комментарии WordPress. Сетевые запросы выполняются через фоновую очередь или по явному действию администратора."
+
+#. Found in faq header.
+msgid "What happens when I deactivate or uninstall ThreadTandem?"
+msgstr "Что произойдёт при деактивации или удалении ThreadTandem?"
+
+#. Found in faq header.
+msgid "What data is retained?"
+msgstr "Какие данные сохраняются?"
+
+#. Found in faq header.
+msgid "Can I change the bot or channel?"
+msgstr "Можно ли сменить бота или канал?"
+
+#. Found in faq header.
+msgid "Are moderation and deletion mirrored everywhere?"
+msgstr "Синхронизируются ли модерация и удаление на обеих платформах?"
+
+#. Found in faq header.
+msgid "Which comments are imported?"
+msgstr "Какие комментарии импортируются?"
+
+#. Found in faq header.
+msgid "Can I use a custom Bot API server?"
+msgstr "Можно ли использовать собственный сервер Bot API?"
+
+#. Found in faq header.
+msgid "Can I use a local WordPress installation?"
+msgstr "Можно ли использовать локальную установку WordPress?"
+
+#. Found in faq header.
+msgid "What if the send result is unknown?"
+msgstr "Что делать, если результат отправки неизвестен?"
+
+#. Found in faq header.
+msgid "Why is delivery delayed?"
+msgstr "Почему сообщения доставляются с задержкой?"
+
+#. Found in faq header.
+msgid "Does viewing a post call Telegram?"
+msgstr "Обращается ли плагин к Telegram при просмотре записи?"
+
+#. Found in installation paragraph.
+msgid "WordPress 6.2 or later is required for safely prepared database table identifiers. The comment, comment metadata and ThreadTandem mapping tables must use InnoDB for transactional imports."
+msgstr "Требуется WordPress 6.2 или новее для безопасной подстановки идентификаторов таблиц базы данных в запросы. Таблицы комментариев, метаданных комментариев и связей ThreadTandem должны использовать InnoDB для импорта с поддержкой транзакций."
+
+#. Found in installation paragraph.
+msgid "An optional TREDA_BOT_TOKEN constant in wp-config.php takes precedence over the database token. The saved token is never rendered back into the settings form. Protect database backups as you would other site credentials."
+msgstr "Необязательная константа TREDA_BOT_TOKEN в wp-config.php имеет приоритет над токеном из базы данных. Сохранённый токен никогда не выводится обратно в форму настроек. Защищайте резервные копии базы данных так же, как другие учётные данные сайта."
+
+#. Found in installation list item.
+msgid "Reply under the announcement in Telegram, review the imported comment in WordPress, then reply from the site to verify the conversation."
+msgstr "Оставьте ответ под публикацией в Telegram, проверьте импортированный комментарий в WordPress, а затем ответьте с сайта, чтобы проверить обмен сообщениями."
+
+#. Found in installation list item.
+msgid "Publish a test post. Check Queue and diagnostics, or use Process queue now."
+msgstr "Опубликуйте тестовую запись. Откройте раздел «Очередь и диагностика» или нажмите «Обработать очередь сейчас»."
+
+#. Found in installation list item.
+msgid "Register the webhook. Telegram must be able to reach your site through public HTTPS. ThreadTandem refuses to replace a different integration webhook."
+msgstr "Зарегистрируйте вебхук. Ваш сайт должен быть доступен Telegram по общедоступному HTTPS-адресу. ThreadTandem не заменяет вебхук, используемый другой интеграцией."
+
+#. Found in installation list item.
+msgid "Enable the features you want, save, and click Check connection. Publishing and comment synchronization are off by default."
+msgstr "Включите нужные функции, сохраните настройки и нажмите «Проверить подключение». По умолчанию публикация записей и синхронизация комментариев отключены."
+
+#. Found in installation list item.
+msgid "Add the bot as a channel administrator with permission to publish. For comments, link a discussion group to the channel and make the bot an administrator of that group too."
+msgstr "Добавьте бота в администраторы канала с правом публикации сообщений. Для синхронизации комментариев привяжите к каналу группу обсуждений и назначьте бота администратором этой группы."
+
+#. Found in installation list item.
+msgid "Activate ThreadTandem on the individual site. Network-wide activation is not supported."
+msgstr "Активируйте ThreadTandem на отдельном сайте. Активация для всей сети не поддерживается."
+
+#. Found in installation list item.
+msgid "Upload the threadtandem-sync-for-telegram directory to wp-content/plugins/ or install the ZIP from Plugins &gt; Add New &gt; Upload Plugin."
+msgstr "Загрузите каталог threadtandem-sync-for-telegram в wp-content/plugins/ или установите ZIP-архив через «Плагины &gt; Добавить новый &gt; Загрузить плагин»."
+
+#. Found in description paragraph.
+msgid "ThreadTandem is an independent integration and is not affiliated with Telegram or WordPress.org. It does not include analytics or advertising."
+msgstr "ThreadTandem — независимая интеграция, не связанная с Telegram или WordPress.org. Плагин не содержит аналитики и рекламы."
+
+#. Found in description paragraph.
+msgid ""
+"Telegram service terms: https://telegram.org/tos\n"
+"Telegram privacy policy: https://telegram.org/privacy\n"
+"Bot API documentation: https://core.telegram.org/bots/api"
+msgstr ""
+"Условия использования Telegram: https://telegram.org/tos\n"
+"Политика конфиденциальности Telegram: https://telegram.org/privacy\n"
+"Документация Bot API: https://core.telegram.org/bots/api"
+
+#. Found in description paragraph.
+msgid "ThreadTandem contacts Telegram when you check the connection, manage the webhook, or process enabled synchronization jobs. It sends the bot token, chat and message identifiers, published post titles, excerpts and links. When comment synchronization is enabled, approved website comment text and the comment author display name are also sent. Comment email addresses and IP addresses are not sent."
+msgstr "ThreadTandem обращается к Telegram при проверке подключения, управлении вебхуком и обработке включённых заданий синхронизации. Плагин передаёт токен бота, идентификаторы чатов и сообщений, заголовки опубликованных записей, отрывки и ссылки. Если синхронизация комментариев включена, также передаются тексты одобренных комментариев с сайта и отображаемые имена их авторов. Адреса электронной почты и IP-адреса авторов комментариев не передаются."
+
+#. Found in description paragraph.
+msgid "ThreadTandem uses the Telegram Bot API, normally at https://api.telegram.org. You need a Telegram account, a bot token and permission to administer the channel and discussion group. You may configure another HTTPS Bot API endpoint; that endpoint then receives the same requests."
+msgstr "ThreadTandem использует Telegram Bot API, по умолчанию по адресу https://api.telegram.org. Вам понадобятся учётная запись Telegram, токен бота и права администратора канала и группы обсуждений. Можно указать другой HTTPS-адрес Bot API; в этом случае те же запросы будут отправляться на него."
+
+#. Found in description paragraph.
+msgid "Features:"
+msgstr "Возможности:"
+
+#. Found in description paragraph.
+msgid ""
+"ThreadTandem connects one WordPress site to one Telegram bot, one channel and its linked discussion group.\n"
+"Each published post keeps a persistent link to its Telegram announcement and discussion.\n"
+"ThreadTandem is independently developed and is not affiliated with or endorsed by Telegram."
+msgstr ""
+"ThreadTandem связывает один сайт WordPress с одним ботом Telegram, одним каналом и привязанной к нему группой обсуждений.\n"
+"Каждая опубликованная запись сохраняет постоянную связь со своим анонсом и обсуждением в Telegram.\n"
+"ThreadTandem разрабатывается независимо, не связан с Telegram и не одобрен им."
+
+#. Found in description list item.
+msgid "Configure a separate HTTPS Bot API server and an optional external webhook URL."
+msgstr "Настройка отдельного HTTPS-сервера Bot API и необязательного внешнего URL вебхука."
+
+#. Found in description list item.
+msgid "Keep uncertain outgoing results for manual investigation instead of silently sending duplicate messages."
+msgstr "Сохранение исходящих заданий с неизвестным результатом для ручной проверки без автоматической отправки возможных дубликатов."
+
+#. Found in description list item.
+msgid "Process deliveries in a database queue with duplicate detection, worker leases, rate-limit delays and visible diagnostics."
+msgstr "Обработка отправки через очередь в базе данных с обнаружением дубликатов, временным закреплением заданий за обработчиком, задержками при ограничении частоты запросов и наглядной диагностикой."
+
+#. Found in description list item.
+msgid "Identify users by Telegram IDs rather than names. No invented email addresses or automatically created WordPress accounts."
+msgstr "Идентификация пользователей по ID Telegram, а не по именам. Без вымышленных адресов электронной почты и автоматического создания учётных записей WordPress."
+
+#. Found in description list item.
+msgid "Hold edited Telegram text for review, even if its previous text was approved."
+msgstr "Повторная отправка отредактированного текста из Telegram на проверку, даже если предыдущий вариант был одобрен."
+
+#. Found in description list item.
+msgid "Hold new Telegram comments for review by default. WordPress spam and moderation rules still apply."
+msgstr "Новые комментарии из Telegram по умолчанию ожидают проверки. Правила WordPress для борьбы со спамом и модерации продолжают действовать."
+
+#. Found in description list item.
+msgid "Continue a nested conversation across both platforms without echoing imported comments back to Telegram."
+msgstr "Продолжение обсуждения с вложенными ответами на обеих платформах без повторной отправки импортированных комментариев в Telegram."
+
+#. Found in description list item.
+msgid "Send approved website comments to the same discussion, replying to the exact parent message."
+msgstr "Отправка одобренных комментариев с сайта в то же обсуждение с ответом на соответствующее родительское сообщение."
+
+#. Found in description list item.
+msgid "Copy text replies from linked Telegram discussions into native WordPress comments."
+msgstr "Копирование текстовых ответов из связанных обсуждений Telegram в стандартные комментарии WordPress."
+
+#. Found in description list item.
+msgid "Control publishing in the block editor sidebar on WordPress 7.1, with a classic-editor fallback."
+msgstr "Управление публикацией через боковую панель редактора блоков в WordPress 7.1 с поддержкой классического редактора."
+
+#. Found in description list item.
+msgid "Disable Telegram publishing for an individual post. Drafts, private posts and password-protected posts are excluded."
+msgstr "Отключение публикации в Telegram для отдельной записи. Черновики, личные и защищённые паролем записи не публикуются в Telegram."
+
+#. Found in description header.
+msgid "Translations"
+msgstr "Переводы"
+
+#. Found in description header.
+msgid "External service: Telegram"
+msgstr "Внешний сервис: Telegram"
+
+#. Screenshot description.
+msgid "Native WordPress comments preserve nested replies. The Telegram author's name and paper-plane icon link to the original message."
+msgstr "Стандартные комментарии WordPress сохраняют вложенные ответы. Имя автора из Telegram и значок бумажного самолётика ведут к исходному сообщению."
+
+#. Screenshot description.
+msgid "Control Telegram publishing for each post from the WordPress block editor sidebar."
+msgstr "Управляйте публикацией каждой записи в Telegram через боковую панель редактора блоков WordPress."
+
+#. Screenshot description.
+msgid "Connect a bot and channel, choose what to synchronize, and manage moderation and incoming Telegram events."
+msgstr "Подключите бота и канал, выберите, что синхронизировать, и настройте модерацию и входящие события Telegram."
+
+#. Found in changelog list item.
+msgid "Include Russian and English translations for publication formats and queue guidance."
+msgstr "Добавлены русские и английские переводы настроек формата публикации и подсказок об очереди."
+
+#. Found in changelog list item.
+msgid "Report jobs queued for an old Telegram connection as failed instead of silently marking them done."
+msgstr "Задания, поставленные в очередь для прежнего подключения к Telegram, теперь отмечаются как неудачные с понятным сообщением вместо незаметной отметки об успешном выполнении."
+
+#. Found in changelog list item.
+msgid "Show failed and uncertain delivery jobs first, with status filters and pagination in diagnostics."
+msgstr "Неудачные задания и задания с неизвестным результатом показываются первыми; в диагностике добавлены фильтры состояния и разбиение на страницы."
+
+#. Found in changelog list item.
+msgid "Preserve chronological bulk cursors across batches and continue previously queued archive operations safely."
+msgstr "Хронологическое положение массовой отправки сохраняется между пакетами, а ранее поставленные задания отправки архива безопасно продолжаются."
+
+#. Found in changelog list item.
+msgid "Send new announcements in publication-date order, oldest first, and wait for earlier delayed, failed or uncertain sends."
+msgstr "Новые анонсы отправляются по дате публикации, от старых к новым; более ранние отложенные, неудачные задания и задания с неизвестным результатом приостанавливают следующие отправки."
+
+#. Found in changelog list item.
+msgid "Keep existing photos and discussions when switching back to link previews; format changes do not resend the archive."
+msgstr "При возврате к предпросмотру ссылок уже отправленные фото и обсуждения сохраняются; смена формата не запускает повторную отправку архива."
+
+#. Found in changelog list item.
+msgid "Upload local posters directly, update captions and images without duplicate messages, and allow longer upload processing time."
+msgstr "Локальные постеры загружаются напрямую, подписи и картинки обновляются без дубликатов сообщений; для загрузки файлов увеличено время ожидания."
+
+#. Found in changelog list item.
+msgid "Add a choice between link previews and photo announcements with plain-text descriptions, preserving existing settings by default."
+msgstr "Добавлен выбор между ссылками с предпросмотром и фото с описанием обычным текстом; текущие настройки по умолчанию сохраняются."
+
+#. Found in changelog list item.
+msgid "Rename settings URLs to page=threadtandem and page=threadtandem-sync, with redirects from the previous URLs."
+msgstr "Адреса настроек изменены на page=threadtandem и page=threadtandem-sync; со старых адресов настроены перенаправления."
+
+#. Found in changelog list item.
+msgid "Add archive sending through the queue, behind a collapsed panel and a separate confirmation screen."
+msgstr "Добавлена отправка архива через очередь: она находится в свёрнутой панели и требует отдельного подтверждения."
+
+#. Found in changelog list item.
+msgid "Include a featured image or the first post image in Telegram announcements, with direct uploads for local JPEG and PNG files."
+msgstr "В анонсы Telegram добавляется миниатюра записи или первая картинка из текста; локальные файлы JPEG и PNG загружаются напрямую."
+
+#. Found in changelog list item.
+msgid "Subscribe to channel publication and edit events while preserving existing comment delivery."
+msgstr "Добавлена подписка на события публикации и редактирования записей канала с сохранением существующей доставки комментариев."
+
+#. Found in changelog list item.
+msgid "Keep linked website articles authoritative and preserve manually edited drafts."
+msgstr "Для связанных статей сайт остаётся основным источником; отредактированные вручную черновики сохраняются."
+
+#. Found in changelog list item.
+msgid "Add publication matching, ignore/restore controls and queued manual delivery on a synchronization page."
+msgstr "Добавлена страница синхронизации с привязкой публикаций, исключением и восстановлением записей и ручной отправкой через очередь."
+
+#. Found in changelog list item.
+msgid "Add queued channel-to-WordPress imports as drafts, with safe text formatting and duplicate protection."
+msgstr "Добавлен импорт публикаций канала в черновики WordPress через очередь с безопасной обработкой текста и защитой от дубликатов."
+
+#. Found in changelog list item.
+msgid "Apply custom link text when creating or updating the same announcement through the queue."
+msgstr "Пользовательский текст ссылки применяется при создании и обновлении того же анонса через очередь."
+
+#. Found in changelog list item.
+msgid "Add editable article link text for Telegram announcements with a Russian default on Russian sites."
+msgstr "Добавлена настройка текста ссылки на статью в анонсах Telegram с русским значением по умолчанию на русскоязычных сайтах."
+
+#. Found in changelog list item.
+msgid "Include complete Russian and English PHP and block-editor translations, including fallback for older language packs."
+msgstr "Включены полные русские и английские переводы PHP-интерфейса и редактора блоков, в том числе дополнение недостающих строк в старых языковых пакетах."
+
+#. Found in changelog list item.
+msgid "Identify whether a connection error concerns the token, channel or linked discussion group, and show the checked bot username when available."
+msgstr "Ошибки подключения теперь указывают, связана ли проблема с токеном, каналом или группой обсуждений; при наличии показывается имя проверенного бота."
+
+#. Found in changelog list item.
+msgid "Keep existing connection verification when the same channel is entered as a link instead of an @username."
+msgstr "Проверенное подключение сохраняется, если тот же канал указан ссылкой вместо @username."
+
+#. Found in changelog list item.
+msgid "Accept public t.me channel links in settings and normalize them to the equivalent @username before validation and saving."
+msgstr "В настройках принимаются общедоступные ссылки t.me на каналы; перед проверкой и сохранением они преобразуются в соответствующий @username."
+
+#. Found in changelog list item.
+#, gp-priority: low
+msgid "Initial release: channel publishing, exact discussion mapping, bidirectional text replies, native moderation, durable queue and privacy controls."
+msgstr "Первый выпуск: публикация в канал, точная привязка обсуждений, текстовые ответы в обе стороны, стандартная модерация, надёжная очередь и настройки конфиденциальности."
+
+#. Found in changelog list item.
+#, gp-priority: low
+msgid "Retain the classic-editor control and exclude editorial notes from public Telegram comments."
+msgstr "Сохранено управление в классическом редакторе; редакционные заметки исключены из публичных комментариев в Telegram."
+
+#. Found in changelog list item.
+#, gp-priority: low
+msgid "Queue post exports after WordPress has saved REST metadata, avoiding stale publishing preferences and duplicate scheduling."
+msgstr "Экспорт записей ставится в очередь после сохранения метаданных через REST API WordPress, чтобы избежать использования устаревших настроек публикации и повторного добавления заданий."
+
+#. Found in changelog list item.
+#, gp-priority: low
+msgid "Save the per-post publishing preference through capability-protected REST metadata."
+msgstr "Настройка публикации отдельной записи сохраняется через метаданные REST API с проверкой прав доступа."
+
+#. Found in changelog list item.
+#, gp-priority: low
+msgid "Add a native Telegram publishing panel for the WordPress block editor, using the current editor API with a fallback for WordPress 6.2."
+msgstr "Добавлена встроенная панель публикации в Telegram для редактора блоков WordPress с использованием актуального API редактора и совместимостью с WordPress 6.2."
+
+#. Found in changelog list item.
+#, gp-priority: low
+msgid "Keep the save action visible and prevent connection actions from using unsaved changes."
+msgstr "Кнопка сохранения остаётся видимой, а действия с подключением не используют несохранённые изменения."
+
+#. Found in changelog list item.
+#, gp-priority: low
+msgid "Add responsive layout, clear status indicators, token visibility control and webhook URL copying."
+msgstr "Добавлены адаптивный интерфейс, понятные индикаторы состояния, управление видимостью токена и копирование URL вебхука."
+
+#. Found in changelog list item.
+#, gp-priority: low
+msgid "Redesign the settings screen with separate connection, synchronization, delivery and diagnostics sections."
+msgstr "Обновлён экран настроек: подключение, синхронизация, доставка и диагностика вынесены в отдельные разделы."
+
+#. Found in changelog list item.
+#, gp-priority: low
+msgid "Revalidate the connection in the background worker before delivery and report failures in queue diagnostics."
+msgstr "Фоновый обработчик повторно проверяет подключение перед отправкой и сообщает об ошибках в диагностике очереди."
+
+#. Found in changelog list item.
+#, gp-priority: low
+msgid "Keep new publications in the queue when saved connection settings need a fresh permission check."
+msgstr "Новые публикации остаются в очереди, если для сохранённых настроек подключения требуется повторная проверка прав доступа."
+
+#. Found in changelog list item.
+#, gp-priority: low
+msgid "Remove the separate source paragraph below imported comments and respect privacy erasure when rendering author links."
+msgstr "Удалён отдельный абзац с указанием источника под импортированными комментариями; при выводе ссылок на авторов учитывается удаление персональных данных."
+
+#. Found in changelog list item.
+#, gp-priority: low
+msgid "Link imported comment authors to their original Telegram message, with a small black paper-plane icon."
+msgstr "Имена авторов импортированных комментариев ведут к исходным сообщениям в Telegram и дополнены небольшим чёрным значком бумажного самолётика."
+
+#. Found in changelog list item.
+#, gp-priority: low
+msgid "Preserve existing bot settings, publication mappings, comments and queue data when replacing the previous plugin."
+msgstr "При замене предыдущего плагина сохраняются настройки бота, связи публикаций, комментарии и данные очереди."
+
+#. Found in changelog list item.
+#, gp-priority: low
+msgid "Use the threadtandem-sync-for-telegram text domain and standard WordPress.org language packs."
+msgstr "Используются текстовый домен threadtandem-sync-for-telegram и стандартные языковые пакеты WordPress.org."
+
+#. Found in changelog list item.
+#, gp-priority: low
+msgid "Rename the plugin to ThreadTandem — Post Publishing and Comment Sync for Telegram."
+msgstr "Плагин переименован в ThreadTandem — публикация записей и синхронизация комментариев с Telegram."

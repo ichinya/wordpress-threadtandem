@@ -43,4 +43,6 @@ The default article-link label in Telegram follows the site's language, independ
 
 The 2026-10-31 audit compared a freshly extracted source template with both PO/MO catalogs: all 242 current strings and all 6 block-editor JSON strings were present, with matching compiled translations and placeholders. Two obsolete strings were removed. The site/profile language-selection and older-language-pack fallback checks passed on WordPress 7.1.3 / PHP 8.4 and WordPress 6.2 / PHP 8.0 (56 checks per installation).
 
+On the same date, 32 missing Russian Stable Readme translations and 81 missing/fuzzy Stable interface translations were imported on WordPress.org as current translations. Existing approved entries were preserved. GlotPress reported 101/101 readme strings and 242/242 interface strings translated, with no waiting, fuzzy or warning entries. The complete readme catalog is retained in `docs/translations/` and is excluded from the installable ZIP. Directory page and language-pack caches can take time to refresh after imports.
+
 Official asset requirements: https://developer.wordpress.org/plugins/wordpress-org/plugin-assets/
