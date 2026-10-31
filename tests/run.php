@@ -72,6 +72,7 @@ function esc_html($text) { return htmlspecialchars($text, ENT_QUOTES, 'UTF-8'); 
 function add_settings_error($setting, $code, $message) { $GLOBALS['setting_errors'][] = $code; }
 function wp_json_encode($value) { return json_encode($value, JSON_UNESCAPED_UNICODE); }
 function wp_strip_all_tags($text) { return strip_tags($text); }
+function wp_check_invalid_utf8($text) { return $text; }
 function sanitize_text_field($text) { return trim(strip_tags($text)); }
 function switch_to_locale($locale) { return false; }
 function restore_previous_locale() { return false; }
@@ -220,6 +221,8 @@ expect(count($GLOBALS['requests']) === 1 && strpos($GLOBALS['requests'][0][0], '
 expect(get_post_meta(1, '_treda_publication', true)['message_id'] === 42, 'Message mapping persisted');
 $body = json_decode($GLOBALS['requests'][0][1]['body'], true);
 expect(strpos($body['text'], '<script>') === false && strpos($body['text'], "\n\n") !== false, 'Announcement has plain input and real line breaks');
+expect(!isset($body['parse_mode']) && strpos($body['text'], '<b>') === false && strpos($body['text'], '<a ') === false && strpos($body['text'], 'Статья & ') === 0, 'Announcement sends plain text without HTML escaping or formatting');
+expect($body['link_preview_options'] === array('is_disabled' => false, 'url' => 'https://site.example/post/1/', 'prefer_large_media' => true, 'show_above_text' => false) && substr($body['text'], -strlen('https://site.example/post/1/')) === 'https://site.example/post/1/', 'Preview explicitly targets the visible article URL below the announcement');
 expect(Treda_Publisher::publish(payload()) === true && count($GLOBALS['requests']) === 1, 'Unchanged export causes no network request');
 unset($GLOBALS['meta'][1]['_treda_message_key']);
 Treda_Publisher::publish(payload());

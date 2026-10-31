@@ -23,14 +23,46 @@ final class Treda_Publisher {
 		}
 	}
 
-	public static function text( $post ) {
-		$title   = self::plain( $post->post_title );
-		$source  = $post->post_excerpt !== '' ? $post->post_excerpt : $post->post_content;
-		$excerpt = self::plain( strip_shortcodes( $source ) );
-		$title   = self::truncate( $title, 200 );
-		$excerpt = self::truncate( $excerpt, 650 );
-		return '<b>' . esc_html( $title ) . "</b>\n\n" . esc_html( $excerpt )
-			. "\n\n" . '<a href="' . esc_url( get_permalink( $post ) ) . '">' . esc_html( Treda_Settings::article_link_text() ) . '</a>';
+	public static function text( $post, $maximum = 4096 ) {
+		$url = get_permalink( $post );
+		if ( self::text_units( $url ) > $maximum ) {
+			return new WP_Error( 'treda_link_length', __( 'The article URL is too long for this Telegram message.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'failed' ) );
+		}
+		$label = self::clip( Treda_Settings::article_link_text(), $maximum - self::text_units( $url ) - 1 );
+		$link  = $label === '' ? $url : $label . "\n" . $url;
+		$left  = $maximum - self::text_units( $link ) - 2;
+		$title = self::clip( self::plain( $post->post_title ), min( 200, $left ) );
+		$left -= $title === '' ? 0 : self::text_units( $title ) + 2;
+		$source = $post->post_excerpt !== '' ? $post->post_excerpt : $post->post_content;
+		// Keep paragraph and list breaks while removing all rich formatting.
+		$source = preg_replace( '~<br\b[^>]*>|</(?:p|div|li|h[1-6]|blockquote|pre|tr)>~i', "\n\n", strip_shortcodes( $source ) );
+		$source = html_entity_decode( wp_strip_all_tags( $source ), ENT_QUOTES, 'UTF-8' );
+		$source = str_replace( array( "\r\n", "\r", "\xc2\xa0" ), array( "\n", "\n", ' ' ), $source );
+		$source = preg_replace( '/[^\S\n]+/u', ' ', $source );
+		$source = preg_replace( '/ *\n */u', "\n", $source );
+		$source = preg_replace( '/\n{3,}/', "\n\n", $source );
+		$excerpt = self::clip( trim( $source ), min( 650, $left ) );
+		return implode( "\n\n", array_filter( array( $title, $excerpt, $link ), 'strlen' ) );
+	}
+
+	private static function text_units( $text ) {
+		preg_match_all( '/./us', wp_check_invalid_utf8( $text ), $matches );
+		$units = 0;
+		foreach ( $matches[0] as $char ) { $units += strlen( $char ) === 4 ? 2 : 1; }
+		return $units;
+	}
+
+	private static function clip( $text, $maximum ) {
+		if ( $maximum <= 0 ) { return ''; }
+		if ( self::text_units( $text ) <= $maximum ) { return $text; }
+		preg_match_all( '/./us', wp_check_invalid_utf8( $text ), $matches );
+		$clipped = ''; $units = 0;
+		foreach ( $matches[0] as $char ) {
+			$units += strlen( $char ) === 4 ? 2 : 1;
+			if ( $units > $maximum - 1 ) { break; }
+			$clipped .= $char;
+		}
+		return rtrim( $clipped ) . '…';
 	}
 
 	public static function plain( $text ) {
@@ -77,41 +109,24 @@ final class Treda_Publisher {
 		if ( ! empty( $binding['message_id'] ) && ! self::save_message_key( $post->ID, $binding ) ) {
 			return new WP_Error( 'treda_index', __( 'Could not save the publication mapping index.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'pending' ) );
 		}
-		$media = Treda_Media::for_post( $post );
-		if ( is_wp_error( $media ) ) { return $media; }
-		$photo = $media || in_array( $binding['media_type'] ?? '', array( 'photo', 'caption' ), true );
-		$params = array(
-			'chat_id'    => $connection['chat_id'],
-			'parse_mode' => 'HTML',
-		);
+		// Existing media messages retain their ID and discussion; new posts are always text.
+		$photo = ! empty( $binding['message_id'] ) && in_array( $binding['media_type'] ?? '', array( 'photo', 'caption' ), true );
+		$params = array( 'chat_id' => $connection['chat_id'] );
 		$params[ $photo ? 'caption' : 'text' ] = $photo ? Treda_Media::caption( $post ) : self::text( $post );
-		// Preserve the hash of old text-only messages; photo hashes include the actual file bytes.
-		if ( ! $photo ) { $params = array( 'chat_id' => $connection['chat_id'], 'text' => $params['text'], 'parse_mode' => 'HTML' ); }
-		$photo_hash = $media ? $media['hash'] : ( $binding['photo_hash'] ?? '' );
-		if ( $photo ) { $params['photo_hash'] = $photo_hash; }
+		if ( is_wp_error( $params[ $photo ? 'caption' : 'text' ] ) ) { return $params[ $photo ? 'caption' : 'text' ]; }
+		if ( ! $photo ) {
+			$params['link_preview_options'] = array( 'is_disabled' => false, 'url' => get_permalink( $post ), 'prefer_large_media' => true, 'show_above_text' => false );
+		}
 		$hash   = hash( 'sha256', wp_json_encode( $params ) );
 		if ( ! empty( $binding['hash'] ) && hash_equals( $binding['hash'], $hash ) ) {
 			return true;
 		}
 		$editing = ! empty( $binding['message_id'] );
-		unset( $params['photo_hash'] );
-		$files = array();
-		$method = $editing ? 'editMessageText' : 'sendMessage';
-		if ( $photo ) {
-			$changed = $media && ( ( $binding['media_type'] ?? '' ) !== 'photo' || ( $binding['photo_hash'] ?? '' ) !== $photo_hash );
-			$method = $editing ? ( $changed ? 'editMessageMedia' : 'editMessageCaption' ) : 'sendPhoto';
-			if ( ! $editing || $changed ) {
-				$reference = $media['reference']; $files = $media['files'];
-				if ( $editing ) {
-					$params['media'] = wp_json_encode( array( 'type' => 'photo', 'media' => $reference, 'caption' => $params['caption'], 'parse_mode' => 'HTML' ) );
-					unset( $params['caption'], $params['parse_mode'] );
-				} else { $params['photo'] = $reference; }
-			}
-		}
+		$method = $photo ? 'editMessageCaption' : ( $editing ? 'editMessageText' : 'sendMessage' );
 		if ( $editing ) {
 			$params['message_id'] = (int) $binding['message_id'];
 		}
-		$result = Treda_API::call( $method, $params, ! $editing, $files );
+		$result = Treda_API::call( $method, $params, ! $editing );
 		if ( is_wp_error( $result ) ) {
 			return $result;
 		}
@@ -125,8 +140,7 @@ final class Treda_Publisher {
 				'chat_id'    => $connection['chat_id'],
 				'message_id' => $editing ? $binding['message_id'] : (int) $result['message_id'],
 				'hash'       => $hash,
-				'media_type' => $photo ? ( $media ? 'photo' : ( $binding['media_type'] ?? 'photo' ) ) : 'text',
-				'photo_hash' => $photo_hash,
+				'media_type' => $photo ? $binding['media_type'] : 'text',
 				'updated_at' => time(),
 			)
 		);

@@ -81,12 +81,6 @@ final class Treda_Media {
 	}
 
 	public static function caption( $post ) {
-		$title = self::limit( Treda_Publisher::plain( $post->post_title ), 200 );
-		$label = Treda_Settings::article_link_text();
-		$used = 4;
-		foreach ( self::units( $title . $label ) as $char ) { $used += strlen( $char ) === 4 ? 2 : 1; }
-		$source = $post->post_excerpt !== '' ? $post->post_excerpt : $post->post_content;
-		$excerpt = self::limit( Treda_Publisher::plain( strip_shortcodes( $source ) ), min( 650, 1024 - $used ) );
-		return '<b>' . esc_html( $title ) . "</b>\n\n" . esc_html( $excerpt ) . "\n\n<a href=\"" . esc_url( get_permalink( $post ) ) . '">' . esc_html( $label ) . '</a>';
+		return Treda_Publisher::text( $post, 1024 );
 	}
 }

@@ -62,7 +62,7 @@ $treda_local_webhook = ! Treda_Settings::valid_https_url( $treda_webhook_url )
 					<p id="treda-publish-help"><?php esc_html_e( 'Send public posts to your channel and update their announcements when you edit them.', 'threadtandem-sync-for-telegram' ); ?></p></div>
 					<label class="treda-switch"><input id="treda-publish-enabled" type="checkbox" role="switch" name="treda_settings[enabled]" value="1" <?php checked( $settings['enabled'], 1 ); ?> aria-labelledby="treda-publish-label" aria-describedby="treda-publish-help"><span aria-hidden="true"></span></label>
 				</div>
-				<p class="treda-help treda-poster-help"><?php esc_html_e( 'Announcements include the featured image, or the first image in the post when no featured image is set. Local JPEG and PNG files are uploaded directly to Telegram.', 'threadtandem-sync-for-telegram' ); ?></p>
+				<p class="treda-help treda-poster-help"><?php esc_html_e( 'Announcements are plain text with a visible article URL and a link preview. Telegram generates the preview from the public article page.', 'threadtandem-sync-for-telegram' ); ?></p>
 				<div class="treda-card-body"><div class="treda-field"><label for="treda-article-link-text"><?php esc_html_e( 'Article link text', 'threadtandem-sync-for-telegram' ); ?></label>
 					<input id="treda-article-link-text" type="text" name="treda_settings[article_link_text]" value="<?php echo esc_attr( $settings['article_link_text'] ); ?>" maxlength="100" placeholder="<?php echo esc_attr( Treda_Settings::default_article_link_text() ); ?>" aria-describedby="treda-article-link-help">
 					<p id="treda-article-link-help" class="treda-help"><?php esc_html_e( 'Text below the Telegram announcement that links to the article. Leave blank for the default in the site language. Maximum 100 characters.', 'threadtandem-sync-for-telegram' ); ?></p>
@@ -130,13 +130,30 @@ $treda_local_webhook = ! Treda_Settings::valid_https_url( $treda_webhook_url )
 
 	<details id="treda-diagnostics" class="treda-card treda-disclosure treda-diagnostics"
 	<?php
-	if ( $counts['failed'] || $counts['uncertain'] ) :
+	if ( $history_open ) :
 		?>
 		open<?php endif; ?>>
 		<summary><span class="dashicons dashicons-chart-bar" aria-hidden="true"></span><span><?php esc_html_e( 'Queue and diagnostics', 'threadtandem-sync-for-telegram' ); ?><small><?php esc_html_e( 'Delivery history and jobs that need attention', 'threadtandem-sync-for-telegram' ); ?></small></span><span class="treda-badge <?php echo $counts['failed'] || $counts['uncertain'] ? 'treda-badge-warning' : 'treda-badge-neutral'; ?>"><?php echo esc_html( $counts['failed'] || $counts['uncertain'] ? __( 'Needs attention', 'threadtandem-sync-for-telegram' ) : __( 'In progress', 'threadtandem-sync-for-telegram' ) ); ?> <?php echo (int) ( $counts['failed'] + $counts['uncertain'] ?: $counts['pending'] + $counts['running'] ); ?></span><span class="dashicons dashicons-arrow-down-alt2 treda-chevron" aria-hidden="true"></span></summary>
-		<div class="treda-diagnostics-body"><div class="treda-diagnostics-toolbar"><div class="treda-counts"><span><?php esc_html_e( 'Queued', 'threadtandem-sync-for-telegram' ); ?> <strong><?php echo (int) $counts['pending']; ?></strong></span><span><?php esc_html_e( 'Failed', 'threadtandem-sync-for-telegram' ); ?> <strong><?php echo (int) $counts['failed']; ?></strong></span><span><?php esc_html_e( 'Result unknown', 'threadtandem-sync-for-telegram' ); ?> <strong><?php echo (int) $counts['uncertain']; ?></strong></span></div><?php self::action_form( 'run', __( 'Process queue now', 'threadtandem-sync-for-telegram' ) ); ?></div>
+		<div class="treda-diagnostics-body"><div class="treda-diagnostics-toolbar"><div class="treda-counts"><span><?php esc_html_e( 'Queued', 'threadtandem-sync-for-telegram' ); ?> <strong><?php echo (int) $counts['pending']; ?></strong></span><span><?php esc_html_e( 'Failed', 'threadtandem-sync-for-telegram' ); ?> <strong><?php echo (int) $counts['failed']; ?></strong></span><span><?php esc_html_e( 'Result unknown', 'threadtandem-sync-for-telegram' ); ?> <strong><?php echo (int) $counts['uncertain']; ?></strong></span></div><?php self::action_form( 'run', __( 'Process queue now', 'threadtandem-sync-for-telegram' ), 'secondary', false, $view ); ?></div>
+			<nav class="treda-diagnostic-filters" aria-label="<?php esc_attr_e( 'Delivery status filters', 'threadtandem-sync-for-telegram' ); ?>">
+			<?php
+			$treda_filters = array(
+				'attention' => array( __( 'Needs attention', 'threadtandem-sync-for-telegram' ), $counts['failed'] + $counts['uncertain'] ),
+				'failed' => array( __( 'Failed', 'threadtandem-sync-for-telegram' ), $counts['failed'] ),
+				'uncertain' => array( __( 'Result unknown', 'threadtandem-sync-for-telegram' ), $counts['uncertain'] ),
+				'pending' => array( __( 'Queued', 'threadtandem-sync-for-telegram' ), $counts['pending'] ),
+				'running' => array( __( 'Running', 'threadtandem-sync-for-telegram' ), $counts['running'] ),
+				'done' => array( __( 'Done', 'threadtandem-sync-for-telegram' ), $counts['done'] ),
+				'all' => array( __( 'All jobs', 'threadtandem-sync-for-telegram' ), array_sum( $counts ) ),
+			);
+			foreach ( $treda_filters as $treda_status => $treda_filter ) :
+				$treda_filter_url = add_query_arg( array( 'page' => 'threadtandem', 'queue_status' => $treda_status ), admin_url( 'options-general.php' ) ) . '#treda-diagnostics';
+				?>
+				<a href="<?php echo esc_url( $treda_filter_url ); ?>"<?php if ( $view['queue_status'] === $treda_status ) { echo ' aria-current="page"'; } ?>><?php echo esc_html( $treda_filter[0] ); ?> <span><?php echo (int) $treda_filter[1]; ?></span></a>
+			<?php endforeach; ?>
+			</nav>
 			<?php if ( ! $jobs ) : ?>
-				<div class="treda-empty-state"><span class="dashicons dashicons-yes-alt" aria-hidden="true"></span><h3><?php esc_html_e( 'The queue is empty.', 'threadtandem-sync-for-telegram' ); ?></h3><p><?php esc_html_e( 'Publish a post or approve a comment to see its delivery here.', 'threadtandem-sync-for-telegram' ); ?></p></div>
+				<div class="treda-empty-state"><span class="dashicons dashicons-yes-alt" aria-hidden="true"></span><h3><?php echo esc_html( array_sum( $counts ) ? __( 'No jobs match this filter.', 'threadtandem-sync-for-telegram' ) : __( 'The queue is empty.', 'threadtandem-sync-for-telegram' ) ); ?></h3></div>
 			<?php else : ?>
 				<div class="treda-table-scroll" tabindex="0" role="region" aria-label="<?php esc_attr_e( 'Recent delivery jobs', 'threadtandem-sync-for-telegram' ); ?>"><table class="widefat"><thead><tr><th scope="col"><?php esc_html_e( 'Job', 'threadtandem-sync-for-telegram' ); ?></th><th scope="col"><?php esc_html_e( 'Status', 'threadtandem-sync-for-telegram' ); ?></th><th scope="col"><?php esc_html_e( 'Attempts', 'threadtandem-sync-for-telegram' ); ?></th><th scope="col"><?php esc_html_e( 'Message', 'threadtandem-sync-for-telegram' ); ?></th><th scope="col"><?php esc_html_e( 'Action', 'threadtandem-sync-for-telegram' ); ?></th></tr></thead><tbody>
 				<?php
@@ -153,13 +170,18 @@ $treda_local_webhook = ! Treda_Settings::valid_https_url( $treda_webhook_url )
 					<?php
 					if ( in_array( $treda_job->status, array( 'failed', 'uncertain' ), true ) ) :
 						?>
-						<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>"><?php wp_nonce_field( 'treda_action' ); ?><input type="hidden" name="action" value="treda_action"><input type="hidden" name="operation" value="retry"><input type="hidden" name="job_id" value="<?php echo (int) $treda_job->id; ?>">
+						<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>"><?php wp_nonce_field( 'treda_action' ); ?><input type="hidden" name="action" value="treda_action"><input type="hidden" name="operation" value="retry"><input type="hidden" name="job_id" value="<?php echo (int) $treda_job->id; ?>"><input type="hidden" name="queue_status" value="<?php echo esc_attr( $view['queue_status'] ); ?>"><input type="hidden" name="queue_page" value="<?php echo (int) $view['queue_page']; ?>">
 						<?php
 						if ( $treda_job->status === 'uncertain' ) :
 							?>
 						<label class="treda-retry-confirm"><input type="checkbox" name="acknowledge" value="1" required> <?php esc_html_e( 'I checked Telegram and accept the risk of a duplicate.', 'threadtandem-sync-for-telegram' ); ?></label><?php endif; ?><?php submit_button( __( 'Retry', 'threadtandem-sync-for-telegram' ), 'secondary small', 'submit', false ); ?></form><?php endif; ?></td></tr>
 				<?php endforeach; ?>
 				</tbody></table></div>
+				<?php if ( $history['pages'] > 1 ) :
+					$treda_pagination_base = str_replace( '999999', '%#%', add_query_arg( array( 'page' => 'threadtandem', 'queue_status' => $view['queue_status'], 'queue_page' => 999999 ), admin_url( 'options-general.php' ) ) );
+					?>
+					<nav class="treda-sync-pagination" aria-label="<?php esc_attr_e( 'Pagination', 'threadtandem-sync-for-telegram' ); ?>"><?php echo wp_kses_post( paginate_links( array( 'base' => $treda_pagination_base, 'total' => $history['pages'], 'current' => $history['page'], 'add_args' => false, 'add_fragment' => '#treda-diagnostics' ) ) ); ?></nav>
+				<?php endif; ?>
 			<?php endif; ?>
 			<p class="treda-help treda-queue-help"><?php esc_html_e( 'WP-Cron processes small batches. Low-traffic sites may need a system cron. An uncertain result requires checking Telegram before retrying.', 'threadtandem-sync-for-telegram' ); ?></p>
 		</div>

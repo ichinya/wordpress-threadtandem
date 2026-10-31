@@ -102,10 +102,6 @@ msgstr "Отправка записей в Telegram"
 msgid "Send public posts to your channel and update their announcements when you edit them."
 msgstr "Отправлять опубликованные записи в канал и обновлять анонсы при изменении записей на сайте."
 
-#: includes/admin-view.php:65
-msgid "Announcements include the featured image, or the first image in the post when no featured image is set. Local JPEG and PNG files are uploaded directly to Telegram."
-msgstr "В анонс добавляется миниатюра записи. Если она не назначена, используется первая картинка из текста. Локальные файлы JPEG и PNG загружаются в Telegram напрямую."
-
 #: includes/admin-view.php:66
 msgid "Article link text"
 msgstr "Текст ссылки на статью"
@@ -950,6 +946,27 @@ msgstr "Перед активацией ThreadTandem на этом сайте о
 #: threadtandem-sync-for-telegram.php:69
 msgid "ThreadTandem could not create its database tables. Check the database permissions."
 msgstr "ThreadTandem не удалось создать таблицы базы данных. Проверьте права доступа к базе."
+
 #: includes/class-treda-publisher.php
 msgid "Telegram connection settings changed after this job was queued. Nothing was sent. Check the current bot and channel, then queue this post again from the Synchronization page."
 msgstr "Настройки подключения Telegram изменились после добавления задания в очередь. Ничего не отправлено. Проверьте текущего бота и канал, затем повторно отправьте запись со страницы синхронизации."
+
+#: includes/admin-view.php:65
+msgid "Announcements are plain text with a visible article URL and a link preview. Telegram generates the preview from the public article page."
+msgstr "Анонсы отправляются обычным текстом с видимой ссылкой и предпросмотром. Telegram создаёт карточку по публичной странице статьи."
+
+#: includes/class-treda-publisher.php:29
+msgid "The article URL is too long for this Telegram message."
+msgstr "Ссылка на статью слишком длинная для этого сообщения Telegram."
+
+#: includes/admin-view.php
+msgid "All jobs"
+msgstr "Все задания"
+
+#: includes/admin-view.php
+msgid "Delivery status filters"
+msgstr "Фильтры состояния доставки"
+
+#: includes/admin-view.php
+msgid "No jobs match this filter."
+msgstr "Заданий с таким состоянием нет."

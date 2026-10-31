@@ -254,13 +254,31 @@ final class Treda_Queue {
 	}
 
 	public static function recent() {
+		return self::diagnostics()['jobs'];
+	}
+
+	public static function diagnostic_status( $status ) {
+		return is_string( $status ) && in_array( $status, array( 'all', 'attention', 'pending', 'running', 'done', 'failed', 'uncertain' ), true ) ? $status : 'all';
+	}
+
+	/** Read-only, bounded history; successful events cannot hide jobs needing attention. */
+	public static function diagnostics( $status = 'all', $page = 1 ) {
 		global $wpdb;
-		return $wpdb->get_results(
+		$status = self::diagnostic_status( $status );
+		$where = $status === 'attention' ? "WHERE status IN ('failed','uncertain')" : '';
+		if ( ! in_array( $status, array( 'all', 'attention' ), true ) ) {
+			$where = $wpdb->prepare( 'WHERE status=%s', $status );
+		}
+		$total = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM %i $where", self::table() ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Static SQL or prepared allowlisted status.
+		$pages = max( 1, (int) ceil( $total / 20 ) );
+		$page = min( $pages, max( 1, (int) $page ) );
+		$jobs = $wpdb->get_results(
 			$wpdb->prepare(
-				'SELECT id,job_key,kind,status,attempts,last_error,updated_at FROM %i ORDER BY updated_at DESC,id DESC LIMIT 20',
-				self::table()
+				"SELECT id,job_key,kind,status,attempts,last_error,updated_at FROM %i $where ORDER BY CASE status WHEN 'failed' THEN 0 WHEN 'uncertain' THEN 1 WHEN 'running' THEN 2 WHEN 'pending' THEN 3 ELSE 4 END,updated_at DESC,id DESC LIMIT 20 OFFSET %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Static SQL or prepared allowlisted status.
+				self::table(), ( $page - 1 ) * 20
 			)
 		);
+		return array( 'jobs' => $jobs, 'total' => $total, 'pages' => $pages, 'page' => $page, 'status' => $status );
 	}
 
 	public static function counts() {

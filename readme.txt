@@ -18,7 +18,7 @@ ThreadTandem is independently developed and is not affiliated with or endorsed b
 
 Features:
 
-* Publish text announcements for public posts and update the same message when the exported title, excerpt or link changes.
+* Publish plain-text announcements with a visible article URL and a link preview. Telegram generates the preview from the public article page. Update the same message when the exported title, excerpt or link changes.
 * Customize the article link text in settings. Russian sites default to "Читать статью" even without an installed plugin language pack.
 * Import new channel text posts and media captions as WordPress drafts through the background queue.
 * Recover up to 100 pending events after a delivery outage, acknowledging only events durably accepted by the queue and restoring the webhook afterwards.
@@ -39,6 +39,7 @@ Features:
 
 This release supports text posts and comments. Media captions can be imported as text, without downloading attachments. Telegram Login, forum topics, attachments, automatic historical import and moderation commands in Telegram are not included.
 Long announcements and website comments are shortened to fit Telegram; their complete original text remains on the website.
+Previously sent media announcements keep their original message and discussion when updated; only their plain-text caption is changed. New announcements do not upload a separate poster. Link previews depend on Telegram and require a publicly accessible article URL.
 
 = External service: Telegram =
 

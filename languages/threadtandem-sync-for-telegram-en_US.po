@@ -102,10 +102,6 @@ msgstr "Post publishing"
 msgid "Send public posts to your channel and update their announcements when you edit them."
 msgstr "Send public posts to your channel and update their announcements when you edit them."
 
-#: includes/admin-view.php:65
-msgid "Announcements include the featured image, or the first image in the post when no featured image is set. Local JPEG and PNG files are uploaded directly to Telegram."
-msgstr "Announcements include the featured image, or the first image in the post when no featured image is set. Local JPEG and PNG files are uploaded directly to Telegram."
-
 #: includes/admin-view.php:66
 msgid "Article link text"
 msgstr "Article link text"
@@ -950,6 +946,27 @@ msgstr "Deactivate the previous plugin network-wide before activating ThreadTand
 #: threadtandem-sync-for-telegram.php:69
 msgid "ThreadTandem could not create its database tables. Check the database permissions."
 msgstr "ThreadTandem could not create its database tables. Check the database permissions."
+
 #: includes/class-treda-publisher.php
 msgid "Telegram connection settings changed after this job was queued. Nothing was sent. Check the current bot and channel, then queue this post again from the Synchronization page."
 msgstr "Telegram connection settings changed after this job was queued. Nothing was sent. Check the current bot and channel, then queue this post again from the Synchronization page."
+
+#: includes/admin-view.php:65
+msgid "Announcements are plain text with a visible article URL and a link preview. Telegram generates the preview from the public article page."
+msgstr "Announcements are plain text with a visible article URL and a link preview. Telegram generates the preview from the public article page."
+
+#: includes/class-treda-publisher.php:29
+msgid "The article URL is too long for this Telegram message."
+msgstr "The article URL is too long for this Telegram message."
+
+#: includes/admin-view.php
+msgid "All jobs"
+msgstr "All jobs"
+
+#: includes/admin-view.php
+msgid "Delivery status filters"
+msgstr "Delivery status filters"
+
+#: includes/admin-view.php
+msgid "No jobs match this filter."
+msgstr "No jobs match this filter."

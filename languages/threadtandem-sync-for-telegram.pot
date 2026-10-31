@@ -106,7 +106,7 @@ msgid "Send public posts to your channel and update their announcements when you
 msgstr ""
 
 #: includes/admin-view.php:65
-msgid "Announcements include the featured image, or the first image in the post when no featured image is set. Local JPEG and PNG files are uploaded directly to Telegram."
+msgid "Announcements are plain text with a visible article URL and a link preview. Telegram generates the preview from the public article page."
 msgstr ""
 
 #: includes/admin-view.php:66
@@ -977,4 +977,20 @@ msgstr ""
 
 #: includes/class-treda-publisher.php
 msgid "Telegram connection settings changed after this job was queued. Nothing was sent. Check the current bot and channel, then queue this post again from the Synchronization page."
+msgstr ""
+
+#: includes/class-treda-publisher.php:29
+msgid "The article URL is too long for this Telegram message."
+msgstr ""
+
+#: includes/admin-view.php
+msgid "All jobs"
+msgstr ""
+
+#: includes/admin-view.php
+msgid "Delivery status filters"
+msgstr ""
+
+#: includes/admin-view.php
+msgid "No jobs match this filter."
 msgstr ""

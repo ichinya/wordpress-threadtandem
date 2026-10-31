@@ -129,16 +129,29 @@ final class Treda_Admin {
 			),
 			60
 		);
-		wp_safe_redirect( admin_url( 'options-general.php?page=threadtandem' ) );
+		$url = admin_url( 'options-general.php?page=threadtandem' );
+		if ( in_array( $operation, array( 'run', 'retry' ), true ) ) {
+			$view = self::diagnostic_request( $_POST, 'attention' );
+			$url = add_query_arg( $view, $url ) . '#treda-diagnostics';
+		}
+		wp_safe_redirect( $url );
 		exit;
 	}
 
-	private static function action_form( $operation, $label, $class = 'secondary', $disabled = false ) {
+	private static function action_form( $operation, $label, $class = 'secondary', $disabled = false, $context = array() ) {
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="treda-inline-form" data-treda-action-form>';
 		wp_nonce_field( 'treda_action' );
 		echo '<input type="hidden" name="action" value="treda_action"><input type="hidden" name="operation" value="' . esc_attr( $operation ) . '">';
+		foreach ( $context as $key => $value ) { echo '<input type="hidden" name="' . esc_attr( $key ) . '" value="' . esc_attr( $value ) . '">'; }
 		submit_button( $label, $class, 'submit', false, $disabled ? array( 'disabled' => true ) : array() );
 		echo '</form>';
+	}
+
+	private static function diagnostic_request( $input, $default ) {
+		return array(
+			'queue_status' => Treda_Queue::diagnostic_status( isset( $input['queue_status'] ) && is_string( $input['queue_status'] ) ? wp_unslash( $input['queue_status'] ) : $default ),
+			'queue_page' => isset( $input['queue_page'] ) && is_scalar( $input['queue_page'] ) ? max( 1, absint( $input['queue_page'] ) ) : 1,
+		);
 	}
 
 	public static function render() {
@@ -147,8 +160,13 @@ final class Treda_Admin {
 		}
 		$settings   = Treda_Settings::get();
 		$connection = Treda_Settings::connection();
-		$jobs       = Treda_Queue::recent();
 		$counts     = Treda_Queue::counts();
+		// These GET parameters only filter the read-only delivery history.
+		$view       = self::diagnostic_request( $_GET, $counts['failed'] || $counts['uncertain'] ? 'attention' : 'all' ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$history_open = $counts['failed'] || $counts['uncertain'] || isset( $_GET['queue_status'] ) || isset( $_GET['queue_page'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$history    = Treda_Queue::diagnostics( $view['queue_status'], $view['queue_page'] );
+		$view['queue_page'] = $history['page'];
+		$jobs       = $history['jobs'];
 		$notice     = get_transient( 'treda_notice_' . get_current_user_id() );
 		if ( $notice ) {
 			delete_transient( 'treda_notice_' . get_current_user_id() );

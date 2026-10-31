@@ -100,6 +100,11 @@
 .treda-diagnostics-toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; padding: 20px 24px; }
 .treda-counts { display: flex; flex-wrap: wrap; gap: 20px; color: var(--treda-muted); font-size: 12px; }
 .treda-counts strong { margin-left: 5px; color: #1d2327; }
+.treda-diagnostic-filters { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 24px 20px; }
+.treda-diagnostic-filters a { display: inline-flex; align-items: center; gap: 7px; padding: 7px 10px; border: 1px solid var(--treda-border); border-radius: 5px; color: #50575e; font-size: 12px; text-decoration: none; }
+.treda-diagnostic-filters a[aria-current=page] { background: #f0f6fc; border-color: #b7d0e4; color: #135e96; }
+.treda-diagnostic-filters a:focus-visible { outline: 2px solid var(--treda-accent); outline-offset: 2px; }
+.treda-diagnostic-filters span { padding: 0 5px; border-radius: 3px; background: #dcdcde80; font-size: 11px; }
 .treda-empty-state { padding: 25px 24px 35px; text-align: center; }
 .treda-empty-state > .dashicons { color: #8c8f94; font-size: 28px; width: 28px; height: 28px; margin-bottom: 8px; }
 .treda-empty-state h3 { margin: 5px 0; font-size: 13px; font-weight: 500; }
