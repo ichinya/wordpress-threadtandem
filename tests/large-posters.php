@@ -1,0 +1,41 @@
+<?php
+/** Bounded photo uploads and explicit proxy rejections in the disposable offline QA site. */
+require __DIR__ . '/publication-formats.php';
+add_filter( 'pre_http_request', 'treda_test_http', 10, 3 );
+$pixels = imagecreatetruecolor( 1800, 1000 );
+for ( $x = 0; $x < 1800; $x++ ) { imageline( $pixels, $x, 0, $x, 999, imagecolorallocate( $pixels, $x % 256, ( $x * 3 ) % 256, ( $x * 7 ) % 256 ) ); }
+ob_start(); imagepng( $pixels, null, 0 ); $original = ob_get_clean(); imagedestroy( $pixels );
+$upload = wp_upload_bits( 'qa-large-poster.png', null, $original );
+treda_test_expect( ! $upload['error'] && strlen( $original ) > 1024 * 1024, 'Large valid PNG fixture exceeds a common reverse-proxy upload limit' );
+$image_id = wp_insert_attachment( array( 'post_title' => 'Large poster QA', 'post_mime_type' => 'image/png', 'post_status' => 'inherit' ), $upload['file'] );
+$id = wp_insert_post( array( 'post_title' => 'Bounded photo upload', 'post_status' => 'draft', 'meta_input' => array( '_thumbnail_id' => $image_id ) ) );
+$temporary_before = glob( get_temp_dir() . 'threadtandem-photo-*' );
+$media = Treda_Media::for_post( get_post( $id ) );
+treda_test_expect( ! is_wp_error( $media ) && strlen( $media['files']['photo']['data'] ) <= 900 * 1024 && $media['files']['photo']['type'] === 'image/jpeg', 'A large local PNG becomes a JPEG upload no larger than 900 KiB' );
+$dimensions = getimagesizefromstring( $media['files']['photo']['data'] );
+treda_test_expect( $dimensions && max( $dimensions[0], $dimensions[1] ) <= 1600 && abs( $dimensions[0] / $dimensions[1] - 1.8 ) < 0.01, 'Upload dimensions are bounded while retaining the original aspect ratio' );
+treda_test_expect( hash_file( 'sha256', $upload['file'] ) === hash( 'sha256', $original ), 'Media Library original is unchanged by upload preparation' );
+$again = Treda_Media::for_post( get_post( $id ) );
+treda_test_expect( $again['hash'] === $media['hash'] && $again['files']['photo']['data'] === $media['files']['photo']['data'], 'Repeated preparation produces the same content hash and avoids unnecessary media edits' );
+treda_test_expect( glob( get_temp_dir() . 'threadtandem-photo-*' ) === $temporary_before, 'Owned temporary JPEGs and placeholders are removed after preparation' );
+$no_editor = static function () { return array(); };
+add_filter( 'wp_image_editors', $no_editor );
+$unavailable = Treda_Media::for_post( get_post( $id ) );
+remove_filter( 'wp_image_editors', $no_editor );
+treda_test_expect( is_wp_error( $unavailable ) && $unavailable->get_error_code() === 'treda_poster_size' && $unavailable->get_error_data()['state'] === 'failed', 'An unavailable image editor fails explicitly instead of uploading an oversized file or silently omitting the image' );
+$treda_test_next_error = array( 'headers' => array(), 'response' => array( 'code' => 413 ), 'body' => '<html>Request Entity Too Large: ' . Treda_Settings::token() . '</html>' );
+wp_update_post( array( 'ID' => $id, 'post_status' => 'publish' ) ); treda_test_run();
+$job = treda_test_job( 'post:' . $id );
+treda_test_expect( $job->status === 'failed' && strpos( $job->last_error, '413' ) !== false && strpos( $job->last_error, 'sendPhoto' ) !== false, 'An HTML proxy rejection is stored as a size error with safe request diagnostics' );
+treda_test_expect( strpos( $job->last_error, Treda_Settings::token() ) === false && ! get_post_meta( $id, '_treda_publication', true ), 'The rejected send creates no false mapping and stores no token or remote body' );
+treda_test_expect( Treda_Queue::retry( $job->id, false ), 'A confirmed rejection can be retried without an uncertain-result acknowledgement' );
+treda_test_run();
+$binding = get_post_meta( $id, '_treda_publication', true );
+$photos = treda_test_methods( 'sendPhoto' ); $last = end( $photos );
+treda_test_expect( treda_test_job( 'post:' . $id )->status === 'done' && $binding['media_type'] === 'photo' && strlen( $last['files']['photo']['data'] ) <= 900 * 1024, 'Retry with the bounded poster completes through the real queue and saves its message binding' );
+$count = count( $treda_test_calls );
+Treda_Queue::post( $id ); treda_test_run();
+treda_test_expect( count( $treda_test_calls ) === $count, 'An unchanged retry does not duplicate or reupload the announcement' );
+remove_filter( 'pre_http_request', 'treda_test_http', 10 );
+echo wp_json_encode( array( 'wordpress' => get_bloginfo( 'version' ), 'php' => PHP_VERSION, 'checks' => $treda_test_checks ), JSON_PRETTY_PRINT ) . PHP_EOL;
+WP_CLI::success( count( $treda_test_checks ) . ' checks passed, including bounded photo uploads and proxy diagnostics.' );

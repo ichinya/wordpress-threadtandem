@@ -252,6 +252,17 @@ $GLOBALS['responses'][] = array('code' => 502, 'body' => 'bad gateway');
 expect(state(Treda_API::call('sendMessage', array(), true)) === 'uncertain', 'Gateway failure on send is ambiguous');
 $GLOBALS['responses'][] = array('code' => 502, 'body' => 'bad gateway');
 expect(state(Treda_API::call('editMessageText')) === 'pending', 'Editing by known message ID may be retried');
+foreach (array('sendMessage', 'sendPhoto', 'editMessageMedia') as $method) {
+    $GLOBALS['responses'][] = array('code' => 413, 'body' => '<html>proxy rejected ' . Treda_Settings::token() . '</html>');
+    $result = Treda_API::call($method, array(), $method !== 'editMessageMedia');
+    expect(state($result) === 'failed' && $result->get_error_code() === 'treda_upload_limit', 'HTML 413 is an explicit size rejection, not an uncertain delivery: ' . $method);
+    expect($result->get_error_data()['http_status'] === 413 && $result->get_error_data()['response_format'] === 'HTML' && $result->get_error_data()['method'] === $method, 'Size diagnostics retain safe HTTP and method facts: ' . $method);
+    expect(strpos($result->get_error_message(), Treda_Settings::token()) === false && strpos($result->get_error_message(), '<html>') === false, 'Proxy error bodies and tokens are never logged: ' . $method);
+}
+$GLOBALS['responses'][] = array('code' => 502, 'body' => '<html>private ' . Treda_Settings::token() . '</html>');
+$result = Treda_API::call('sendPhoto', array('caption' => 'private caption'), true);
+expect(state($result) === 'uncertain' && $result->get_error_data()['http_status'] === 502 && strpos($result->get_error_message(), 'HTTP 502') !== false, 'A gateway failure remains protected from duplicate retries and records the HTTP status');
+expect(strpos($result->get_error_message(), 'private caption') === false && strpos($result->get_error_message(), Treda_Settings::token()) === false && $result->get_error_data()['request_bytes'] > 0, 'Ambiguous diagnostics expose only method, format, byte count and elapsed time');
 $GLOBALS['responses'][] = array('code' => 400, 'body' => json_encode(array('ok' => false, 'error_code' => 400, 'description' => 'Bad Request: message is not modified')));
 expect(Treda_API::call('editMessageText') === true, 'Already-applied edit considered success');
 

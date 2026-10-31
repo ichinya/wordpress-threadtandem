@@ -7,8 +7,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-31T15:53:38+05:00\n"
-"PO-Revision-Date: 2026-10-31 12:09+0000\n"
+"POT-Creation-Date: 2026-10-31T19:26:03+05:00\n"
+"PO-Revision-Date: 2026-10-31 14:26+0000\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: threadtandem-sync-for-telegram\n"
 "Language: en_US\n"
@@ -457,105 +457,115 @@ msgstr "Unknown action."
 msgid "Save the bot token first."
 msgstr "Save the bot token first."
 
-#: includes/class-treda-api.php:42
+#: includes/class-treda-api.php:44
 msgid "The send result is unknown. Check Telegram before retrying."
 msgstr "The send result is unknown. Check Telegram before retrying."
 
-#: includes/class-treda-api.php:43
+#: includes/class-treda-api.php:45
 msgid "Could not connect to Telegram."
 msgstr "Could not connect to Telegram."
 
-#: includes/class-treda-api.php:65
+#: includes/class-treda-api.php:58
+msgid "The Bot API server rejected the upload as too large (HTTP 413). Use a smaller photo or increase the server upload limit."
+msgstr "The Bot API server rejected the upload as too large (HTTP 413). Use a smaller photo or increase the server upload limit."
+
+#: includes/class-treda-api.php:78
 msgid "Telegram has limited the request rate."
 msgstr "Telegram has limited the request rate."
 
-#: includes/class-treda-api.php:75
+#: includes/class-treda-api.php:88
 msgid "Telegram did not confirm the operation result."
 msgstr "Telegram did not confirm the operation result."
 
-#: includes/class-treda-api.php:82
+#: includes/class-treda-api.php:95
 msgid "Telegram rejected the parameters. Check the destination and bot permissions."
 msgstr "Telegram rejected the parameters. Check the destination and bot permissions."
 
-#: includes/class-treda-api.php:83
+#: includes/class-treda-api.php:96
 msgid "Telegram rejected the bot token."
 msgstr "Telegram rejected the bot token."
 
-#: includes/class-treda-api.php:84
+#: includes/class-treda-api.php:97
 msgid "The bot does not have access or permission to send messages."
 msgstr "The bot does not have access or permission to send messages."
 
-#: includes/class-treda-api.php:86
+#: includes/class-treda-api.php:99
 msgid "Telegram rejected the request."
 msgstr "Telegram rejected the request."
 
+#. translators: 1: Bot API method, 2: HTTP status, 3: response format, 4:
+#. request size in bytes, 5: elapsed milliseconds.
+#: includes/class-treda-api.php:107
+msgid "Request %1$s: HTTP %2$d, format %3$s, %4$d bytes, %5$d ms."
+msgstr "Request %1$s: HTTP %2$d, format %3$s, %4$d bytes, %5$d ms."
+
 #. translators: 1: connection check step, 2: safe Telegram error message.
-#: includes/class-treda-api.php:93
+#: includes/class-treda-api.php:115
 msgid "%1$s: %2$s"
 msgstr "%1$s: %2$s"
 
 #. translators: %s: Telegram bot username, without the @ prefix.
-#: includes/class-treda-api.php:99
+#: includes/class-treda-api.php:121
 msgid "Bot: @%s."
 msgstr "Bot: @%s."
 
-#: includes/class-treda-api.php:108
+#: includes/class-treda-api.php:130
 msgid "Bot token check"
 msgstr "Bot token check"
 
-#: includes/class-treda-api.php:112
+#: includes/class-treda-api.php:134
 msgid "Save the channel before checking the connection."
 msgstr "Save the channel before checking the connection."
 
-#: includes/class-treda-api.php:116
+#: includes/class-treda-api.php:138
 msgid "Channel access"
 msgstr "Channel access"
 
-#: includes/class-treda-api.php:119
+#: includes/class-treda-api.php:141
 msgid "Select a Telegram channel. Forum groups are not supported by this release."
 msgstr "Select a Telegram channel. Forum groups are not supported by this release."
 
-#: includes/class-treda-api.php:129
+#: includes/class-treda-api.php:151
 msgid "Channel permissions"
 msgstr "Channel permissions"
 
-#: includes/class-treda-api.php:132
+#: includes/class-treda-api.php:154
 msgid "Add the bot as a channel administrator with permission to publish."
 msgstr "Add the bot as a channel administrator with permission to publish."
 
-#: includes/class-treda-api.php:145
+#: includes/class-treda-api.php:167
 msgid "Link a discussion group to the channel before enabling comment synchronization."
 msgstr "Link a discussion group to the channel before enabling comment synchronization."
 
-#: includes/class-treda-api.php:155
+#: includes/class-treda-api.php:177
 msgid "Discussion group access"
 msgstr "Discussion group access"
 
-#: includes/class-treda-api.php:158
+#: includes/class-treda-api.php:180
 msgid "Add the bot as an administrator of the linked discussion group."
 msgstr "Add the bot as an administrator of the linked discussion group."
 
-#: includes/class-treda-api.php:167 includes/class-treda-api.php:212
+#: includes/class-treda-api.php:189 includes/class-treda-api.php:234
 msgid "Check the connection first."
 msgstr "Check the connection first."
 
-#: includes/class-treda-api.php:171
+#: includes/class-treda-api.php:193
 msgid "The webhook requires a public HTTPS URL."
 msgstr "The webhook requires a public HTTPS URL."
 
-#: includes/class-treda-api.php:178
+#: includes/class-treda-api.php:200
 msgid "This bot already uses a different webhook. Use a dedicated bot or disconnect the previous integration first."
 msgstr "This bot already uses a different webhook. Use a dedicated bot or disconnect the previous integration first."
 
-#: includes/class-treda-api.php:204
+#: includes/class-treda-api.php:226
 msgid "The bot uses a different webhook. ThreadTandem will not change it."
 msgstr "The bot uses a different webhook. ThreadTandem will not change it."
 
-#: includes/class-treda-api.php:220 includes/class-treda-webhook.php:40
+#: includes/class-treda-api.php:242 includes/class-treda-webhook.php:40
 msgid "Invalid Telegram update."
 msgstr "Invalid Telegram update."
 
-#: includes/class-treda-api.php:229 includes/class-treda-webhook.php:49
+#: includes/class-treda-api.php:251 includes/class-treda-webhook.php:49
 #: includes/class-treda-webhook.php:86
 msgid "Could not store the Telegram update."
 msgstr "Could not store the Telegram update."
@@ -693,7 +703,11 @@ msgstr "Approved comments and the author name will also appear in the linked Tel
 msgid "From Telegram"
 msgstr "From Telegram"
 
-#: includes/class-treda-media.php:61
+#: includes/class-treda-media.php:93
+msgid "The poster is too large for a safe upload and could not be reduced. Enable a WordPress image editor or choose a smaller JPEG or PNG."
+msgstr "The poster is too large for a safe upload and could not be reduced. Enable a WordPress image editor or choose a smaller JPEG or PNG."
+
+#: includes/class-treda-media.php:97
 msgid "The poster could not be prepared. Use a readable JPEG or PNG in Media Library, up to 10 MB, with a width and height total up to 10000 and an aspect ratio up to 20:1."
 msgstr "The poster could not be prepared. Use a readable JPEG or PNG in Media Library, up to 10 MB, with a width and height total up to 10000 and an aspect ratio up to 20:1."
 

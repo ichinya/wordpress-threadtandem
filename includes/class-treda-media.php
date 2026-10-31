@@ -52,9 +52,45 @@ final class Treda_Media {
 		$size = filesize( $real );
 		$image = wp_getimagesize( $real );
 		if ( ! $size || $size > 10 * MB_IN_BYTES || ! $image || ! $image[0] || ! $image[1] || ! in_array( $image['mime'] ?? '', array( 'image/jpeg', 'image/png' ), true ) || $image[0] + $image[1] > 10000 || max( $image[0], $image[1] ) > 20 * min( $image[0], $image[1] ) ) { return self::error(); }
+		// Leave room for multipart fields below common 1 MiB reverse-proxy limits.
+		if ( $size > 900 * 1024 ) { return self::reduced_file( $real ); }
 		$data = file_get_contents( $real, false, null, 0, 10 * MB_IN_BYTES + 1 ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Validated local uploads file; no HTTP request.
 		if ( $data === false || strlen( $data ) > 10 * MB_IN_BYTES ) { return self::error(); }
 		return array( 'reference' => 'attach://photo', 'hash' => hash( 'sha256', $data ), 'files' => array( 'photo' => array( 'name' => sanitize_file_name( basename( $real ) ), 'type' => $image['mime'], 'data' => $data ) ) );
+	}
+
+	/** Prepare a bounded upload copy; never overwrite the Media Library original. */
+	private static function reduced_file( $real ) {
+		$editor = wp_get_image_editor( $real );
+		if ( is_wp_error( $editor ) ) { return self::size_error(); }
+		if ( ! function_exists( 'wp_tempnam' ) ) { require_once ABSPATH . 'wp-admin/includes/file.php'; }
+		$temporary = wp_tempnam( 'threadtandem-photo' );
+		if ( ! $temporary ) { return self::size_error(); }
+		$target = $temporary . '.jpg';
+		try {
+			foreach ( array( array( 1600, 82 ), array( 1280, 78 ), array( 1024, 72 ) ) as $attempt ) {
+				$dimensions = $editor->get_size();
+				if ( max( $dimensions['width'], $dimensions['height'] ) > $attempt[0]
+					&& is_wp_error( $editor->resize( $attempt[0], $attempt[0], false ) ) ) { return self::size_error(); }
+				if ( is_wp_error( $editor->set_quality( $attempt[1] ) ) ) { return self::size_error(); }
+				$saved = $editor->save( $target, 'image/jpeg' );
+				if ( is_wp_error( $saved ) || $saved['path'] !== $target ) { return self::size_error(); }
+				clearstatcache( true, $target );
+				$size = filesize( $target );
+				if ( ! $size || $size > 900 * 1024 ) { continue; }
+				$data = file_get_contents( $target, false, null, 0, 900 * 1024 + 1 ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Owned temporary image, no HTTP request.
+				if ( $data === false || strlen( $data ) > 900 * 1024 ) { return self::size_error(); }
+				return array( 'reference' => 'attach://photo', 'hash' => hash( 'sha256', $data ), 'files' => array( 'photo' => array( 'name' => sanitize_file_name( pathinfo( $real, PATHINFO_FILENAME ) . '.jpg' ), 'type' => 'image/jpeg', 'data' => $data ) ) );
+			}
+			return self::size_error();
+		} finally {
+			wp_delete_file( $target );
+			wp_delete_file( $temporary );
+		}
+	}
+
+	private static function size_error() {
+		return new WP_Error( 'treda_poster_size', __( 'The poster is too large for a safe upload and could not be reduced. Enable a WordPress image editor or choose a smaller JPEG or PNG.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'failed' ) );
 	}
 
 	private static function error() {

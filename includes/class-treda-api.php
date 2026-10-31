@@ -24,6 +24,8 @@ final class Treda_API {
 			}
 			$body .= '--' . $boundary . "--\r\n";
 		}
+		$started = microtime( true );
+		$request_bytes = strlen( $body );
 		$response = wp_safe_remote_post(
 			$settings['api_url'] . '/bot' . $token . '/' . $method,
 			array(
@@ -36,16 +38,27 @@ final class Treda_API {
 			)
 		);
 		if ( is_wp_error( $response ) ) {
-			return new WP_Error(
+			return self::request_error(
 				'treda_transport',
 				$creates_message
 				? __( 'The send result is unknown. Check Telegram before retrying.', 'threadtandem-sync-for-telegram' )
 				: __( 'Could not connect to Telegram.', 'threadtandem-sync-for-telegram' ),
-				array( 'state' => $creates_message ? 'uncertain' : 'pending' )
+				array( 'state' => $creates_message ? 'uncertain' : 'pending' ),
+				$method, 0, 'transport', $request_bytes, $started
 			);
 		}
 		$status = (int) wp_remote_retrieve_response_code( $response );
-		$body   = json_decode( wp_remote_retrieve_body( $response ), true );
+		$raw_body = wp_remote_retrieve_body( $response );
+		$body   = json_decode( $raw_body, true );
+		$format = is_array( $body ) ? 'JSON' : ( preg_match( '/^\s*<(?:!doctype|html)\b/i', $raw_body ) ? 'HTML' : 'non-JSON' );
+		// A reverse proxy may reject a large upload with an HTML error before Telegram sees it.
+		if ( $status === 413 ) {
+			return self::request_error(
+				'treda_upload_limit',
+				__( 'The Bot API server rejected the upload as too large (HTTP 413). Use a smaller photo or increase the server upload limit.', 'threadtandem-sync-for-telegram' ),
+				array( 'state' => 'failed' ), $method, $status, $format, $request_bytes, $started
+			);
+		}
 		if ( $status === 200 && is_array( $body ) && ! empty( $body['ok'] ) && array_key_exists( 'result', $body ) ) {
 			return $body['result'];
 		}
@@ -70,12 +83,12 @@ final class Treda_API {
 			);
 		}
 		if ( $status >= 500 || ! is_array( $body ) || ! isset( $body['ok'] ) ) {
-			return new WP_Error(
+			return self::request_error(
 				'treda_response',
 				__( 'Telegram did not confirm the operation result.', 'threadtandem-sync-for-telegram' ),
 				array(
 					'state' => $creates_message ? 'uncertain' : 'pending',
-				)
+				), $method, $status, $format, $request_bytes, $started
 			);
 		}
 		$messages = array(
@@ -84,6 +97,15 @@ final class Treda_API {
 			403 => __( 'The bot does not have access or permission to send messages.', 'threadtandem-sync-for-telegram' ),
 		);
 		return new WP_Error( 'treda_api', $messages[ $code ] ?? __( 'Telegram rejected the request.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'failed' ) );
+	}
+
+	/** Record bounded facts only, never remote bodies, credentials, URLs or message text. */
+	private static function request_error( $code, $message, $data, $method, $status, $format, $bytes, $started ) {
+		$method = preg_match( '/^[a-zA-Z][a-zA-Z0-9]{0,47}$/D', $method ) ? $method : 'API';
+		$elapsed = (int) round( max( 0, microtime( true ) - $started ) * 1000 );
+		/* translators: 1: Bot API method, 2: HTTP status, 3: response format, 4: request size in bytes, 5: elapsed milliseconds. */
+		$message .= ' ' . sprintf( __( 'Request %1$s: HTTP %2$d, format %3$s, %4$d bytes, %5$d ms.', 'threadtandem-sync-for-telegram' ), $method, $status, $format, $bytes, $elapsed );
+		return new WP_Error( $code, $message, array_merge( $data, array( 'method' => $method, 'http_status' => $status, 'response_format' => $format, 'request_bytes' => $bytes, 'elapsed_ms' => $elapsed ) ) );
 	}
 
 	/** Keep retry metadata and safe error text while identifying the failed connection step. */
