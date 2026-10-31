@@ -62,8 +62,14 @@ $treda_local_webhook = ! Treda_Settings::valid_https_url( $treda_webhook_url )
 					<p id="treda-publish-help"><?php esc_html_e( 'Send public posts to your channel and update their announcements when you edit them.', 'threadtandem-sync-for-telegram' ); ?></p></div>
 					<label class="treda-switch"><input id="treda-publish-enabled" type="checkbox" role="switch" name="treda_settings[enabled]" value="1" <?php checked( $settings['enabled'], 1 ); ?> aria-labelledby="treda-publish-label" aria-describedby="treda-publish-help"><span aria-hidden="true"></span></label>
 				</div>
-				<p class="treda-help treda-poster-help"><?php esc_html_e( 'Announcements are plain text with a visible article URL and a link preview. Telegram generates the preview from the public article page.', 'threadtandem-sync-for-telegram' ); ?></p>
-				<div class="treda-card-body"><div class="treda-field"><label for="treda-article-link-text"><?php esc_html_e( 'Article link text', 'threadtandem-sync-for-telegram' ); ?></label>
+				<div class="treda-card-body"><div class="treda-field"><label for="treda-publication-format"><?php esc_html_e( 'Publication format', 'threadtandem-sync-for-telegram' ); ?></label>
+					<select id="treda-publication-format" name="treda_settings[publication_format]" aria-describedby="treda-publication-format-help treda-publication-format-existing">
+						<option value="preview" <?php selected( Treda_Settings::publication_format(), 'preview' ); ?>><?php esc_html_e( 'Link with preview', 'threadtandem-sync-for-telegram' ); ?></option>
+						<option value="photo" <?php selected( Treda_Settings::publication_format(), 'photo' ); ?>><?php esc_html_e( 'Photo with description', 'threadtandem-sync-for-telegram' ); ?></option>
+					</select>
+					<p id="treda-publication-format-help" class="treda-help"><?php esc_html_e( 'Link: Telegram creates a preview of the article. Photo: upload the featured image or first content image with a description and link. Without an image, send a link preview.', 'threadtandem-sync-for-telegram' ); ?></p>
+					<p id="treda-publication-format-existing" class="treda-help"><?php esc_html_e( 'Changing this setting does not resend the archive. Use Send to update an announcement. An existing photo is kept when switching to link previews, preserving its comments.', 'threadtandem-sync-for-telegram' ); ?></p>
+				</div><div class="treda-field"><label for="treda-article-link-text"><?php esc_html_e( 'Article link text', 'threadtandem-sync-for-telegram' ); ?></label>
 					<input id="treda-article-link-text" type="text" name="treda_settings[article_link_text]" value="<?php echo esc_attr( $settings['article_link_text'] ); ?>" maxlength="100" placeholder="<?php echo esc_attr( Treda_Settings::default_article_link_text() ); ?>" aria-describedby="treda-article-link-help">
 					<p id="treda-article-link-help" class="treda-help"><?php esc_html_e( 'Text below the Telegram announcement that links to the article. Leave blank for the default in the site language. Maximum 100 characters.', 'threadtandem-sync-for-telegram' ); ?></p>
 					<p class="treda-help"><?php esc_html_e( 'Applies to new announcements and queued updates. To update an existing announcement, use Send on the Post synchronization page.', 'threadtandem-sync-for-telegram' ); ?></p>

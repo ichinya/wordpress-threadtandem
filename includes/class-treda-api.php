@@ -27,7 +27,8 @@ final class Treda_API {
 		$response = wp_safe_remote_post(
 			$settings['api_url'] . '/bot' . $token . '/' . $method,
 			array(
-				'timeout'             => 15,
+				// Allow time to upload and process a poster; ordinary requests stay short.
+				'timeout'             => $files ? 45 : 15,
 				'redirection'         => 0,
 				'headers'             => array( 'Content-Type' => $content_type ),
 				'body'                => $body,

@@ -973,3 +973,27 @@ msgstr "Заданий с таким состоянием нет."
 #: includes/class-treda-bulk.php
 msgid "New announcements are sent from oldest to newest by publication date. An earlier failed or uncertain send pauses later new announcements."
 msgstr "Новые анонсы отправляются по дате публикации: от старых к новым. Ошибка или неизвестный результат ранней отправки приостанавливают следующие новые анонсы."
+
+#: includes/admin-view.php includes/class-treda-settings.php
+msgid "Publication format"
+msgstr "Формат публикации"
+
+#: includes/admin-view.php includes/class-treda-settings.php
+msgid "Link with preview"
+msgstr "Ссылка с предпросмотром"
+
+#: includes/admin-view.php includes/class-treda-settings.php
+msgid "Photo with description"
+msgstr "Картинка с описанием"
+
+#: includes/admin-view.php includes/class-treda-settings.php
+msgid "Link: Telegram creates a preview of the article. Photo: upload the featured image or first content image with a description and link. Without an image, send a link preview."
+msgstr "Ссылка: Telegram создаёт карточку статьи. Картинка: миниатюра записи или первая картинка из текста загружается с описанием и ссылкой. Если картинки нет, отправляется ссылка с предпросмотром."
+
+#: includes/admin-view.php includes/class-treda-settings.php
+msgid "Changing this setting does not resend the archive. Use Send to update an announcement. An existing photo is kept when switching to link previews, preserving its comments."
+msgstr "Смена формата не запускает отправку архива. Чтобы обновить анонс, нажмите «Отправить». При выборе предпросмотра уже отправленное фото сохраняется вместе с обсуждением."
+
+#: includes/admin-view.php includes/class-treda-settings.php
+msgid "Select a supported publication format. The previous value was kept."
+msgstr "Выберите доступный формат публикации. Сохранено прежнее значение."

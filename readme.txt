@@ -18,7 +18,7 @@ ThreadTandem is independently developed and is not affiliated with or endorsed b
 
 Features:
 
-* Publish plain-text announcements with a visible article URL and a link preview. Telegram generates the preview from the public article page. Update the same message when the exported title, excerpt or link changes.
+* Choose link previews or photos with descriptions. Link previews use a plain-text announcement and visible article URL; Telegram generates the card from the public article page. Photo mode uploads the featured image or first content image with a plain-text description and link.
 * Customize the article link text in settings. Russian sites default to "Читать статью" even without an installed plugin language pack.
 * Import new channel text posts and media captions as WordPress drafts through the background queue.
 * Recover up to 100 pending events after a delivery outage, acknowledging only events durably accepted by the queue and restoring the webhook afterwards.
@@ -37,9 +37,9 @@ Features:
 * Configure a separate HTTPS Bot API server and an optional external webhook URL.
 * English interface and bundled Russian translations, including block-editor controls. Also supports WordPress.org language packs.
 
-This release supports text posts and comments. Media captions can be imported as text, without downloading attachments. Telegram Login, forum topics, attachments, automatic historical import and moderation commands in Telegram are not included.
+Incoming synchronization supports text posts and comments. Media captions can be imported as text, without downloading attachments. Downloading incoming attachments, Telegram Login, forum topics, automatic historical import and moderation commands in Telegram are not included.
 Long announcements and website comments are shortened to fit Telegram; their complete original text remains on the website.
-Previously sent media announcements keep their original message and discussion when updated; only their plain-text caption is changed. New announcements do not upload a separate poster. Link previews depend on Telegram and require a publicly accessible article URL.
+Link previews are the default. Photo mode falls back to a link preview when no image is available. Local JPEG/PNG posters are uploaded directly, up to 10 MB. Existing text announcements can be updated with a photo without changing their message ID. An existing photo is kept when switching to link previews or removing the poster, preserving its discussion. Format changes do not resend the archive; use Send on the synchronization page to queue an existing announcement. Link previews depend on Telegram and require a publicly accessible article URL.
 
 = External service: Telegram =
 

@@ -109,24 +109,44 @@ final class Treda_Publisher {
 		if ( ! empty( $binding['message_id'] ) && ! self::save_message_key( $post->ID, $binding ) ) {
 			return new WP_Error( 'treda_index', __( 'Could not save the publication mapping index.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'pending' ) );
 		}
-		// Existing media messages retain their ID and discussion; new posts are always text.
-		$photo = ! empty( $binding['message_id'] ) && in_array( $binding['media_type'] ?? '', array( 'photo', 'caption' ), true );
+		$editing = ! empty( $binding['message_id'] );
+		$media = Treda_Settings::publication_format() === 'photo' ? Treda_Media::for_post( $post ) : false;
+		if ( is_wp_error( $media ) ) { return $media; }
+		// Telegram cannot turn an existing photo into a plain text message without replacing it.
+		$photo = $media || ( $editing && in_array( $binding['media_type'] ?? '', array( 'photo', 'caption' ), true ) );
 		$params = array( 'chat_id' => $connection['chat_id'] );
 		$params[ $photo ? 'caption' : 'text' ] = $photo ? Treda_Media::caption( $post ) : self::text( $post );
 		if ( is_wp_error( $params[ $photo ? 'caption' : 'text' ] ) ) { return $params[ $photo ? 'caption' : 'text' ]; }
 		if ( ! $photo ) {
 			$params['link_preview_options'] = array( 'is_disabled' => false, 'url' => get_permalink( $post ), 'prefer_large_media' => true, 'show_above_text' => false );
 		}
-		$hash   = hash( 'sha256', wp_json_encode( $params ) );
+		$photo_hash = $media ? $media['hash'] : ( $binding['photo_hash'] ?? '' );
+		$hash_data = $params;
+		if ( $photo ) { $hash_data['photo_hash'] = $photo_hash; }
+		$hash   = hash( 'sha256', wp_json_encode( $hash_data ) );
 		if ( ! empty( $binding['hash'] ) && hash_equals( $binding['hash'], $hash ) ) {
 			return true;
 		}
-		$editing = ! empty( $binding['message_id'] );
+		$files = array();
 		$method = $photo ? 'editMessageCaption' : ( $editing ? 'editMessageText' : 'sendMessage' );
+		if ( $photo && $media ) {
+			$changed = ! $editing || ( $binding['media_type'] ?? '' ) !== 'photo' || ( $binding['photo_hash'] ?? '' ) !== $photo_hash;
+			if ( $changed ) {
+				$files = $media['files'];
+				if ( $editing ) {
+					$method = 'editMessageMedia';
+					$params['media'] = wp_json_encode( array( 'type' => 'photo', 'media' => $media['reference'], 'caption' => $params['caption'] ) );
+					unset( $params['caption'] );
+				} else {
+					$method = 'sendPhoto';
+					$params['photo'] = $media['reference'];
+				}
+			}
+		}
 		if ( $editing ) {
 			$params['message_id'] = (int) $binding['message_id'];
 		}
-		$result = Treda_API::call( $method, $params, ! $editing );
+		$result = Treda_API::call( $method, $params, ! $editing, $files );
 		if ( is_wp_error( $result ) ) {
 			return $result;
 		}
@@ -140,7 +160,8 @@ final class Treda_Publisher {
 				'chat_id'    => $connection['chat_id'],
 				'message_id' => $editing ? $binding['message_id'] : (int) $result['message_id'],
 				'hash'       => $hash,
-				'media_type' => $photo ? $binding['media_type'] : 'text',
+				'media_type' => $photo ? ( $media ? 'photo' : $binding['media_type'] ) : 'text',
+				'photo_hash' => $photo_hash,
 				'updated_at' => time(),
 			)
 		);

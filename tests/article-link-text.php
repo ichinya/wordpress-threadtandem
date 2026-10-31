@@ -2,6 +2,8 @@
 /** Announcement label coverage on the disposable integration installation. */
 require __DIR__ . '/channel-sync.php';
 add_filter( 'pre_http_request', 'treda_test_http', 10, 3 );
+// Earlier failure scenarios intentionally leave blocked jobs; label tests use a fresh outbox.
+$wpdb->query( $wpdb->prepare( 'DELETE FROM %i', Treda_Queue::table() ) );
 $original_site_language = get_option( 'WPLANG' );
 update_option( 'WPLANG', 'ru_RU' );
 $settings = Treda_Settings::get();

@@ -1,0 +1,67 @@
+<?php
+/** Both publication formats and safe updates, using real WordPress with an offline Bot API. */
+require __DIR__ . '/posters.php';
+add_filter( 'pre_http_request', 'treda_test_http', 10, 3 );
+// The preview suite ends with an intentionally uncertain send; isolate the next scenario.
+$wpdb->query( $wpdb->prepare( 'DELETE FROM %i', Treda_Queue::table() ) );
+$settings = Treda_Settings::get();
+$fingerprint = Treda_Settings::fingerprint();
+$calls_before = count( $treda_test_calls );
+$jobs_before = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i', Treda_Queue::table() ) );
+treda_test_expect( Treda_Settings::publication_format() === 'preview', 'Existing settings default to link previews' );
+$settings = Treda_Settings::sanitize( array_merge( $settings, array( 'publication_format' => 'photo' ) ) );
+update_option( 'treda_settings', $settings );
+treda_test_expect( Treda_Settings::publication_format() === 'photo' && Treda_Settings::fingerprint() === $fingerprint && Treda_Settings::ready(), 'Saving photo mode preserves the verified Telegram connection' );
+$invalid = Treda_Settings::sanitize( array_merge( $settings, array( 'publication_format' => array( 'unexpected' ) ) ) );
+$omitted = $settings; unset( $omitted['publication_format'] );
+treda_test_expect( $invalid['publication_format'] === 'photo' && Treda_Settings::sanitize( $omitted )['publication_format'] === 'photo', 'Malformed format values are rejected and omitted settings preserve the saved format' );
+treda_test_expect( count( $treda_test_calls ) === $calls_before && (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i', Treda_Queue::table() ) ) === $jobs_before, 'Changing formats does not enqueue or resend the archive' );
+$photo_id = wp_insert_post( array( 'post_title' => 'Photo & description 🚀', 'post_excerpt' => str_repeat( '<p>Plain <b>text</b> & emoji 🚀.</p>', 90 ), 'post_status' => 'publish', 'meta_input' => array( '_thumbnail_id' => $attachment ) ) );
+$photos_before = count( treda_test_methods( 'sendPhoto' ) );
+treda_test_run();
+$photos = treda_test_methods( 'sendPhoto' ); $last = end( $photos );
+$photo_binding = get_post_meta( $photo_id, '_treda_publication', true );
+treda_test_expect( count( $photos ) === $photos_before + 1 && $last['params']['photo'] === 'attach://photo' && ! empty( $last['files']['photo']['data'] ) && $photo_binding['media_type'] === 'photo', 'Photo mode uploads the local featured image with a new announcement' );
+treda_test_expect( $last['params']['caption'] === Treda_Media::caption( get_post( $photo_id ) ) && strlen( iconv( 'UTF-8', 'UTF-16LE', $last['params']['caption'] ) ) / 2 <= 1024 && ! isset( $last['params']['parse_mode'] ) && ! isset( $last['params']['link_preview_options'] ), 'Photo caption is plain text, includes the article link and fits Telegram UTF-16 limits' );
+$calls_before = count( $treda_test_calls ); Treda_Queue::post( $photo_id ); treda_test_run();
+treda_test_expect( count( $treda_test_calls ) === $calls_before, 'An unchanged photo job does not resend or reupload the poster' );
+wp_update_post( array( 'ID' => $photo_id, 'post_excerpt' => 'Changed caption & link' ) ); treda_test_run();
+$captions = treda_test_methods( 'editMessageCaption' ); $last = end( $captions );
+treda_test_expect( $last['params']['message_id'] === $photo_binding['message_id'] && ! $last['files'] && ! isset( $last['params']['parse_mode'] ), 'Caption-only changes keep the same message and do not reupload the image' );
+$replacement = wp_upload_bits( 'qa-format-replacement.png', null, file_get_contents( ABSPATH . 'wp-admin/images/about-texture.png' ) );
+treda_test_expect( ! $replacement['error'], 'A distinct valid local PNG is available for image-only updates' );
+$replacement_id = wp_insert_attachment( array( 'post_title' => 'Replacement poster', 'post_mime_type' => 'image/png', 'post_status' => 'inherit' ), $replacement['file'] );
+update_post_meta( $photo_id, '_thumbnail_id', $replacement_id ); Treda_Queue::post( $photo_id ); treda_test_run();
+$media_edits = treda_test_methods( 'editMessageMedia' ); $last = end( $media_edits );
+treda_test_expect( (int) $last['params']['message_id'] === $photo_binding['message_id'] && $last['files']['photo']['data'] === file_get_contents( $replacement['file'] ) && json_decode( $last['params']['media'], true )['caption'] === Treda_Media::caption( get_post( $photo_id ) ), 'Changing only the poster updates media on the same message' );
+delete_post_meta( $photo_id, '_thumbnail_id' ); wp_update_post( array( 'ID' => $photo_id, 'post_excerpt' => 'Poster removed from the site' ) ); treda_test_run();
+$captions = treda_test_methods( 'editMessageCaption' );
+treda_test_expect( (int) end( $captions )['params']['message_id'] === $photo_binding['message_id'] && get_post_meta( $photo_id, '_treda_publication', true )['media_type'] === 'photo', 'Removing the local poster preserves an already sent photo and its discussion' );
+$without = wp_insert_post( array( 'post_title' => 'No poster fallback', 'post_status' => 'publish' ) ); treda_test_run();
+treda_test_expect( get_post_meta( $without, '_treda_publication', true )['media_type'] === 'text', 'Photo mode falls back to a text link preview when no image exists' );
+
+$settings['publication_format'] = 'preview'; update_option( 'treda_settings', $settings );
+$convert = wp_insert_post( array( 'post_title' => 'Convert existing preview', 'post_status' => 'publish', 'meta_input' => array( '_thumbnail_id' => $attachment ) ) ); treda_test_run();
+$old_binding = get_post_meta( $convert, '_treda_publication', true );
+$settings['publication_format'] = 'photo'; update_option( 'treda_settings', $settings );
+$sends_before = count( treda_test_methods( 'sendMessage' ) ) + count( treda_test_methods( 'sendPhoto' ) );
+Treda_Queue::post( $convert ); treda_test_run();
+$converted = get_post_meta( $convert, '_treda_publication', true );
+$media_edits = treda_test_methods( 'editMessageMedia' );
+treda_test_expect( $converted['media_type'] === 'photo' && $converted['message_id'] === $old_binding['message_id'] && (int) end( $media_edits )['params']['message_id'] === $old_binding['message_id'] && count( treda_test_methods( 'sendMessage' ) ) + count( treda_test_methods( 'sendPhoto' ) ) === $sends_before, 'Choosing photo mode converts an existing text message without a duplicate or a new message ID' );
+$settings['publication_format'] = 'preview'; update_option( 'treda_settings', $settings );
+wp_update_post( array( 'ID' => $convert, 'post_excerpt' => 'Preview mode keeps the existing photo' ) ); treda_test_run();
+$captions = treda_test_methods( 'editMessageCaption' );
+treda_test_expect( (int) end( $captions )['params']['message_id'] === $old_binding['message_id'] && get_post_meta( $convert, '_treda_publication', true )['media_type'] === 'photo', 'Switching back to previews keeps an existing photo rather than deleting its discussion' );
+
+$settings['publication_format'] = 'photo'; update_option( 'treda_settings', $settings );
+$calls_before = count( $treda_test_calls );
+$invalid_photo = wp_insert_post( array( 'post_title' => 'Invalid selected poster', 'post_status' => 'publish', 'meta_input' => array( '_thumbnail_id' => 999999999 ) ) ); treda_test_run();
+treda_test_expect( treda_test_job( 'post:' . $invalid_photo )->status === 'failed' && count( $treda_test_calls ) === $calls_before && ! get_post_meta( $invalid_photo, '_treda_publication', true ), 'An invalid selected poster fails visibly without sending an unexpected text fallback' );
+update_post_meta( $invalid_photo, '_treda_disabled', '1' ); Treda_Queue::post( $invalid_photo ); treda_test_run();
+ob_start(); Treda_Admin::render(); $format_html = ob_get_clean();
+$dom = new DOMDocument(); @$dom->loadHTML( $format_html ); $xpath = new DOMXPath( $dom );
+treda_test_expect( $xpath->query( '//select[@name="treda_settings[publication_format]"]/option' )->length === 2 && $xpath->query( '//select[@id="treda-publication-format"]/option[@value="photo" and @selected]' )->length === 1, 'Settings expose exactly two formats and retain the saved selection' );
+remove_filter( 'pre_http_request', 'treda_test_http', 10 );
+echo wp_json_encode( array( 'wordpress' => get_bloginfo( 'version' ), 'php' => PHP_VERSION, 'checks' => $treda_test_checks ), JSON_PRETTY_PRINT ) . PHP_EOL;
+WP_CLI::success( count( $treda_test_checks ) . ' publication format checks passed.' );

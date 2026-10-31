@@ -998,3 +998,27 @@ msgstr ""
 #: includes/class-treda-bulk.php
 msgid "New announcements are sent from oldest to newest by publication date. An earlier failed or uncertain send pauses later new announcements."
 msgstr ""
+
+#: includes/admin-view.php includes/class-treda-settings.php
+msgid "Publication format"
+msgstr ""
+
+#: includes/admin-view.php includes/class-treda-settings.php
+msgid "Link with preview"
+msgstr ""
+
+#: includes/admin-view.php includes/class-treda-settings.php
+msgid "Photo with description"
+msgstr ""
+
+#: includes/admin-view.php includes/class-treda-settings.php
+msgid "Link: Telegram creates a preview of the article. Photo: upload the featured image or first content image with a description and link. Without an image, send a link preview."
+msgstr ""
+
+#: includes/admin-view.php includes/class-treda-settings.php
+msgid "Changing this setting does not resend the archive. Use Send to update an announcement. An existing photo is kept when switching to link previews, preserving its comments."
+msgstr ""
+
+#: includes/admin-view.php includes/class-treda-settings.php
+msgid "Select a supported publication format. The previous value was kept."
+msgstr ""

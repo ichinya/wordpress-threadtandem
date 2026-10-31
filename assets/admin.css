@@ -23,6 +23,7 @@
 .treda-field + .treda-field { margin-top: 23px; }
 .treda-field > label { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 9px; font-weight: 600; font-size: 13px; }
 .treda-settings input[type=text], .treda-settings input[type=password], .treda-settings input[type=url] { display: block; width: 100%; min-width: 0; min-height: 40px; margin: 0; padding: 7px 11px; border-color: #b8bdc2; border-radius: 5px; font-size: 13px; }
+.treda-settings .treda-field select { display: block; width: 100%; max-width: 100%; min-width: 0; min-height: 40px; margin: 0; padding: 7px 32px 7px 11px; border-color: #b8bdc2; border-radius: 5px; font-size: 13px; }
 .treda-settings input::placeholder { color: #8c8f94; opacity: 1; }
 .treda-settings input:focus { border-color: var(--treda-accent); box-shadow: 0 0 0 1px var(--treda-accent); }
 .treda-input-group { display: flex; align-items: stretch; gap: 8px; }

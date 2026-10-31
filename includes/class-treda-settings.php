@@ -27,6 +27,7 @@ final class Treda_Settings {
 				'chat_id'             => '',
 				'webhook_url'         => '',
 				'article_link_text'   => '',
+				'publication_format'  => 'preview',
 				'enabled'             => 0,
 				'import_enabled'      => 0,
 				'comments_enabled'    => 0,
@@ -54,6 +55,10 @@ final class Treda_Settings {
 
 	public static function token() {
 		return defined( 'TREDA_BOT_TOKEN' ) ? (string) TREDA_BOT_TOKEN : self::get()['token'];
+	}
+
+	public static function publication_format() {
+		return self::get()['publication_format'] === 'photo' ? 'photo' : 'preview';
 	}
 
 	public static function fingerprint() {
@@ -104,6 +109,13 @@ final class Treda_Settings {
 		$new['comments_enabled']    = empty( $input['comments_enabled'] ) ? 0 : 1;
 		$new['telegram_moderation'] = empty( $input['telegram_moderation'] ) ? 0 : 1;
 		$new['retain_data']         = empty( $input['retain_data'] ) ? 0 : 1;
+		if ( array_key_exists( 'publication_format', $input ) ) {
+			if ( is_string( $input['publication_format'] ) && in_array( $input['publication_format'], array( 'preview', 'photo' ), true ) ) {
+				$new['publication_format'] = $input['publication_format'];
+			} else {
+				add_settings_error( 'treda', 'publication_format', __( 'Select a supported publication format. The previous value was kept.', 'threadtandem-sync-for-telegram' ) );
+			}
+		}
 		if ( array_key_exists( 'article_link_text', $input ) && is_string( $input['article_link_text'] ) ) {
 			$new['article_link_text'] = wp_html_excerpt( trim( sanitize_text_field( $input['article_link_text'] ) ), 100, '' );
 		}
