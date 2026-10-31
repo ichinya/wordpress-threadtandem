@@ -4,6 +4,8 @@ Plugin slug: `threadtandem-sync-for-telegram`.
 
 Copy only the PNG files from `wordpress-org-assets/` to the top-level SVN `assets/` directory, alongside `trunk/` and `tags/`. These are directory images, not plugin runtime assets. Keep them outside the installable ZIP.
 
+The main-branch Actions deployment also publishes the allowlisted PNGs to this top-level SVN directory in the same commit as trunk. Other directory artwork is retained. Version-tag deployments leave directory images unchanged, so an older release cannot overwrite current screenshots. The existing SVN secret is used without exposing it locally.
+
 | File | View |
 | --- | --- |
 | `icon-128x128.png` | Standard plugin directory icon |

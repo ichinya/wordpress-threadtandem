@@ -73,4 +73,9 @@ jobs:
           PACKAGE: ${{ steps.build.outputs.package }}
           SOURCE_REF: ${{ github.ref }}
           SOURCE_COMMIT: ${{ github.sha }}
-        run: python3 tools/svn_deploy.py deploy --package "$PACKAGE" --ref "$SOURCE_REF" --commit "$SOURCE_COMMIT"
+        run: |
+          images=()
+          if [[ "$SOURCE_REF" == 'refs/heads/main' ]]; then
+            images=(--directory-assets wordpress-org-assets)
+          fi
+          python3 tools/svn_deploy.py deploy --package "$PACKAGE" --ref "$SOURCE_REF" --commit "$SOURCE_COMMIT" "${images[@]}"

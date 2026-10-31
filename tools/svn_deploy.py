@@ -88,6 +88,21 @@ def validate(package, tag=None):
     return payload
 
 
+def directory_assets(root):
+    """Directory images live beside trunk, never inside the installable package."""
+    if root.is_symlink() or not root.is_dir():
+        raise ValueError("Directory assets must be a real directory")
+    payload = files(root)
+    if not payload:
+        raise ValueError("Directory assets are empty")
+    for name, content in payload.items():
+        if not re.fullmatch(r"(?:icon-(?:128x128|256x256)|screenshot-[1-9]\d*(?:-[a-z]{2}(?:_[A-Z]{2})?)?)\.png", name):
+            raise ValueError("File outside directory image allowlist: " + name)
+        if not content.startswith(b"\x89PNG\r\n\x1a\n") or len(content) > 10 * 1024 * 1024:
+            raise ValueError("Expected a PNG image no larger than 10 MB: " + name)
+    return payload
+
+
 class SVN:
     def __init__(self, binary, config, username=None, password=None):
         self.binary, self.config = binary, config
@@ -153,8 +168,11 @@ def is_ancestor(repo, older, newer):
     return result.returncode == 0
 
 
-def deploy(package, mode, commit, git_repo, repository=REPOSITORY, svn_binary="svn", username="Ichi-nya", password=None, tag=None):
+def deploy(package, mode, commit, git_repo, repository=REPOSITORY, svn_binary="svn", username="Ichi-nya", password=None, tag=None, assets=None):
     payload = validate(package, tag if mode == "tag" else None)
+    images = directory_assets(assets) if assets is not None else None
+    if images is not None and mode != "main":
+        raise ValueError("Only main may update directory assets")
     if mode not in ("main", "tag") or (mode == "tag" and not tag):
         raise ValueError("Invalid deployment mode")
     if not re.fullmatch(r"[0-9a-f]{40}", commit):
@@ -187,6 +205,15 @@ def deploy(package, mode, commit, git_repo, repository=REPOSITORY, svn_binary="s
                     raise ValueError("Main history diverged; reconcile SVN manually before deploying")
             mirror(svn, trunk, set_stable(payload, stable))
             svn.run("propset", COMMIT_PROPERTY, commit, trunk)
+            if images is not None:
+                svn.run("update", "--set-depth", "infinity", wc / "assets")
+                # Update the allowlisted images only; retain other directory artwork.
+                for name, content in images.items():
+                    image = wc / "assets" / name
+                    if not image.exists() or image.read_bytes() != content:
+                        image.write_bytes(content)
+                    svn.run("add", "--force", image)
+                    svn.run("propset", "svn:mime-type", "image/png", image)
         else:
             destination = tags / tag
             if destination.exists():
@@ -216,6 +243,7 @@ def main():
     parser.add_argument("--package", type=Path, required=True)
     parser.add_argument("--ref", required=True)
     parser.add_argument("--commit", required=True)
+    parser.add_argument("--directory-assets", type=Path)
     args = parser.parse_args()
     tag = args.ref.removeprefix("refs/tags/").removeprefix("v") if args.ref.startswith("refs/tags/") else None
     if tag is not None:
@@ -228,7 +256,7 @@ def main():
     print("Validated " + str(len(payload)) + " package files; tree SHA256 " + digest)
     if args.command == "deploy":
         password = os.environ.pop("WPORG_SVN_PASSWORD", None)
-        print(deploy(args.package, "tag" if tag else "main", args.commit, Path.cwd(), password=password, tag=tag))
+        print(deploy(args.package, "tag" if tag else "main", args.commit, Path.cwd(), password=password, tag=tag, assets=args.directory_assets))
 
 
 if __name__ == "__main__":

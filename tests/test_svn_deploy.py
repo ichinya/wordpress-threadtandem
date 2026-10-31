@@ -1,5 +1,6 @@
 """Offline deployment tests using disposable Git and SVN repositories."""
 import importlib.util
+import base64
 import os
 from pathlib import Path
 import shutil
@@ -136,6 +137,34 @@ class DeploymentTests(unittest.TestCase):
         self.assertEqual(before, self.revision())
         self.assertEqual("", run(SVN, "list", self.url + "/tags"))
 
+    def test_directory_assets_update_without_touching_release_or_other_images(self):
+        payload = package(self.root / "package", "9.8.7")
+        self.publish(payload, "tag", self.first, "9.8.7")
+        images = self.root / "images"
+        images.mkdir()
+        png = base64.b64decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=")
+        (images / "screenshot-1.png").write_bytes(png)
+        original = self.cat("tags/9.8.7/readme.txt")
+        def publish_images(commit):
+            return deploy.deploy(payload, "main", commit, self.git, self.url, SVN, assets=images)
+        before = self.revision()
+        publish_images(self.second)
+        self.assertEqual(int(before) + 1, int(self.revision()), "Images and trunk publish atomically")
+        self.assertIn("screenshot-1.png", run(SVN, "list", self.url + "/assets"))
+        self.assertEqual("image/png", run(SVN, "propget", "svn:mime-type", self.url + "/assets/screenshot-1.png"))
+        self.assertEqual(original, self.cat("tags/9.8.7/readme.txt"))
+        self.assertNotIn("screenshot", run(SVN, "list", self.url + "/trunk"))
+        before = self.revision()
+        publish_images(self.second)
+        self.assertEqual(before, self.revision(), "Unchanged images do not create commits")
+        (images / "screenshot-1.png").rename(images / "screenshot-2-ru.png")
+        publish_images(self.third)
+        self.assertEqual("screenshot-1.png\nscreenshot-2-ru.png", run(SVN, "list", self.url + "/assets"))
+        (images / "screenshot-2-ru.png").write_bytes(png + b"stale")
+        before = self.revision()
+        self.assertIn("Skipped", publish_images(self.second))
+        self.assertEqual(before, self.revision(), "Older main runs cannot overwrite current images")
+
 
 class ValidationTests(unittest.TestCase):
     def setUp(self):
@@ -183,6 +212,17 @@ class ValidationTests(unittest.TestCase):
     def test_wrong_remote_rejected_before_credentials_are_used(self):
         with self.assertRaisesRegex(ValueError, "Only the plugin"):
             deploy.deploy(self.root, "main", "a" * 40, self.root, "https://example.invalid/svn", password="secret")
+
+    def test_directory_assets_reject_private_files_and_non_images(self):
+        images = self.root / "directory-images"
+        images.mkdir()
+        (images / "svn.txt").write_text("private", encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "allowlist"):
+            deploy.directory_assets(images)
+        (images / "svn.txt").unlink()
+        (images / "screenshot-1.png").write_text("not an image", encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "Expected a PNG"):
+            deploy.directory_assets(images)
 
 
 if __name__ == "__main__":
