@@ -2,12 +2,12 @@
 /** Native block-editor controls with a classic-editor fallback. */
 defined( 'ABSPATH' ) || exit;
 
-final class Treda_Editor {
+final class ThreadTandem_Editor {
 
 	public static function hooks() {
 		register_post_meta(
 			'post',
-			'_treda_disabled',
+			'_threadtandem_disabled',
 			array(
 				'type'              => 'string',
 				'single'            => true,
@@ -46,18 +46,18 @@ final class Treda_Editor {
 			return;
 		}
 		wp_enqueue_script(
-			'treda-editor',
-			plugins_url( 'assets/editor.js', TREDA_FILE ),
+			'threadtandem-editor',
+			plugins_url( 'assets/editor.js', THREADTANDEM_FILE ),
 			array( 'wp-plugins', 'wp-editor', 'wp-edit-post', 'wp-element', 'wp-components', 'wp-data', 'wp-i18n' ),
-			TREDA_VERSION,
+			(string) filemtime( THREADTANDEM_DIR . 'assets/editor.js' ),
 			true
 		);
 		$post   = get_post();
 		$config = array(
-			'publishingEnabled' => ! empty( Treda_Settings::get()['enabled'] ),
-			'publicationUrl'    => $post ? Treda_Publisher::link( get_post_meta( $post->ID, '_treda_publication', true ) ) : '',
+			'publishingEnabled' => ! empty( ThreadTandem_Settings::get()['enabled'] ),
+			'publicationUrl'    => $post ? ThreadTandem_Publisher::link( get_post_meta( $post->ID, '_threadtandem_publication', true ) ) : '',
 		);
-		wp_add_inline_script( 'treda-editor', 'window.tredaEditor = ' . wp_json_encode( $config ) . ';', 'before' );
-		wp_set_script_translations( 'treda-editor', 'threadtandem-sync-for-telegram', TREDA_DIR . 'languages' );
+		wp_add_inline_script( 'threadtandem-editor', 'window.threadtandemEditor = ' . wp_json_encode( $config ) . ';', 'before' );
+		wp_set_script_translations( 'threadtandem-editor', 'threadtandem-sync-for-telegram', THREADTANDEM_DIR . 'languages' );
 	}
 }

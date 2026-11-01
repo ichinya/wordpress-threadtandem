@@ -4,10 +4,10 @@ defined( 'ABSPATH' ) || exit;
 
 // Queue claims and leases require uncached, atomic SQL; WordPress has no queue API.
 // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-final class Treda_Queue {
+final class ThreadTandem_Queue {
 	public static function table() {
 		global $wpdb;
-		return $wpdb->prefix . 'treda_jobs';
+		return $wpdb->prefix . 'threadtandem_jobs';
 	}
 
 	public static function activate( $network_wide = false ) {
@@ -15,21 +15,21 @@ final class Treda_Queue {
 			wp_die( esc_html__( 'Activate ThreadTandem separately on each site, rather than network-wide.', 'threadtandem-sync-for-telegram' ) );
 		}
 		self::install();
-		if ( get_option( 'treda_schema_version' ) !== TREDA_SCHEMA_VERSION ) {
+		if ( get_option( 'threadtandem_schema_version' ) !== THREADTANDEM_SCHEMA_VERSION ) {
 			wp_die( esc_html__( 'ThreadTandem could not create its database tables.', 'threadtandem-sync-for-telegram' ) );
 		}
 	}
 
 	public static function hooks() {
 		add_filter( 'cron_schedules', array( __CLASS__, 'schedules' ) );
-		add_action( 'treda_tick', array( __CLASS__, 'run' ) );
-		if ( ! wp_next_scheduled( 'treda_tick' ) ) {
-			wp_schedule_event( time() + 60, 'treda_minute', 'treda_tick' );
+		add_action( 'threadtandem_tick', array( __CLASS__, 'run' ) );
+		if ( ! wp_next_scheduled( 'threadtandem_tick' ) ) {
+			wp_schedule_event( time() + 60, 'threadtandem_minute', 'threadtandem_tick' );
 		}
 	}
 
 	public static function schedules( $schedules ) {
-		$schedules['treda_minute'] = array(
+		$schedules['threadtandem_minute'] = array(
 			'interval' => 60,
 			'display'  => __( 'ThreadTandem: every minute', 'threadtandem-sync-for-telegram' ),
 		);
@@ -60,16 +60,16 @@ final class Treda_Queue {
             KEY ready (status,available_at)
         ) ENGINE=InnoDB $collate;"
 		);
-		Treda_Messages::install();
+		ThreadTandem_Messages::install();
 		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $table ) ) ) === $table
-			&& $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( Treda_Messages::table() ) ) ) === Treda_Messages::table() ) {
-			update_option( 'treda_schema_version', TREDA_SCHEMA_VERSION, false );
+			&& $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( ThreadTandem_Messages::table() ) ) ) === ThreadTandem_Messages::table() ) {
+			update_option( 'threadtandem_schema_version', THREADTANDEM_SCHEMA_VERSION, false );
 		}
-		Treda_Settings::secret();
+		ThreadTandem_Settings::secret();
 	}
 
 	public static function deactivate() {
-		wp_clear_scheduled_hook( 'treda_tick' );
+		wp_clear_scheduled_hook( 'threadtandem_tick' );
 	}
 
 	/** A single mutable job serializes each local entity, including concurrent edits. */
@@ -90,7 +90,7 @@ final class Treda_Queue {
 				wp_json_encode(
 					array(
 						$kind . '_id' => (int) $id,
-						'connection'  => $connection ?? Treda_Settings::fingerprint(),
+						'connection'  => $connection ?? ThreadTandem_Settings::fingerprint(),
 					)
 				),
 				$now,
@@ -117,7 +117,7 @@ final class Treda_Queue {
 	/** A duplicate preserves its durable receipt, without hiding other SQL errors. */
 	public static function event( $update ) {
 		global $wpdb;
-		$connection = Treda_Settings::connection();
+		$connection = ThreadTandem_Settings::connection();
 		if ( ! $connection ) {
 			return false;
 		}
@@ -132,7 +132,7 @@ final class Treda_Queue {
 				wp_json_encode(
 					array(
 						'update'     => $update,
-						'connection' => Treda_Settings::fingerprint(),
+						'connection' => ThreadTandem_Settings::fingerprint(),
 					)
 				),
 				$now,
@@ -165,15 +165,15 @@ final class Treda_Queue {
 					 AND (j.kind<>'post' OR current_post.ID IS NULL OR current_post.post_type<>'post'
 					 OR current_post.post_status<>'publish' OR current_post.post_password<>''
 					 OR EXISTS (SELECT 1 FROM %i AS current_meta WHERE current_meta.post_id=current_post.ID
-					 AND ((current_meta.meta_key='_treda_disabled' AND current_meta.meta_value='1')
-					 OR (current_meta.meta_key='_treda_publication' AND current_meta.meta_value NOT IN ('','a:0:{}'))))
+					 AND ((current_meta.meta_key='_threadtandem_disabled' AND current_meta.meta_value='1')
+					 OR (current_meta.meta_key='_threadtandem_publication' AND current_meta.meta_value NOT IN ('','a:0:{}'))))
 					 OR j.id=(
 					 SELECT q.id FROM %i AS q INNER JOIN %i AS p ON p.ID=CAST(SUBSTRING(q.job_key,6) AS UNSIGNED)
 					 WHERE q.kind='post' AND q.status IN ('pending','running','failed','uncertain')
 					 AND p.post_type='post' AND p.post_status='publish' AND p.post_password=''
 					 AND NOT EXISTS (SELECT 1 FROM %i AS pm WHERE pm.post_id=p.ID
-					 AND ((pm.meta_key='_treda_disabled' AND pm.meta_value='1')
-					 OR (pm.meta_key='_treda_publication' AND pm.meta_value NOT IN ('','a:0:{}'))))
+					 AND ((pm.meta_key='_threadtandem_disabled' AND pm.meta_value='1')
+					 OR (pm.meta_key='_threadtandem_publication' AND pm.meta_value NOT IN ('','a:0:{}'))))
 					 ORDER BY p.post_date ASC,p.ID ASC,q.id ASC LIMIT 1))
 					 ORDER BY j.id LIMIT 1",
 					self::table(),
@@ -206,22 +206,22 @@ final class Treda_Queue {
 			$payload = json_decode( $job->payload, true );
 			try {
 				if ( ! is_array( $payload ) ) {
-					$result = new WP_Error( 'treda_payload', __( 'Invalid job data.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'failed' ) );
+					$result = new WP_Error( 'threadtandem_payload', __( 'Invalid job data.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'failed' ) );
 				} elseif ( $job->kind === 'post' ) {
-					$result = Treda_Publisher::publish( $payload );
+					$result = ThreadTandem_Publisher::publish( $payload );
 				} elseif ( $job->kind === 'comment' ) {
-					$result = Treda_Comments::publish( $payload );
+					$result = ThreadTandem_Comments::publish( $payload );
 				} elseif ( $job->kind === 'update' ) {
-					$result = Treda_Webhook::process( $payload );
+					$result = ThreadTandem_Webhook::process( $payload );
 				} elseif ( $job->kind === 'bulk' ) {
-					$result = Treda_Bulk::process( $job, $token, $payload );
+					$result = ThreadTandem_Bulk::process( $job, $token, $payload );
 				} else {
-					$result = new WP_Error( 'treda_kind', __( 'Unknown job type.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'failed' ) );
+					$result = new WP_Error( 'threadtandem_kind', __( 'Unknown job type.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'failed' ) );
 				}
 			} catch ( Throwable $error ) {
 				$wpdb->query( 'ROLLBACK' );
 				$result = new WP_Error(
-					'treda_exception',
+					'threadtandem_exception',
 					__( 'The worker encountered an error. Check diagnostics.', 'threadtandem-sync-for-telegram' ),
 					array(
 						'state' => in_array( $job->kind, array( 'update', 'bulk' ), true ) ? 'failed' : 'uncertain',

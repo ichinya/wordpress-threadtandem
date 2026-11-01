@@ -12,9 +12,9 @@
 
 	var el = wp.element.createElement;
 	var __ = wp.i18n.__;
-	var config = window.tredaEditor || {};
+	var config = window.threadtandemEditor || {};
 
-	function TredaPanel() {
+	function ThreadTandemPanel() {
 		var state = wp.data.useSelect( function ( select ) {
 			var editor = select( 'core/editor' );
 			return {
@@ -30,12 +30,12 @@
 
 		return el(
 			Panel,
-			{ name: 'treda-telegram', title: __( 'ThreadTandem · Telegram', 'threadtandem-sync-for-telegram' ) },
+			{ name: 'threadtandem-telegram', title: __( 'ThreadTandem · Telegram', 'threadtandem-sync-for-telegram' ) },
 			el( wp.components.ToggleControl, {
 				label: __( 'Publish to Telegram', 'threadtandem-sync-for-telegram' ),
-				checked: state.meta._treda_disabled !== '1',
+				checked: state.meta._threadtandem_disabled !== '1',
 				onChange: function ( enabled ) {
-					editPost( { meta: Object.assign( {}, state.meta, { _treda_disabled: enabled ? '0' : '1' } ) } );
+					editPost( { meta: Object.assign( {}, state.meta, { _threadtandem_disabled: enabled ? '0' : '1' } ) } );
 				}
 			} ),
 			! config.publishingEnabled && el( 'p', {}, __( 'Automatic publishing is disabled in ThreadTandem settings.', 'threadtandem-sync-for-telegram' ) ),
@@ -48,5 +48,5 @@
 		);
 	}
 
-	wp.plugins.registerPlugin( 'treda', { render: TredaPanel } );
+	wp.plugins.registerPlugin( 'threadtandem', { render: ThreadTandemPanel } );
 } )( window.wp );

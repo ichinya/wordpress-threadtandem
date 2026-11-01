@@ -1,13 +1,13 @@
 <?php
 defined( 'ABSPATH' ) || exit;
 
-final class Treda_API {
+final class ThreadTandem_API {
 	/** Errors deliberately contain no remote body, token or request URL. */
 	public static function call( $method, $params = array(), $creates_message = false, $files = array() ) {
-		$settings = Treda_Settings::get();
-		$token    = Treda_Settings::token();
+		$settings = ThreadTandem_Settings::get();
+		$token    = ThreadTandem_Settings::token();
 		if ( $token === '' ) {
-			return new WP_Error( 'treda_token', __( 'Save the bot token first.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'failed' ) );
+			return new WP_Error( 'threadtandem_token', __( 'Save the bot token first.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'failed' ) );
 		}
 		$content_type = 'application/json';
 		$body = wp_json_encode( (object) $params );
@@ -39,7 +39,7 @@ final class Treda_API {
 		);
 		if ( is_wp_error( $response ) ) {
 			return self::request_error(
-				'treda_transport',
+				'threadtandem_transport',
 				$creates_message
 				? __( 'The send result is unknown. Check Telegram before retrying.', 'threadtandem-sync-for-telegram' )
 				: __( 'Could not connect to Telegram.', 'threadtandem-sync-for-telegram' ),
@@ -54,7 +54,7 @@ final class Treda_API {
 		// A reverse proxy may reject a large upload with an HTML error before Telegram sees it.
 		if ( $status === 413 ) {
 			return self::request_error(
-				'treda_upload_limit',
+				'threadtandem_upload_limit',
 				__( 'The Bot API server rejected the upload as too large (HTTP 413). Use a smaller photo or increase the server upload limit.', 'threadtandem-sync-for-telegram' ),
 				array( 'state' => 'failed' ), $method, $status, $format, $request_bytes, $started
 			);
@@ -74,7 +74,7 @@ final class Treda_API {
 		if ( $code === 429 ) {
 			$delay = max( 1, (int) ( $body['parameters']['retry_after'] ?? 60 ) );
 			return new WP_Error(
-				'treda_rate_limit',
+				'threadtandem_rate_limit',
 				__( 'Telegram has limited the request rate.', 'threadtandem-sync-for-telegram' ),
 				array(
 					'state' => 'pending',
@@ -84,7 +84,7 @@ final class Treda_API {
 		}
 		if ( $status >= 500 || ! is_array( $body ) || ! isset( $body['ok'] ) ) {
 			return self::request_error(
-				'treda_response',
+				'threadtandem_response',
 				__( 'Telegram did not confirm the operation result.', 'threadtandem-sync-for-telegram' ),
 				array(
 					'state' => $creates_message ? 'uncertain' : 'pending',
@@ -97,7 +97,7 @@ final class Treda_API {
 			403 => __( 'The bot does not have access or permission to send messages.', 'threadtandem-sync-for-telegram' ),
 			409 => __( 'Another getUpdates request or webhook is using this bot. Use a dedicated bot and stop the other receiver.', 'threadtandem-sync-for-telegram' ),
 		);
-		return new WP_Error( 'treda_api', $messages[ $code ] ?? __( 'Telegram rejected the request.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'failed' ) );
+		return new WP_Error( 'threadtandem_api', $messages[ $code ] ?? __( 'Telegram rejected the request.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'failed' ) );
 	}
 
 	/** Record bounded facts only, never remote bodies, credentials, URLs or message text. */
@@ -125,21 +125,21 @@ final class Treda_API {
 	}
 
 	public static function check() {
-		delete_option( 'treda_connection' );
+		delete_option( 'threadtandem_connection' );
 		$bot = self::call( 'getMe' );
 		if ( is_wp_error( $bot ) ) {
 			return self::check_error( $bot, __( 'Bot token check', 'threadtandem-sync-for-telegram' ) );
 		}
-		$settings = Treda_Settings::get();
+		$settings = ThreadTandem_Settings::get();
 		if ( $settings['chat_id'] === '' ) {
-			return new WP_Error( 'treda_chat', __( 'Save the channel before checking the connection.', 'threadtandem-sync-for-telegram' ) );
+			return new WP_Error( 'threadtandem_chat', __( 'Save the channel before checking the connection.', 'threadtandem-sync-for-telegram' ) );
 		}
 		$chat = self::call( 'getChat', array( 'chat_id' => $settings['chat_id'] ) );
 		if ( is_wp_error( $chat ) ) {
 			return self::check_error( $chat, __( 'Channel access', 'threadtandem-sync-for-telegram' ), $bot );
 		}
 		if ( ( $chat['type'] ?? '' ) !== 'channel' ) {
-			return new WP_Error( 'treda_mode', __( 'Select a Telegram channel. Forum groups are not supported by this release.', 'threadtandem-sync-for-telegram' ) );
+			return new WP_Error( 'threadtandem_mode', __( 'Select a Telegram channel. Forum groups are not supported by this release.', 'threadtandem-sync-for-telegram' ) );
 		}
 		$member = self::call(
 			'getChatMember',
@@ -152,10 +152,10 @@ final class Treda_API {
 			return self::check_error( $member, __( 'Channel permissions', 'threadtandem-sync-for-telegram' ), $bot );
 		}
 		if ( ( $member['status'] ?? '' ) !== 'administrator' || empty( $member['can_post_messages'] ) ) {
-			return new WP_Error( 'treda_rights', __( 'Add the bot as a channel administrator with permission to publish.', 'threadtandem-sync-for-telegram' ) );
+			return new WP_Error( 'threadtandem_rights', __( 'Add the bot as a channel administrator with permission to publish.', 'threadtandem-sync-for-telegram' ) );
 		}
 		$connection = array(
-			'fingerprint'        => Treda_Settings::fingerprint(),
+			'fingerprint'        => ThreadTandem_Settings::fingerprint(),
 			'bot_id'             => (string) $bot['id'],
 			'username'           => $bot['username'] ?? '',
 			'chat_id'            => (string) $chat['id'],
@@ -165,7 +165,7 @@ final class Treda_API {
 		);
 		if ( ! empty( $settings['comments_enabled'] ) ) {
 			if ( empty( $connection['discussion_chat_id'] ) ) {
-				return new WP_Error( 'treda_group', __( 'Link a discussion group to the channel before enabling comment synchronization.', 'threadtandem-sync-for-telegram' ) );
+				return new WP_Error( 'threadtandem_group', __( 'Link a discussion group to the channel before enabling comment synchronization.', 'threadtandem-sync-for-telegram' ) );
 			}
 			$group_member = self::call(
 				'getChatMember',
@@ -178,44 +178,46 @@ final class Treda_API {
 				return self::check_error( $group_member, __( 'Discussion group access', 'threadtandem-sync-for-telegram' ), $bot );
 			}
 			if ( ( $group_member['status'] ?? '' ) !== 'administrator' ) {
-				return new WP_Error( 'treda_group_rights', __( 'Add the bot as an administrator of the linked discussion group.', 'threadtandem-sync-for-telegram' ) );
+				return new WP_Error( 'threadtandem_group_rights', __( 'Add the bot as an administrator of the linked discussion group.', 'threadtandem-sync-for-telegram' ) );
 			}
 		}
-		update_option( 'treda_connection', $connection, false );
+		update_option( 'threadtandem_connection', $connection, false );
 		return $connection;
 	}
 
 	public static function register_webhook() {
-		if ( Treda_Settings::updates_mode() === 'polling' ) {
-			return new WP_Error( 'treda_mode', __( 'Cron polling is selected. A webhook will not be registered.', 'threadtandem-sync-for-telegram' ) );
+		if ( ThreadTandem_Settings::updates_mode() === 'polling' ) {
+			return new WP_Error( 'threadtandem_mode', __( 'Cron polling is selected. A webhook will not be registered.', 'threadtandem-sync-for-telegram' ) );
 		}
-		if ( ! Treda_Settings::ready() ) {
-			return new WP_Error( 'treda_connection', __( 'Check the connection first.', 'threadtandem-sync-for-telegram' ) );
+		if ( ! ThreadTandem_Settings::ready() ) {
+			return new WP_Error( 'threadtandem_connection', __( 'Check the connection first.', 'threadtandem-sync-for-telegram' ) );
 		}
-		$url = Treda_Settings::webhook_url();
-		if ( ! Treda_Settings::valid_https_url( $url ) ) {
-			return new WP_Error( 'treda_https', __( 'The webhook requires a public HTTPS URL.', 'threadtandem-sync-for-telegram' ) );
+		$url = ThreadTandem_Settings::webhook_url();
+		if ( ! ThreadTandem_Settings::valid_https_url( $url ) ) {
+			return new WP_Error( 'threadtandem_https', __( 'The webhook requires a public HTTPS URL.', 'threadtandem-sync-for-telegram' ) );
 		}
 		$info = self::call( 'getWebhookInfo' );
 		if ( is_wp_error( $info ) ) {
 			return $info;
 		}
-		if ( ! empty( $info['url'] ) && $info['url'] !== $url ) {
-			return new WP_Error( 'treda_conflict', __( 'This bot already uses a different webhook. Use a dedicated bot or disconnect the previous integration first.', 'threadtandem-sync-for-telegram' ) );
+		if ( ! empty( $info['url'] ) && ! ThreadTandem_Migration::owns_webhook( $info['url'], $url ) ) {
+			return new WP_Error( 'threadtandem_conflict', __( 'This bot already uses a different webhook. Use a dedicated bot or disconnect the previous integration first.', 'threadtandem-sync-for-telegram' ) );
 		}
 		if ( get_current_user_id() ) {
-			update_option( 'treda_import_author', get_current_user_id(), false );
+			update_option( 'threadtandem_import_author', get_current_user_id(), false );
 		}
-		return self::call(
+		$result = self::call(
 			'setWebhook',
 			array(
 				'url'                  => $url,
-				'secret_token'         => Treda_Settings::secret(),
+				'secret_token'         => ThreadTandem_Settings::secret(),
 				'allowed_updates'      => array( 'message', 'edited_message', 'channel_post', 'edited_channel_post' ),
 				'max_connections'      => 1,
 				'drop_pending_updates' => false,
 			)
 		);
+		if ( ! is_wp_error( $result ) ) { delete_option( 'threadtandem_webhook_upgrade' ); }
+		return $result;
 	}
 
 	public static function disconnect_webhook() {
@@ -226,16 +228,16 @@ final class Treda_API {
 		if ( empty( $info['url'] ) ) {
 			return true;
 		}
-		if ( $info['url'] !== Treda_Settings::webhook_url() ) {
-			return new WP_Error( 'treda_conflict', __( 'The bot uses a different webhook. ThreadTandem will not change it.', 'threadtandem-sync-for-telegram' ) );
+		if ( ! ThreadTandem_Migration::owns_webhook( $info['url'], ThreadTandem_Settings::webhook_url() ) ) {
+			return new WP_Error( 'threadtandem_conflict', __( 'The bot uses a different webhook. ThreadTandem will not change it.', 'threadtandem-sync-for-telegram' ) );
 		}
 		return self::call( 'deleteWebhook', array( 'drop_pending_updates' => false ) );
 	}
 
 	/** Recover one pending batch after a delivery outage; acknowledge only durable receipts. */
 	public static function recover_updates() {
-		if ( ! Treda_Settings::ready() ) {
-			return new WP_Error( 'treda_connection', __( 'Check the connection first.', 'threadtandem-sync-for-telegram' ) );
+		if ( ! ThreadTandem_Settings::ready() ) {
+			return new WP_Error( 'threadtandem_connection', __( 'Check the connection first.', 'threadtandem-sync-for-telegram' ) );
 		}
 		$disconnected = self::disconnect_webhook();
 		if ( is_wp_error( $disconnected ) ) { return $disconnected; }
@@ -243,16 +245,16 @@ final class Treda_API {
 		try {
 			$updates = self::call( 'getUpdates', array( 'limit' => 100, 'timeout' => 0 ) );
 			if ( is_wp_error( $updates ) || ! is_array( $updates ) ) {
-				$result = is_wp_error( $updates ) ? $updates : new WP_Error( 'treda_update', __( 'Invalid Telegram update.', 'threadtandem-sync-for-telegram' ) );
+				$result = is_wp_error( $updates ) ? $updates : new WP_Error( 'threadtandem_update', __( 'Invalid Telegram update.', 'threadtandem-sync-for-telegram' ) );
 			} else {
 				$last = -1;
 				foreach ( $updates as $update ) {
-					$request = new WP_REST_Request( 'POST', '/treda/v1/webhook' );
+					$request = new WP_REST_Request( 'POST', '/threadtandem/v1/webhook' );
 					$request->set_header( 'Content-Type', 'application/json' );
 					$request->set_body( wp_json_encode( $update ) );
-					$accepted = Treda_Webhook::receive( $request );
+					$accepted = ThreadTandem_Webhook::receive( $request );
 					if ( is_wp_error( $accepted ) || $accepted->get_status() >= 300 ) {
-						$result = is_wp_error( $accepted ) ? $accepted : new WP_Error( 'treda_storage', __( 'Could not store the Telegram update.', 'threadtandem-sync-for-telegram' ) );
+						$result = is_wp_error( $accepted ) ? $accepted : new WP_Error( 'threadtandem_storage', __( 'Could not store the Telegram update.', 'threadtandem-sync-for-telegram' ) );
 						break;
 					}
 					$last = max( $last, $update['update_id'] );
@@ -264,7 +266,7 @@ final class Treda_API {
 				}
 			}
 		} finally {
-			$restored = Treda_Settings::updates_mode() === 'webhook' ? self::register_webhook() : true;
+			$restored = ThreadTandem_Settings::updates_mode() === 'webhook' ? self::register_webhook() : true;
 		}
 		return is_wp_error( $restored ) ? $restored : $result;
 	}

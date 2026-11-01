@@ -164,8 +164,8 @@ msgid "WordPress 6.2 or later is required for safely prepared database table ide
 msgstr "Требуется WordPress 6.2 или новее для безопасной подстановки идентификаторов таблиц базы данных в запросы. Таблицы комментариев, метаданных комментариев и связей ThreadTandem должны использовать InnoDB для импорта с поддержкой транзакций."
 
 #. Found in installation paragraph.
-msgid "An optional TREDA_BOT_TOKEN constant in wp-config.php takes precedence over the database token. The saved token is never rendered back into the settings form. Protect database backups as you would other site credentials."
-msgstr "Необязательная константа TREDA_BOT_TOKEN в wp-config.php имеет приоритет над токеном из базы данных. Сохранённый токен никогда не выводится обратно в форму настроек. Защищайте резервные копии базы данных так же, как другие учётные данные сайта."
+msgid "An optional THREADTANDEM_BOT_TOKEN constant in wp-config.php takes precedence over the database token. The saved token is never rendered back into the settings form. Protect database backups as you would other site credentials."
+msgstr "Необязательная константа THREADTANDEM_BOT_TOKEN в wp-config.php имеет приоритет над токеном из базы данных. Сохранённый токен никогда не выводится обратно в форму настроек. Защищайте резервные копии базы данных так же, как другие учётные данные сайта."
 
 #. Found in installation list item.
 msgid "Reply under the announcement in Telegram, review the imported comment in WordPress, then reply from the site to verify the conversation."

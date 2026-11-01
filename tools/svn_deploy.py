@@ -74,9 +74,9 @@ def validate(package, tag=None):
             raise ValueError("Possible embedded bot credential: " + name)
     main = payload[MAIN].decode("utf-8-sig")
     header = re.search(r"(?m)^\s*\* Version:\s*(\S+)", main)
-    constant = re.search(r"define\(\s*['\"]TREDA_VERSION['\"]\s*,\s*['\"]([^'\"]+)", main)
+    constant = re.search(r"define\(\s*['\"]THREADTANDEM_VERSION['\"]\s*,\s*['\"]([^'\"]+)", main)
     if not header or not constant or header[1] != constant[1]:
-        raise ValueError("Plugin header and TREDA_VERSION must agree")
+        raise ValueError("Plugin header and THREADTANDEM_VERSION must agree")
     version = header[1]
     version_tuple(version)
     stable = STABLE.search(payload["readme.txt"].decode("utf-8-sig"))

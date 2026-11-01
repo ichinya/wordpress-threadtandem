@@ -22,7 +22,7 @@ def run(*args):
 
 def package(root, version, text="fixture"):
     root.mkdir(parents=True, exist_ok=True)
-    (root / deploy.MAIN).write_text("<?php\n/**\n * Version: " + version + "\n */\ndefine('TREDA_VERSION', '" + version + "');\n", encoding="utf-8")
+    (root / deploy.MAIN).write_text("<?php\n/**\n * Version: " + version + "\n */\ndefine('THREADTANDEM_VERSION', '" + version + "');\n", encoding="utf-8")
     (root / "readme.txt").write_text("=== Test fixture ===\nStable tag: " + version + "\n", encoding="utf-8")
     (root / "uninstall.php").write_text("<?php\n", encoding="utf-8")
     (root / "LICENSE").write_text("GPL-2.0-or-later\n", encoding="utf-8")

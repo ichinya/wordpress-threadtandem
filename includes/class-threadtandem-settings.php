@@ -1,7 +1,7 @@
 <?php
 defined( 'ABSPATH' ) || exit;
 
-final class Treda_Settings {
+final class ThreadTandem_Settings {
 	/** Fill new bundled strings even while an older WordPress.org language pack is installed. */
 	public static function load_translations( $locale = null ) {
 		$locale = $locale ?: determine_locale();
@@ -15,12 +15,12 @@ final class Treda_Settings {
 			load_textdomain( $domain, $official, $locale );
 		}
 		// WordPress keeps earlier translations and fills missing entries from this catalog.
-		load_textdomain( $domain, TREDA_DIR . 'languages/' . $filename, $locale );
+		load_textdomain( $domain, THREADTANDEM_DIR . 'languages/' . $filename, $locale );
 	}
 
 	public static function get() {
 		return wp_parse_args(
-			get_option( 'treda_settings', array() ),
+			get_option( 'threadtandem_settings', array() ),
 			array(
 				'token'               => '',
 				'api_url'             => 'https://api.telegram.org',
@@ -55,7 +55,7 @@ final class Treda_Settings {
 	}
 
 	public static function token() {
-		return defined( 'TREDA_BOT_TOKEN' ) ? (string) TREDA_BOT_TOKEN : self::get()['token'];
+		return defined( 'THREADTANDEM_BOT_TOKEN' ) ? (string) THREADTANDEM_BOT_TOKEN : self::get()['token'];
 	}
 
 	public static function publication_format() {
@@ -72,7 +72,7 @@ final class Treda_Settings {
 	}
 
 	public static function connection() {
-		$connection = get_option( 'treda_connection', array() );
+		$connection = get_option( 'threadtandem_connection', array() );
 		return ! empty( $connection['fingerprint'] ) && hash_equals( $connection['fingerprint'], self::fingerprint() )
 			? $connection : array();
 	}
@@ -83,14 +83,14 @@ final class Treda_Settings {
 
 	public static function webhook_url() {
 		$settings = self::get();
-		return $settings['webhook_url'] ?: rest_url( 'treda/v1/webhook' );
+		return $settings['webhook_url'] ?: rest_url( 'threadtandem/v1/webhook' );
 	}
 
 	public static function secret() {
-		$secret = get_option( 'treda_webhook_secret', '' );
+		$secret = get_option( 'threadtandem_webhook_secret', '' );
 		if ( $secret === '' ) {
-			add_option( 'treda_webhook_secret', wp_generate_password( 48, false, false ), '', false );
-			$secret = get_option( 'treda_webhook_secret', '' );
+			add_option( 'threadtandem_webhook_secret', wp_generate_password( 48, false, false ), '', false );
+			$secret = get_option( 'threadtandem_webhook_secret', '' );
 		}
 		return $secret;
 	}
@@ -118,20 +118,20 @@ final class Treda_Settings {
 			if ( is_string( $input['updates_mode'] ) && in_array( $input['updates_mode'], array( 'webhook', 'polling' ), true ) ) {
 				$new['updates_mode'] = $input['updates_mode'];
 			} else {
-				add_settings_error( 'treda', 'updates_mode', __( 'Select a supported update delivery mode. The previous value was kept.', 'threadtandem-sync-for-telegram' ) );
+				add_settings_error( 'threadtandem', 'updates_mode', __( 'Select a supported update delivery mode. The previous value was kept.', 'threadtandem-sync-for-telegram' ) );
 			}
 		}
 		if ( array_key_exists( 'publication_format', $input ) ) {
 			if ( is_string( $input['publication_format'] ) && in_array( $input['publication_format'], array( 'preview', 'photo' ), true ) ) {
 				$new['publication_format'] = $input['publication_format'];
 			} else {
-				add_settings_error( 'treda', 'publication_format', __( 'Select a supported publication format. The previous value was kept.', 'threadtandem-sync-for-telegram' ) );
+				add_settings_error( 'threadtandem', 'publication_format', __( 'Select a supported publication format. The previous value was kept.', 'threadtandem-sync-for-telegram' ) );
 			}
 		}
 		if ( array_key_exists( 'article_link_text', $input ) && is_string( $input['article_link_text'] ) ) {
 			$new['article_link_text'] = wp_html_excerpt( trim( sanitize_text_field( $input['article_link_text'] ) ), 100, '' );
 		}
-		if ( ! defined( 'TREDA_BOT_TOKEN' ) ) {
+		if ( ! defined( 'THREADTANDEM_BOT_TOKEN' ) ) {
 			$token = isset( $input['token'] ) && is_string( $input['token'] ) ? trim( $input['token'] ) : '';
 			if ( ! empty( $input['clear_token'] ) ) {
 				$new['token'] = '';
@@ -139,7 +139,7 @@ final class Treda_Settings {
 				if ( preg_match( '/^\d+:[A-Za-z0-9_-]{20,}$/D', $token ) ) {
 					$new['token'] = $token;
 				} else {
-					add_settings_error( 'treda', 'token', __( 'The token format is invalid. The previous token was kept.', 'threadtandem-sync-for-telegram' ) );
+					add_settings_error( 'threadtandem', 'token', __( 'The token format is invalid. The previous token was kept.', 'threadtandem-sync-for-telegram' ) );
 				}
 			}
 		}
@@ -151,7 +151,7 @@ final class Treda_Settings {
 		if ( $chat === '' || preg_match( '/^(?:-100\d+|@[A-Za-z0-9_]{5,})$/D', $chat ) ) {
 			$new['chat_id'] = $chat;
 		} else {
-			add_settings_error( 'treda', 'chat', __( 'Enter a channel ID starting with -100, an @username or a link like https://t.me/username.', 'threadtandem-sync-for-telegram' ) );
+			add_settings_error( 'threadtandem', 'chat', __( 'Enter a channel ID starting with -100, an @username or a link like https://t.me/username.', 'threadtandem-sync-for-telegram' ) );
 		}
 		$api   = isset( $input['api_url'] ) && is_string( $input['api_url'] ) ? rtrim( trim( $input['api_url'] ), '/' ) : '';
 		$api   = $api ?: 'https://api.telegram.org';
@@ -159,13 +159,13 @@ final class Treda_Settings {
 		if ( self::valid_https_url( $api ) && ! isset( $parts['query'] ) ) {
 			$new['api_url'] = esc_url_raw( $api, array( 'https' ) );
 		} else {
-			add_settings_error( 'treda', 'api', __( 'The API URL must use HTTPS without credentials or query parameters.', 'threadtandem-sync-for-telegram' ) );
+			add_settings_error( 'threadtandem', 'api', __( 'The API URL must use HTTPS without credentials or query parameters.', 'threadtandem-sync-for-telegram' ) );
 		}
 		$url = isset( $input['webhook_url'] ) && is_string( $input['webhook_url'] ) ? trim( $input['webhook_url'] ) : '';
 		if ( $url === '' || self::valid_https_url( $url ) ) {
 			$new['webhook_url'] = esc_url_raw( $url, array( 'https' ) );
 		} else {
-			add_settings_error( 'treda', 'webhook', __( 'The external webhook URL must use HTTPS.', 'threadtandem-sync-for-telegram' ) );
+			add_settings_error( 'threadtandem', 'webhook', __( 'The external webhook URL must use HTTPS.', 'threadtandem-sync-for-telegram' ) );
 		}
 		return $new;
 	}

@@ -2,7 +2,7 @@
 /** Resolve a publication poster without fetching arbitrary remote files. */
 defined( 'ABSPATH' ) || exit;
 
-final class Treda_Media {
+final class ThreadTandem_Media {
 	public static function for_post( $post ) {
 		$id = (int) get_post_thumbnail_id( $post->ID );
 		if ( $id ) { return self::attachment( $id ); }
@@ -90,11 +90,11 @@ final class Treda_Media {
 	}
 
 	private static function size_error() {
-		return new WP_Error( 'treda_poster_size', __( 'The poster is too large for a safe upload and could not be reduced. Enable a WordPress image editor or choose a smaller JPEG or PNG.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'failed' ) );
+		return new WP_Error( 'threadtandem_poster_size', __( 'The poster is too large for a safe upload and could not be reduced. Enable a WordPress image editor or choose a smaller JPEG or PNG.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'failed' ) );
 	}
 
 	private static function error() {
-		return new WP_Error( 'treda_poster', __( 'The poster could not be prepared. Use a readable JPEG or PNG in Media Library, up to 10 MB, with a width and height total up to 10000 and an aspect ratio up to 20:1.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'failed' ) );
+		return new WP_Error( 'threadtandem_poster', __( 'The poster could not be prepared. Use a readable JPEG or PNG in Media Library, up to 10 MB, with a width and height total up to 10000 and an aspect ratio up to 20:1.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'failed' ) );
 	}
 
 	/** Telegram caption entities use UTF-16 offsets; keep emoji within the 1024-unit limit. */
@@ -117,6 +117,6 @@ final class Treda_Media {
 	}
 
 	public static function caption( $post ) {
-		return Treda_Publisher::text( $post, 1024 );
+		return ThreadTandem_Publisher::text( $post, 1024 );
 	}
 }

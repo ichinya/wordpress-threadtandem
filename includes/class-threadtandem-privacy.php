@@ -2,7 +2,7 @@
 /** Privacy policy suggestions and additional comment metadata handling. */
 defined( 'ABSPATH' ) || exit;
 
-final class Treda_Privacy {
+final class ThreadTandem_Privacy {
 	public static function hooks() {
 		add_action( 'admin_init', array( __CLASS__, 'policy' ) );
 		add_filter( 'wp_privacy_personal_data_exporters', array( __CLASS__, 'exporters' ) );
@@ -27,7 +27,7 @@ final class Treda_Privacy {
 	public static function exporters( $exporters ) {
 		return array_merge(
 			array(
-				'treda' => array(
+				'threadtandem' => array(
 					'exporter_friendly_name' => __( 'ThreadTandem Telegram metadata', 'threadtandem-sync-for-telegram' ),
 					'callback'               => array(
 						__CLASS__,
@@ -43,7 +43,7 @@ final class Treda_Privacy {
 		// Run before the core comment eraser removes matching email addresses.
 		return array_merge(
 			array(
-				'treda' => array(
+				'threadtandem' => array(
 					'eraser_friendly_name' => __( 'ThreadTandem Telegram metadata', 'threadtandem-sync-for-telegram' ),
 					'callback'             => array(
 						__CLASS__,
@@ -72,10 +72,10 @@ final class Treda_Privacy {
 		$comments = self::comments( $email, $page );
 		$data     = array();
 		foreach ( $comments as $comment ) {
-			$sender = get_comment_meta( $comment->comment_ID, '_treda_sender_id', true );
+			$sender = get_comment_meta( $comment->comment_ID, '_threadtandem_sender_id', true );
 			if ( $sender !== '' ) {
 				$data[] = array(
-					'group_id'    => 'treda',
+					'group_id'    => 'threadtandem',
 					'group_label' => __( 'Telegram comment identities', 'threadtandem-sync-for-telegram' ),
 					'item_id'     => 'comment-' . $comment->comment_ID,
 					'data'        => array(
@@ -85,7 +85,7 @@ final class Treda_Privacy {
 						),
 						array(
 							'name'  => __( 'Telegram sender type', 'threadtandem-sync-for-telegram' ),
-							'value' => get_comment_meta( $comment->comment_ID, '_treda_sender_type', true ),
+							'value' => get_comment_meta( $comment->comment_ID, '_threadtandem_sender_type', true ),
 						),
 					),
 				);
@@ -102,12 +102,12 @@ final class Treda_Privacy {
 		$removed  = false;
 		$retained = false;
 		foreach ( $comments as $comment ) {
-			$retained = get_comment_meta( $comment->comment_ID, '_treda_origin', true ) === 'telegram'
-				|| (bool) Treda_Messages::for_comment( $comment->comment_ID ) || $retained;
-			$removed  = delete_comment_meta( $comment->comment_ID, '_treda_sender_id' ) || $removed;
-			$removed  = delete_comment_meta( $comment->comment_ID, '_treda_sender_type' ) || $removed;
-			$removed  = delete_comment_meta( $comment->comment_ID, '_treda_chat_id' ) || $removed;
-			$removed  = delete_comment_meta( $comment->comment_ID, '_treda_message_id' ) || $removed;
+			$retained = get_comment_meta( $comment->comment_ID, '_threadtandem_origin', true ) === 'telegram'
+				|| (bool) ThreadTandem_Messages::for_comment( $comment->comment_ID ) || $retained;
+			$removed  = delete_comment_meta( $comment->comment_ID, '_threadtandem_sender_id' ) || $removed;
+			$removed  = delete_comment_meta( $comment->comment_ID, '_threadtandem_sender_type' ) || $removed;
+			$removed  = delete_comment_meta( $comment->comment_ID, '_threadtandem_chat_id' ) || $removed;
+			$removed  = delete_comment_meta( $comment->comment_ID, '_threadtandem_message_id' ) || $removed;
 		}
 		return array(
 			'items_removed'  => $removed,

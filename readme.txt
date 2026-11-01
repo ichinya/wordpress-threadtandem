@@ -67,7 +67,7 @@ ThreadTandem is an independent integration and is not affiliated with Telegram o
 7. Publish a test post. Check Queue and diagnostics, or use Process queue now.
 8. Reply under the announcement in Telegram, review the imported comment in WordPress, then reply from the site to verify the conversation.
 
-An optional TREDA_BOT_TOKEN constant in wp-config.php takes precedence over the database token. The saved token is never rendered back into the settings form. Protect database backups as you would other site credentials.
+An optional THREADTANDEM_BOT_TOKEN constant in wp-config.php takes precedence over the database token. The saved token is never rendered back into the settings form. Protect database backups as you would other site credentials.
 
 WordPress 6.2 or later is required for safely prepared database table identifiers. The comment, comment metadata and ThreadTandem mapping tables must use InnoDB for transactional imports.
 

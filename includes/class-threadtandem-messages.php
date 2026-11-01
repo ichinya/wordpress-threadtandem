@@ -4,10 +4,10 @@ defined( 'ABSPATH' ) || exit;
 
 // Mapping reads participate in transactions and cannot use stale cache entries.
 // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-final class Treda_Messages {
+final class ThreadTandem_Messages {
 	public static function table() {
 		global $wpdb;
-		return $wpdb->prefix . 'treda_messages';
+		return $wpdb->prefix . 'threadtandem_messages';
 	}
 
 	public static function install() {
@@ -37,7 +37,7 @@ final class Treda_Messages {
 
 	public static function find( $chat_id, $message_id, $lock = false ) {
 		global $wpdb;
-		$connection = Treda_Settings::connection();
+		$connection = ThreadTandem_Settings::connection();
 		if ( ! $connection ) {
 			return null;
 		}
@@ -65,7 +65,7 @@ final class Treda_Messages {
 
 	public static function for_comment( $comment_id ) {
 		global $wpdb;
-		$connection = Treda_Settings::connection();
+		$connection = ThreadTandem_Settings::connection();
 		return $wpdb->get_row(
 			$wpdb->prepare(
 				"SELECT * FROM %i WHERE comment_id=%d AND bot_id=%s AND origin='site' AND state='active' ORDER BY id DESC LIMIT 1",
@@ -78,7 +78,7 @@ final class Treda_Messages {
 
 	public static function parent_message( $comment_id, $chat_id ) {
 		global $wpdb;
-		$connection = Treda_Settings::connection();
+		$connection = ThreadTandem_Settings::connection();
 		return $wpdb->get_row(
 			$wpdb->prepare(
 				"SELECT * FROM %i WHERE comment_id=%d AND bot_id=%s AND chat_id=%s AND state='active' ORDER BY id DESC LIMIT 1",
@@ -93,7 +93,7 @@ final class Treda_Messages {
 	/** Called inside the import transaction; the unique key also serializes first import. */
 	public static function reserve( $chat_id, $message_id, $post_id ) {
 		global $wpdb;
-		$connection = Treda_Settings::connection();
+		$connection = ThreadTandem_Settings::connection();
 		return false !== $wpdb->query(
 			$wpdb->prepare(
 				"INSERT INTO %i (bot_id,chat_id,message_id,post_id,origin) VALUES (%s,%s,%d,%d,'telegram')
@@ -109,7 +109,7 @@ final class Treda_Messages {
 
 	public static function save( $data ) {
 		global $wpdb;
-		$connection = Treda_Settings::connection();
+		$connection = ThreadTandem_Settings::connection();
 		return false !== $wpdb->query(
 			$wpdb->prepare(
 				"INSERT INTO %i (bot_id,chat_id,message_id,post_id,comment_id,origin,version,update_id,content_hash,state)

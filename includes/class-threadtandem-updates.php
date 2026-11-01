@@ -4,13 +4,13 @@ defined( 'ABSPATH' ) || exit;
 
 // MySQL advisory locks serialize pollers and transport switches across PHP processes.
 // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-final class Treda_Updates {
+final class ThreadTandem_Updates {
 	private static $settings_lock = false;
 
 	public static function hooks() {
-		add_action( 'treda_tick', array( __CLASS__, 'tick' ), 5 );
-		add_filter( 'pre_update_option_treda_settings', array( __CLASS__, 'before_settings' ), 10, 2 );
-		add_action( 'update_option_treda_settings', array( __CLASS__, 'settings_changed' ), 10, 2 );
+		add_action( 'threadtandem_tick', array( __CLASS__, 'tick' ), 5 );
+		add_filter( 'pre_update_option_threadtandem_settings', array( __CLASS__, 'before_settings' ), 10, 2 );
+		add_action( 'update_option_threadtandem_settings', array( __CLASS__, 'settings_changed' ), 10, 2 );
 	}
 
 	private static function lock_name() {
@@ -29,7 +29,7 @@ final class Treda_Updates {
 	}
 
 	private static function busy() {
-		return new WP_Error( 'treda_updates_busy', __( 'An update receiver is already running. Try again shortly.', 'threadtandem-sync-for-telegram' ) );
+		return new WP_Error( 'threadtandem_updates_busy', __( 'An update receiver is already running. Try again shortly.', 'threadtandem-sync-for-telegram' ) );
 	}
 
 	private static function exclusive( $callback ) {
@@ -43,7 +43,7 @@ final class Treda_Updates {
 		foreach ( array( 'updates_mode', 'token', 'api_url', 'chat_id', 'comments_enabled', 'import_enabled' ) as $key ) {
 			if ( ( $new[ $key ] ?? null ) !== ( $old[ $key ] ?? null ) ) {
 				if ( ! self::lock() ) {
-					add_settings_error( 'treda', 'updates_busy', self::busy()->get_error_message() );
+					add_settings_error( 'threadtandem', 'updates_busy', self::busy()->get_error_message() );
 					return $old;
 				}
 				self::$settings_lock = true;
@@ -58,7 +58,7 @@ final class Treda_Updates {
 			if ( ( $old['updates_mode'] ?? 'webhook' ) !== ( $new['updates_mode'] ?? 'webhook' ) ) {
 				// This callback already owns the same cross-process lock as polling.
 				$result = self::$settings_lock ? self::connect_locked() : self::connect();
-				if ( is_wp_error( $result ) ) { add_settings_error( 'treda', 'updates_connect', $result->get_error_message() ); }
+				if ( is_wp_error( $result ) ) { add_settings_error( 'threadtandem', 'updates_connect', $result->get_error_message() ); }
 			}
 		} finally {
 			if ( self::$settings_lock ) { self::$settings_lock = false; self::unlock(); }
@@ -66,14 +66,14 @@ final class Treda_Updates {
 	}
 
 	public static function state() {
-		$scope = hash( 'sha256', Treda_Settings::token() . '|' . Treda_Settings::get()['api_url'] );
-		$state = get_option( 'treda_updates_state', array() );
+		$scope = hash( 'sha256', ThreadTandem_Settings::token() . '|' . ThreadTandem_Settings::get()['api_url'] );
+		$state = get_option( 'threadtandem_updates_state', array() );
 		if ( ! is_array( $state ) || ( $state['scope'] ?? '' ) !== $scope ) { $state = array(); }
 		return wp_parse_args( $state, array( 'scope' => $scope, 'enabled' => true, 'offset' => 0, 'last_update' => 0, 'last_attempt' => 0, 'last_success' => 0, 'error' => '', 'retry_at' => 0 ) );
 	}
 
 	private static function save( $state ) {
-		return update_option( 'treda_updates_state', $state, false ) || get_option( 'treda_updates_state' ) === $state;
+		return update_option( 'threadtandem_updates_state', $state, false ) || get_option( 'threadtandem_updates_state' ) === $state;
 	}
 
 	private static function error( $error, $state ) {
@@ -95,12 +95,12 @@ final class Treda_Updates {
 		$state['retry_at'] = 0;
 		if ( ! self::save( $state ) ) { return self::storage_error(); }
 		if ( get_current_user_id() && current_user_can( 'edit_posts' ) ) {
-			update_option( 'treda_import_author', get_current_user_id(), false );
+			update_option( 'threadtandem_import_author', get_current_user_id(), false );
 		}
-		if ( ! Treda_Settings::ready() ) {
-			return self::error( new WP_Error( 'treda_connection', __( 'Check the connection first.', 'threadtandem-sync-for-telegram' ) ), $state );
+		if ( ! ThreadTandem_Settings::ready() ) {
+			return self::error( new WP_Error( 'threadtandem_connection', __( 'Check the connection first.', 'threadtandem-sync-for-telegram' ) ), $state );
 		}
-		$result = Treda_Settings::updates_mode() === 'polling' ? Treda_API::disconnect_webhook() : Treda_API::register_webhook();
+		$result = ThreadTandem_Settings::updates_mode() === 'polling' ? ThreadTandem_API::disconnect_webhook() : ThreadTandem_API::register_webhook();
 		return is_wp_error( $result ) ? self::error( $result, $state ) : $result;
 	}
 
@@ -110,19 +110,23 @@ final class Treda_Updates {
 			$state['enabled'] = false;
 			$state['error'] = '';
 			if ( ! self::save( $state ) ) { return self::storage_error(); }
-			$result = Treda_API::disconnect_webhook();
+			$result = ThreadTandem_API::disconnect_webhook();
 			return is_wp_error( $result ) ? self::error( $result, $state ) : $result;
 		} );
 	}
 
 	public static function recover() {
 		return self::exclusive( function () {
-			return Treda_Settings::updates_mode() === 'polling' ? self::poll_locked() : Treda_API::recover_updates();
+			return ThreadTandem_Settings::updates_mode() === 'polling' ? self::poll_locked() : ThreadTandem_API::recover_updates();
 		} );
 	}
 
 	public static function tick() {
-		if ( Treda_Settings::updates_mode() !== 'polling' || ! Treda_Settings::ready() ) { return; }
+		if ( ThreadTandem_Settings::updates_mode() === 'webhook' && get_option( 'threadtandem_webhook_upgrade' ) && ThreadTandem_Settings::ready() ) {
+			if ( ! is_wp_error( self::connect() ) ) { delete_option( 'threadtandem_webhook_upgrade' ); }
+			return;
+		}
+		if ( ThreadTandem_Settings::updates_mode() !== 'polling' || ! ThreadTandem_Settings::ready() ) { return; }
 		$state = self::state();
 		if ( ! $state['enabled'] || $state['retry_at'] > time() ) { return; }
 		self::poll();
@@ -133,38 +137,38 @@ final class Treda_Updates {
 	}
 
 	private static function storage_error() {
-		return new WP_Error( 'treda_storage', __( 'Could not store the Telegram update.', 'threadtandem-sync-for-telegram' ) );
+		return new WP_Error( 'threadtandem_storage', __( 'Could not store the Telegram update.', 'threadtandem-sync-for-telegram' ) );
 	}
 
 	private static function poll_locked() {
-		if ( Treda_Settings::updates_mode() !== 'polling' || ! Treda_Settings::ready() ) {
-			return new WP_Error( 'treda_mode', __( 'Select cron polling and check the connection first.', 'threadtandem-sync-for-telegram' ) );
+		if ( ThreadTandem_Settings::updates_mode() !== 'polling' || ! ThreadTandem_Settings::ready() ) {
+			return new WP_Error( 'threadtandem_mode', __( 'Select cron polling and check the connection first.', 'threadtandem-sync-for-telegram' ) );
 		}
 		$state = self::state();
-		if ( ! $state['enabled'] ) { return new WP_Error( 'treda_paused', __( 'Polling is paused. Start receiving events to resume it.', 'threadtandem-sync-for-telegram' ) ); }
+		if ( ! $state['enabled'] ) { return new WP_Error( 'threadtandem_paused', __( 'Polling is paused. Start receiving events to resume it.', 'threadtandem-sync-for-telegram' ) ); }
 		$state['last_attempt'] = time();
 		if ( ! self::save( $state ) ) { return self::storage_error(); }
 		try {
 			// Never remove a webhook belonging to another integration, and never drop updates.
-			$result = Treda_API::disconnect_webhook();
+			$result = ThreadTandem_API::disconnect_webhook();
 			if ( is_wp_error( $result ) ) { return self::error( $result, $state ); }
 			// Telegram may choose a new, lower update ID after a week without updates.
 			if ( $state['last_update'] && $state['last_update'] < time() - 7 * DAY_IN_SECONDS ) { $state['offset'] = 0; }
-			$updates = Treda_API::call( 'getUpdates', array( 'offset' => (int) $state['offset'], 'limit' => 100, 'timeout' => 10, 'allowed_updates' => array( 'message', 'edited_message', 'channel_post', 'edited_channel_post' ) ) );
+			$updates = ThreadTandem_API::call( 'getUpdates', array( 'offset' => (int) $state['offset'], 'limit' => 100, 'timeout' => 10, 'allowed_updates' => array( 'message', 'edited_message', 'channel_post', 'edited_channel_post' ) ) );
 			if ( is_wp_error( $updates ) ) { return self::error( $updates, $state ); }
-			if ( ! is_array( $updates ) ) { return self::error( new WP_Error( 'treda_update', __( 'Invalid Telegram update.', 'threadtandem-sync-for-telegram' ) ), $state ); }
+			if ( ! is_array( $updates ) ) { return self::error( new WP_Error( 'threadtandem_update', __( 'Invalid Telegram update.', 'threadtandem-sync-for-telegram' ) ), $state ); }
 			$previous = -1;
 			foreach ( $updates as $update ) {
 				if ( ! is_array( $update ) || ! isset( $update['update_id'] ) || ! is_int( $update['update_id'] ) || $update['update_id'] < (int) $state['offset'] || $update['update_id'] <= $previous ) {
-					return self::error( new WP_Error( 'treda_update', __( 'Invalid Telegram update.', 'threadtandem-sync-for-telegram' ) ), $state );
+					return self::error( new WP_Error( 'threadtandem_update', __( 'Invalid Telegram update.', 'threadtandem-sync-for-telegram' ) ), $state );
 				}
 				$previous = $update['update_id'];
 			}
 			foreach ( $updates as $update ) {
-				$request = new WP_REST_Request( 'POST', '/treda/v1/webhook' );
+				$request = new WP_REST_Request( 'POST', '/threadtandem/v1/webhook' );
 				$request->set_header( 'Content-Type', 'application/json' );
 				$request->set_body( wp_json_encode( $update ) );
-				$accepted = Treda_Webhook::receive( $request );
+				$accepted = ThreadTandem_Webhook::receive( $request );
 				if ( is_wp_error( $accepted ) || $accepted->get_status() >= 300 ) {
 					return self::error( is_wp_error( $accepted ) ? $accepted : self::storage_error(), $state );
 				}
@@ -178,7 +182,7 @@ final class Treda_Updates {
 			$state['retry_at'] = 0;
 			return self::save( $state ) ? true : self::storage_error();
 		} catch ( Throwable $error ) {
-			return self::error( new WP_Error( 'treda_polling', __( 'Could not receive Telegram updates. Check diagnostics and try again.', 'threadtandem-sync-for-telegram' ) ), self::state() );
+			return self::error( new WP_Error( 'threadtandem_polling', __( 'Could not receive Telegram updates. Check diagnostics and try again.', 'threadtandem-sync-for-telegram' ) ), self::state() );
 		}
 	}
 }
