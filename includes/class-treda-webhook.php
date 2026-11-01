@@ -111,6 +111,10 @@ final class Treda_Webhook {
 			return true;
 		}
 		$publication = Treda_Messages::find( $connection['chat_id'], (int) $origin['message_id'] );
+		// Delayed forwards of an explicitly removed publication must not change its replacement's discussion.
+		if ( $publication && $publication->state !== 'active' ) {
+			return true;
+		}
 		if ( ! $publication || ! in_array( $publication->origin, array( 'publication', 'channel' ), true ) ) {
 			return new WP_Error( 'treda_waiting', __( 'Waiting for the exact publication mapping. The forward may have arrived before the API response.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'pending' ) );
 		}
