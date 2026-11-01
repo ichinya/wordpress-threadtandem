@@ -72,6 +72,7 @@ try {
 		$assert( determine_locale() === $expected, $label . ': computing public text restores the interface language' );
 		ob_start(); Treda_Admin::render(); $html = ob_get_clean();
 		$assert( strpos( $html, $ru ? 'Сохранить настройки' : 'Save settings' ) !== false && strpos( $html, $ru ? 'Что синхронизировать' : 'What to synchronize' ) !== false, $label . ': actual settings render in the selected language' );
+		$assert( strpos( $html, $ru ? 'Режим получения обновлений' : 'Update delivery mode' ) !== false && strpos( $html, $ru ? 'По крону, раз в минуту' : 'Cron polling, every minute' ) !== false, $label . ': incoming transport controls follow the WordPress language' );
 		ob_start(); Treda_Sync::render(); $sync_html = ob_get_clean();
 		$assert( strpos( $sync_html, $ru ? 'Отправить все записи в Telegram-канал' : 'Send all posts to the Telegram channel' ) !== false && strpos( $sync_html, $ru ? 'Связанные записи' : 'Linked articles' ) !== false, $label . ': synchronization and bulk sending render in the selected language' );
 		$settings['article_link_text'] = 'Custom link / Своя подпись'; update_option( 'treda_settings', $settings );

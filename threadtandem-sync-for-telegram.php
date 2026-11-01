@@ -48,7 +48,7 @@ define( 'TREDA_SCHEMA_VERSION', '3' );
 define( 'TREDA_DIR', plugin_dir_path( __FILE__ ) );
 define( 'TREDA_FILE', __FILE__ );
 
-foreach ( array( 'settings', 'api', 'queue', 'media', 'publisher', 'editor', 'messages', 'comments', 'sync', 'bulk', 'webhook', 'privacy', 'admin' ) as $treda_component ) {
+foreach ( array( 'settings', 'api', 'queue', 'media', 'publisher', 'editor', 'messages', 'comments', 'sync', 'bulk', 'webhook', 'updates', 'privacy', 'admin' ) as $treda_component ) {
 	require_once TREDA_DIR . 'includes/class-treda-' . $treda_component . '.php';
 }
 unset( $treda_component );
@@ -78,6 +78,7 @@ add_action(
 		Treda_Editor::hooks();
 		Treda_Comments::hooks();
 		Treda_Webhook::hooks();
+		Treda_Updates::hooks();
 		Treda_Privacy::hooks();
 		if ( is_admin() ) {
 			Treda_Admin::hooks();

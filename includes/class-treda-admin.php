@@ -76,7 +76,7 @@ final class Treda_Admin {
 		if ( $hook !== 'settings_page_threadtandem' ) {
 			return;
 		}
-		wp_enqueue_script( 'treda-admin', plugins_url( 'assets/admin.js', TREDA_FILE ), array(), TREDA_VERSION, true );
+		wp_enqueue_script( 'treda-admin', plugins_url( 'assets/admin.js', TREDA_FILE ), array(), (string) filemtime( TREDA_DIR . 'assets/admin.js' ), true );
 		wp_localize_script(
 			'treda-admin',
 			'tredaAdmin',
@@ -100,16 +100,17 @@ final class Treda_Admin {
 		$message   = '';
 		if ( $operation === 'check' ) {
 			$result  = Treda_API::check();
-			$message = __( 'Bot permissions checked. Webhook delivery still needs a real incoming event.', 'threadtandem-sync-for-telegram' );
+			if ( ! is_wp_error( $result ) && Treda_Settings::updates_mode() === 'polling' && Treda_Updates::state()['enabled'] ) { $result = Treda_Updates::connect(); }
+			$message = __( 'Bot permissions checked. Verify a real incoming event using the selected delivery mode.', 'threadtandem-sync-for-telegram' );
 		} elseif ( $operation === 'webhook' ) {
-			$result  = Treda_API::register_webhook();
-			$message = __( 'Webhook registered. Check incoming events in the queue.', 'threadtandem-sync-for-telegram' );
+			$result  = Treda_Updates::connect();
+			$message = Treda_Settings::updates_mode() === 'polling' ? __( 'Cron polling enabled. The webhook was removed without discarding pending events.', 'threadtandem-sync-for-telegram' ) : __( 'Webhook registered. Check incoming events in the queue.', 'threadtandem-sync-for-telegram' );
 		} elseif ( $operation === 'disconnect' ) {
-			$result  = Treda_API::disconnect_webhook();
-			$message = __( 'The ThreadTandem webhook is disconnected.', 'threadtandem-sync-for-telegram' );
+			$result  = Treda_Updates::disconnect();
+			$message = __( 'Receiving Telegram events is paused.', 'threadtandem-sync-for-telegram' );
 		} elseif ( $operation === 'recover' ) {
-			$result = Treda_API::recover_updates();
-			$message = __( 'Pending Telegram events were received and the webhook was restored. Process the queue to import them.', 'threadtandem-sync-for-telegram' );
+			$result = Treda_Updates::recover();
+			$message = Treda_Settings::updates_mode() === 'polling' ? __( 'A Telegram update batch was received. The webhook remains disabled.', 'threadtandem-sync-for-telegram' ) : __( 'Pending Telegram events were received and the webhook was restored. Process the queue to import them.', 'threadtandem-sync-for-telegram' );
 		} elseif ( $operation === 'run' ) {
 			Treda_Queue::run();
 			$message = __( 'A queue batch was processed. See the results below.', 'threadtandem-sync-for-telegram' );

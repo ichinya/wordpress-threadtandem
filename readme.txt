@@ -21,6 +21,7 @@ Features:
 * Choose link previews or photos with descriptions. Link previews use a plain-text announcement and visible article URL; Telegram generates the card from the public article page. Photo mode uploads the featured image or first content image with a plain-text description and link.
 * Customize the article link text in settings. Russian sites default to "Читать статью" even without an installed plugin language pack.
 * Import new channel text posts and media captions as WordPress drafts through the background queue.
+* Receive incoming updates through a webhook or poll the Bot API once a minute using WP-Cron. Polling works without a public incoming HTTPS connection.
 * Recover up to 100 pending events after a delivery outage, acknowledging only events durably accepted by the queue and restoring the webhook afterwards.
 * Review unmatched publications under Settings > ThreadTandem synchronization: ignore, link to an existing article, or queue a website article for delivery.
 * Preserve WordPress as the source for linked articles; Telegram edits update untouched imported drafts only. Matching keeps the original source draft available.
@@ -45,9 +46,9 @@ Link previews are the default. Photo mode falls back to a link preview when no i
 
 ThreadTandem uses the Telegram Bot API, normally at https://api.telegram.org. You need a Telegram account, a bot token and permission to administer the channel and discussion group. You may configure another HTTPS Bot API endpoint; that endpoint then receives the same requests.
 
-ThreadTandem contacts Telegram when you check the connection, manage the webhook, or process enabled synchronization jobs. It sends the bot token, chat and message identifiers, published post titles, excerpts and links. When comment synchronization is enabled, approved website comment text and the comment author display name are also sent. Comment email addresses and IP addresses are not sent.
+ThreadTandem contacts Telegram when you check the connection, manage incoming delivery, poll for updates, or process enabled synchronization jobs. It sends the bot token, chat and message identifiers, published post titles, excerpts and links. When comment synchronization is enabled, approved website comment text and the comment author display name are also sent. Comment email addresses and IP addresses are not sent.
 
-Telegram delivers channel publications and discussion messages to your webhook. When channel import is enabled, new text publications and media captions are stored as drafts with their channel/message identifiers and dates. Eligible text replies are stored in WordPress with their display names, numeric sender identities, chat/message identifiers and reply relationships. Inform participants before enabling import, including participants of private groups. The comment form informs website visitors that approved comments and their names will also appear in Telegram.
+Telegram delivers channel publications and discussion messages to your webhook, or ThreadTandem retrieves them using getUpdates in cron polling mode. When channel import is enabled, new text publications and media captions are stored as drafts with their channel/message identifiers and dates. Eligible text replies are stored in WordPress with their display names, numeric sender identities, chat/message identifiers and reply relationships. Inform participants before enabling import, including participants of private groups. The comment form informs website visitors that approved comments and their names will also appear in Telegram.
 
 Telegram service terms: https://telegram.org/tos
 Telegram privacy policy: https://telegram.org/privacy
@@ -62,7 +63,7 @@ ThreadTandem is an independent integration and is not affiliated with Telegram o
 3. Open Settings > ThreadTandem. Save a dedicated bot token and a channel ID, @username or public link such as https://t.me/username.
 4. Add the bot as a channel administrator with permission to publish. For comments, link a discussion group to the channel and make the bot an administrator of that group too.
 5. Enable the features you want, save, and click Check connection. Publishing and comment synchronization are off by default.
-6. Register the webhook. Telegram must be able to reach your site through public HTTPS. ThreadTandem refuses to replace a different integration webhook.
+6. Select an update delivery mode and save. Webhook mode requires public incoming HTTPS. Cron polling removes this site's webhook and retrieves updates once a minute, without discarding pending events. ThreadTandem refuses to replace a different integration webhook. Use a dedicated bot with only one receiver.
 7. Publish a test post. Check Queue and diagnostics, or use Process queue now.
 8. Reply under the announcement in Telegram, review the imported comment in WordPress, then reply from the site to verify the conversation.
 
@@ -86,7 +87,13 @@ A timeout may occur after Telegram accepted a message. ThreadTandem marks this a
 
 = Can I use a local WordPress installation? =
 
-Outgoing API checks and sends can work locally. Incoming Telegram events require a public HTTPS route to the REST endpoint. The external webhook URL option does not create a tunnel. A proxy must preserve the request body and X-Telegram-Bot-Api-Secret-Token header.
+Yes. Choose Cron polling, every minute in Telegram events, save and check the connection. Polling needs outgoing HTTPS access to the configured Bot API and a running WP-Cron, but no public incoming address. Webhook mode requires a public HTTPS route to the REST endpoint. The external webhook URL option does not create a tunnel. A proxy must preserve the request body and X-Telegram-Bot-Api-Secret-Token header.
+
+= How does cron polling work? =
+
+The existing minute worker requests up to 100 updates with getUpdates before processing the queue. Each accepted event is durably queued before its ID is confirmed in a later request. Duplicate receipts do not create duplicate jobs. The cursor is scoped to the bot and API server. A transport switch keeps existing publication and comment mappings. Disconnect pauses polling; Start polling resumes it. Receive updates now runs one batch without restoring a webhook. The settings show the last successful poll and any receiving error.
+
+Configure a system cron to run wp-cron.php every minute for predictable delivery; otherwise WP-Cron depends on site visits. Telegram stores updates for no more than 24 hours. Another polling application or webhook using the same bot causes conflicts. Switching back to Webhook registers this site's webhook and stops automatic polling.
 
 = Can I use a custom Bot API server? =
 

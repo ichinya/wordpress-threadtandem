@@ -26,6 +26,7 @@ final class Treda_Settings {
 				'api_url'             => 'https://api.telegram.org',
 				'chat_id'             => '',
 				'webhook_url'         => '',
+				'updates_mode'        => 'webhook',
 				'article_link_text'   => '',
 				'publication_format'  => 'preview',
 				'enabled'             => 0,
@@ -59,6 +60,10 @@ final class Treda_Settings {
 
 	public static function publication_format() {
 		return self::get()['publication_format'] === 'photo' ? 'photo' : 'preview';
+	}
+
+	public static function updates_mode() {
+		return self::get()['updates_mode'] === 'polling' ? 'polling' : 'webhook';
 	}
 
 	public static function fingerprint() {
@@ -109,6 +114,13 @@ final class Treda_Settings {
 		$new['comments_enabled']    = empty( $input['comments_enabled'] ) ? 0 : 1;
 		$new['telegram_moderation'] = empty( $input['telegram_moderation'] ) ? 0 : 1;
 		$new['retain_data']         = empty( $input['retain_data'] ) ? 0 : 1;
+		if ( array_key_exists( 'updates_mode', $input ) ) {
+			if ( is_string( $input['updates_mode'] ) && in_array( $input['updates_mode'], array( 'webhook', 'polling' ), true ) ) {
+				$new['updates_mode'] = $input['updates_mode'];
+			} else {
+				add_settings_error( 'treda', 'updates_mode', __( 'Select a supported update delivery mode. The previous value was kept.', 'threadtandem-sync-for-telegram' ) );
+			}
+		}
 		if ( array_key_exists( 'publication_format', $input ) ) {
 			if ( is_string( $input['publication_format'] ) && in_array( $input['publication_format'], array( 'preview', 'photo' ), true ) ) {
 				$new['publication_format'] = $input['publication_format'];

@@ -11,6 +11,7 @@ function treda_lifecycle_expect($condition, $message) {
 $settings = Treda_Settings::get();
 $settings['retain_data'] = 1;
 update_option('treda_settings', $settings);
+update_option('treda_updates_state', array('scope'=>'qa-only','offset'=>123), false);
 $posts_before = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->posts}");
 $comments_before = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->comments}");
 Treda_Queue::deactivate();
@@ -19,11 +20,13 @@ treda_lifecycle_expect($wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $wpd
 define('WP_UNINSTALL_PLUGIN', plugin_basename(TREDA_FILE));
 require TREDA_DIR . 'uninstall.php';
 treda_lifecycle_expect((bool) get_option('treda_settings'), 'Default uninstall must keep settings');
+treda_lifecycle_expect((bool) get_option('treda_updates_state'), 'Default uninstall must keep the polling cursor');
 treda_lifecycle_expect($wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $wpdb->esc_like(Treda_Messages::table()))) === Treda_Messages::table(), 'Default uninstall must preserve mappings');
 $settings['retain_data'] = 0;
 update_option('treda_settings', $settings);
 treda_uninstall_site();
 treda_lifecycle_expect(!get_option('treda_settings') && !get_option('treda_webhook_secret'), 'Opted-in cleanup must remove options and secrets');
+treda_lifecycle_expect(!get_option('treda_updates_state'), 'Opted-in cleanup must remove polling state');
 treda_lifecycle_expect(!$wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $wpdb->esc_like(Treda_Queue::table()))), 'Opted-in cleanup must remove queue table');
 treda_lifecycle_expect(!$wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $wpdb->esc_like(Treda_Messages::table()))), 'Opted-in cleanup must remove mapping table');
 treda_lifecycle_expect((int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->posts}") === $posts_before, 'Cleanup must retain native posts');

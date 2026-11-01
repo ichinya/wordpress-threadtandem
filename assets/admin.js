@@ -20,8 +20,9 @@
 		status.textContent = dirty ? strings.unsaved : originalStatus;
 		actions.forEach( function ( button ) { button.disabled = dirty || button.dataset.initialDisabled === '1'; } );
 	}
-	form.addEventListener( 'input', updateDirty );
-	form.addEventListener( 'change', updateDirty );
+	// Controls in the sidebar can belong to the settings form via the form attribute.
+	root.addEventListener( 'input', function ( event ) { if ( event.target.form === form ) { updateDirty(); } } );
+	root.addEventListener( 'change', function ( event ) { if ( event.target.form === form ) { updateDirty(); } } );
 	var reveal = root.querySelector( '[data-treda-token-toggle]' );
 	if ( reveal ) {
 		reveal.addEventListener( 'click', function () {

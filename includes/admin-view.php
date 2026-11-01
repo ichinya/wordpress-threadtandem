@@ -4,6 +4,8 @@ defined( 'ABSPATH' ) || exit;
 $treda_has_token     = Treda_Settings::token() !== '';
 $treda_can_check     = $treda_has_token && $settings['chat_id'] !== '';
 $treda_webhook_url   = Treda_Settings::webhook_url();
+$treda_polling       = Treda_Settings::updates_mode() === 'polling';
+$treda_updates       = Treda_Updates::state();
 $treda_webhook_host  = wp_parse_url( $treda_webhook_url, PHP_URL_HOST );
 $treda_local_webhook = ! Treda_Settings::valid_https_url( $treda_webhook_url )
 	|| in_array( $treda_webhook_host, array( 'localhost', '127.0.0.1', '::1' ), true )
@@ -119,15 +121,26 @@ $treda_local_webhook = ! Treda_Settings::valid_https_url( $treda_webhook_url )
 			</section>
 
 			<section class="treda-card treda-delivery-card"><div class="treda-sidebar-heading"><h2><?php esc_html_e( 'Telegram events', 'threadtandem-sync-for-telegram' ); ?></h2><span class="dashicons dashicons-randomize" aria-hidden="true"></span></div>
-				<p><?php esc_html_e( 'Enable incoming events so Telegram replies can reach your website.', 'threadtandem-sync-for-telegram' ); ?></p>
+				<div class="treda-field"><label for="treda-updates-mode"><?php esc_html_e( 'Update delivery mode', 'threadtandem-sync-for-telegram' ); ?></label>
+					<select id="treda-updates-mode" name="treda_settings[updates_mode]" form="treda-settings-form"><option value="webhook" <?php selected( ! $treda_polling ); ?>><?php esc_html_e( 'Webhook', 'threadtandem-sync-for-telegram' ); ?></option><option value="polling" <?php selected( $treda_polling ); ?>><?php esc_html_e( 'Cron polling, every minute', 'threadtandem-sync-for-telegram' ); ?></option></select>
+					<p class="treda-help"><?php esc_html_e( 'Save to switch modes. Cron polling removes this site\'s webhook and receives updates without a public incoming HTTPS connection.', 'threadtandem-sync-for-telegram' ); ?></p>
+				</div>
 				<?php
-				if ( $treda_local_webhook ) :
+				if ( ! $treda_polling && $treda_local_webhook ) :
 					?>
 					<p class="treda-callout treda-callout-warning"><?php esc_html_e( 'A public HTTPS address is needed to receive events. Set it in Advanced settings when testing locally.', 'threadtandem-sync-for-telegram' ); ?></p><?php endif; ?>
-				<div class="treda-action-row"><?php self::action_form( 'webhook', __( 'Connect events', 'threadtandem-sync-for-telegram' ), 'secondary', ! $connection || $treda_local_webhook ); ?><?php self::action_form( 'disconnect', __( 'Disconnect', 'threadtandem-sync-for-telegram' ), 'link-delete', ! $connection ); ?></div>
-				<?php self::action_form( 'recover', __( 'Receive pending events', 'threadtandem-sync-for-telegram' ), 'secondary', ! $connection || $treda_local_webhook ); ?>
+				<?php if ( $treda_polling ) : ?>
+					<p><strong><?php echo esc_html( $treda_updates['enabled'] ? __( 'Polling enabled', 'threadtandem-sync-for-telegram' ) : __( 'Polling paused', 'threadtandem-sync-for-telegram' ) ); ?></strong></p>
+					<p class="treda-help"><?php esc_html_e( 'WP-Cron checks for updates every minute. For reliable delivery, configure a server cron to run wp-cron.php every minute. Telegram retains updates for up to 24 hours.', 'threadtandem-sync-for-telegram' ); ?></p>
+					<p><?php esc_html_e( 'Last successful poll:', 'threadtandem-sync-for-telegram' ); ?> <?php echo esc_html( $treda_updates['last_success'] ? wp_date( get_option( 'date_format' ) . ' H:i:s', $treda_updates['last_success'] ) : __( 'Not yet', 'threadtandem-sync-for-telegram' ) ); ?></p>
+				<?php endif; ?>
+				<?php if ( $treda_updates['error'] ) : ?><p class="treda-callout treda-callout-warning" role="status"><?php echo esc_html( $treda_updates['error'] ); ?></p><?php endif; ?>
+				<div class="treda-action-row"><?php self::action_form( 'webhook', $treda_polling ? __( 'Start polling', 'threadtandem-sync-for-telegram' ) : __( 'Connect events', 'threadtandem-sync-for-telegram' ), 'secondary', ! $connection || ( ! $treda_polling && $treda_local_webhook ) ); ?><?php self::action_form( 'disconnect', __( 'Disconnect', 'threadtandem-sync-for-telegram' ), 'link-delete', ! $connection ); ?></div>
+				<?php self::action_form( 'recover', $treda_polling ? __( 'Receive updates now', 'threadtandem-sync-for-telegram' ) : __( 'Receive pending events', 'threadtandem-sync-for-telegram' ), 'secondary', ! $connection || ( $treda_polling ? ! $treda_updates['enabled'] : $treda_local_webhook ) ); ?>
+				<?php if ( ! $treda_polling ) : ?>
 				<p class="treda-help"><?php esc_html_e( 'Use after a delivery outage. Receives up to 100 pending events, then restores the webhook. Telegram retains events for up to 24 hours.', 'threadtandem-sync-for-telegram' ); ?></p>
 				<details class="treda-endpoint"><summary><?php esc_html_e( 'Webhook endpoint:', 'threadtandem-sync-for-telegram' ); ?></summary><div class="treda-input-group"><input id="treda-endpoint" type="text" readonly value="<?php echo esc_attr( $treda_webhook_url ); ?>" aria-label="<?php esc_attr_e( 'Webhook endpoint:', 'threadtandem-sync-for-telegram' ); ?>"><button type="button" class="button" data-treda-copy="treda-endpoint"><?php esc_html_e( 'Copy', 'threadtandem-sync-for-telegram' ); ?></button></div><span class="treda-copy-status" role="status" aria-live="polite"></span></details>
+				<?php endif; ?>
 			</section>
 
 			<section class="treda-setup-guide"><h2><?php esc_html_e( 'Before connecting', 'threadtandem-sync-for-telegram' ); ?></h2><ol><li><?php esc_html_e( 'Create a dedicated bot in BotFather.', 'threadtandem-sync-for-telegram' ); ?></li><li><?php esc_html_e( 'Make the bot a channel administrator with permission to publish.', 'threadtandem-sync-for-telegram' ); ?></li><li><?php esc_html_e( 'Link a discussion group and add the bot as its administrator.', 'threadtandem-sync-for-telegram' ); ?></li></ol></section>

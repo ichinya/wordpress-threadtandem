@@ -20,7 +20,7 @@ function treda_uninstall_site() {
 	foreach ( array( '_treda_origin', '_treda_sender_id', '_treda_sender_type', '_treda_message_id', '_treda_chat_id' ) as $key ) {
 		delete_metadata( 'comment', 0, $key, '', true );
 	}
-	foreach ( array( 'treda_settings', 'treda_connection', 'treda_schema_version', 'treda_webhook_secret', 'treda_import_author' ) as $key ) {
+	foreach ( array( 'treda_settings', 'treda_connection', 'treda_schema_version', 'treda_webhook_secret', 'treda_import_author', 'treda_updates_state' ) as $key ) {
 		delete_option( $key );
 	}
 	// Core posts and comments, including imported text, remain site content.

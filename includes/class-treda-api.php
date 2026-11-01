@@ -34,7 +34,7 @@ final class Treda_API {
 				'redirection'         => 0,
 				'headers'             => array( 'Content-Type' => $content_type ),
 				'body'                => $body,
-				'limit_response_size' => 262144,
+				'limit_response_size' => $method === 'getUpdates' ? 8388608 : 262144,
 			)
 		);
 		if ( is_wp_error( $response ) ) {
@@ -95,6 +95,7 @@ final class Treda_API {
 			400 => __( 'Telegram rejected the parameters. Check the destination and bot permissions.', 'threadtandem-sync-for-telegram' ),
 			401 => __( 'Telegram rejected the bot token.', 'threadtandem-sync-for-telegram' ),
 			403 => __( 'The bot does not have access or permission to send messages.', 'threadtandem-sync-for-telegram' ),
+			409 => __( 'Another getUpdates request or webhook is using this bot. Use a dedicated bot and stop the other receiver.', 'threadtandem-sync-for-telegram' ),
 		);
 		return new WP_Error( 'treda_api', $messages[ $code ] ?? __( 'Telegram rejected the request.', 'threadtandem-sync-for-telegram' ), array( 'state' => 'failed' ) );
 	}
@@ -185,6 +186,9 @@ final class Treda_API {
 	}
 
 	public static function register_webhook() {
+		if ( Treda_Settings::updates_mode() === 'polling' ) {
+			return new WP_Error( 'treda_mode', __( 'Cron polling is selected. A webhook will not be registered.', 'threadtandem-sync-for-telegram' ) );
+		}
 		if ( ! Treda_Settings::ready() ) {
 			return new WP_Error( 'treda_connection', __( 'Check the connection first.', 'threadtandem-sync-for-telegram' ) );
 		}
@@ -260,7 +264,7 @@ final class Treda_API {
 				}
 			}
 		} finally {
-			$restored = self::register_webhook();
+			$restored = Treda_Settings::updates_mode() === 'webhook' ? self::register_webhook() : true;
 		}
 		return is_wp_error( $restored ) ? $restored : $result;
 	}
