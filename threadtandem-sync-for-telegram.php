@@ -2,7 +2,7 @@
 /**
  * Plugin Name: ThreadTandem — Post Publishing and Comment Sync for Telegram
  * Description: Publish posts to Telegram and synchronize text comments with a linked discussion group.
- * Version: 1.3.0
+ * Version: 1.3.1
  * Author: Ichi-nya
  * Requires at least: 6.2
  * Requires PHP: 7.4
@@ -45,7 +45,7 @@ if ( defined( 'THREADTANDEM_VERSION' ) ) {
 }
 
 // Upgrade the former identifiers before loading workers that use the canonical storage.
-define( 'THREADTANDEM_VERSION', '1.3.0' );
+define( 'THREADTANDEM_VERSION', '1.3.1' );
 define( 'THREADTANDEM_SCHEMA_VERSION', '3' );
 define( 'THREADTANDEM_DIR', plugin_dir_path( __FILE__ ) );
 define( 'THREADTANDEM_FILE', __FILE__ );

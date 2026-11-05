@@ -4,7 +4,7 @@ Tags: telegram, comments, discussion, crossposting
 Requires at least: 6.2
 Tested up to: 7.1.4
 Requires PHP: 7.4
-Stable tag: 1.3.0
+Stable tag: 1.3.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -134,6 +134,14 @@ WordPress.org language packs are installed automatically when an approved transl
 English is the source language. Russian translations are included with the plugin and follow the WordPress site or user language, without requiring a separate download.
 
 == Changelog ==
+
+= 1.3.1 =
+* Migrate legacy integration identifiers to ThreadTandem while preserving bot settings, publication links, comments, queue history and update cursors.
+* Restore recognition of previously published articles after updating from the earlier plugin name, without resending them.
+* Use the threadtandem/v1 webhook endpoint and retain authenticated compatibility with previously registered webhook URLs.
+* Add minute-based cron polling as an alternative to webhooks, preserving pending Telegram updates when switching modes.
+* Preserve polling pause state during migration and safely handle delayed discussion forwards from replaced announcements.
+* Skip SVN commits when only development tests or documentation change and the published package and directory images are unchanged.
 
 = 1.3.0 =
 * Add a choice between link previews and photo announcements with plain-text descriptions, preserving existing settings by default.
