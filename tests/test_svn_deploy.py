@@ -115,6 +115,7 @@ class DeploymentTests(unittest.TestCase):
     def test_divergent_main_is_rejected(self):
         payload = package(self.root / "package", "9.8.7")
         self.publish(payload, "tag", self.first, "9.8.7")
+        (payload / "includes/example.php").write_text("<?php // changed main\n", encoding="utf-8")
         self.publish(payload, "main", self.second)
         run("git", "-C", self.git, "checkout", "--detach", self.first)
         other = self.commit("different history")
@@ -122,6 +123,45 @@ class DeploymentTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "diverged"):
             self.publish(payload, "main", other)
         self.assertEqual(before, self.revision())
+
+    def test_tests_and_docs_only_commits_leave_svn_revision_and_marker_unchanged(self):
+        payload = package(self.root / "package", "9.8.7")
+        self.publish(payload, "tag", self.first, "9.8.7")
+        before = self.revision()
+        for name in ("tests/example.php", "docs/guide.md", "README.md"):
+            source = self.git / name
+            source.parent.mkdir(parents=True, exist_ok=True)
+            source.write_text("Development-only content\n", encoding="utf-8")
+            run("git", "-C", self.git, "add", name)
+            commit = self.commit("Update " + name)
+            self.assertEqual("SVN is already up to date", self.publish(payload, "main", commit))
+            self.assertEqual(before, self.revision(), name + " must not create an SVN commit")
+            self.assertEqual(self.first, run(SVN, "propget", deploy.COMMIT_PROPERTY, self.url + "/trunk"))
+        # Development readme's Stable tag is normalized to the current public release.
+        (payload / "readme.txt").write_text("=== Test fixture ===\nStable tag: 9.8.8\n", encoding="utf-8")
+        self.assertEqual("SVN is already up to date", self.publish(payload, "main", commit))
+        self.assertEqual(before, self.revision())
+
+    def test_changed_package_publishes_without_version_bump_and_new_tag_still_publishes(self):
+        payload = package(self.root / "package", "9.8.7")
+        self.publish(payload, "tag", self.first, "9.8.7")
+        self.publish(payload, "main", self.second)  # Same package, newer Git commit.
+        before = self.revision()
+        (payload / "readme.txt").write_text("=== Test fixture ===\nStable tag: 9.8.7\n\nUpdated public description.\n", encoding="utf-8")
+        self.assertIn("Published main", self.publish(payload, "main", self.third))
+        self.assertEqual(int(before) + 1, int(self.revision()))
+        self.assertEqual(self.third, run(SVN, "propget", deploy.COMMIT_PROPERTY, self.url + "/trunk"))
+        self.assertIn("Updated public description", self.cat("trunk/readme.txt"))
+        self.assertIn("9.8.7", self.cat("trunk/" + deploy.MAIN))
+        # A release tag must not be skipped just because its files already match trunk.
+        release = package(self.root / "next", "9.8.8")
+        commit = self.commit("Prepare next release")
+        self.publish(release, "main", commit)
+        before = self.revision()
+        self.assertIn("Published tag", self.publish(release, "tag", commit, "9.8.8"))
+        self.assertEqual(int(before) + 1, int(self.revision()))
+        self.assertIn("9.8.8", self.cat("tags/9.8.8/" + deploy.MAIN))
+        self.assertIn("9.8.8", self.cat("trunk/readme.txt"))
 
     def test_failure_before_commit_is_atomic(self):
         payload = package(self.root / "package", "9.8.7")
@@ -157,6 +197,9 @@ class DeploymentTests(unittest.TestCase):
         before = self.revision()
         publish_images(self.second)
         self.assertEqual(before, self.revision(), "Unchanged images do not create commits")
+        publish_images(self.third)
+        self.assertEqual(before, self.revision(), "A newer Git SHA alone does not republish identical images")
+        self.assertEqual(self.second, run(SVN, "propget", deploy.COMMIT_PROPERTY, self.url + "/trunk"))
         (images / "screenshot-1.png").rename(images / "screenshot-2-ru.png")
         publish_images(self.third)
         self.assertEqual("screenshot-1.png\nscreenshot-2-ru.png", run(SVN, "list", self.url + "/assets"))

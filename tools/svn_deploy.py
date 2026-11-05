@@ -204,7 +204,6 @@ def deploy(package, mode, commit, git_repo, repository=REPOSITORY, svn_binary="s
                 if not is_ancestor(git_repo, recorded, commit):
                     raise ValueError("Main history diverged; reconcile SVN manually before deploying")
             mirror(svn, trunk, set_stable(payload, stable))
-            svn.run("propset", COMMIT_PROPERTY, commit, trunk)
             if images is not None:
                 svn.run("update", "--set-depth", "infinity", wc / "assets")
                 # Update the allowlisted images only; retain other directory artwork.
@@ -233,6 +232,10 @@ def deploy(package, mode, commit, git_repo, repository=REPOSITORY, svn_binary="s
         status = ET.fromstring(svn.run("status", "--xml", wc))
         if not list(status.iter("entry")):
             return "SVN is already up to date"
+        if mode == "main":
+            # Record only deployments that change published content or directory assets.
+            # Advancing this property alone would commit every tests/docs-only Git push.
+            svn.run("propset", COMMIT_PROPERTY, commit, trunk)
         svn.run("commit", wc, "--message", "GitHub " + mode + " " + (tag or commit) + " (" + commit + ")")
         return "Published " + mode + " " + (tag or commit)
 
