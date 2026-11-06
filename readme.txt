@@ -1,10 +1,11 @@
 === ThreadTandem — Post Publishing and Comment Sync for Telegram ===
 Contributors: ichi-nya
+Donate link: https://dalink.to/ichi_nya
 Tags: telegram, comments, discussion, crossposting
 Requires at least: 6.2
 Tested up to: 7.1.4
 Requires PHP: 7.4
-Stable tag: 1.3.1
+Stable tag: 1.3.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -15,6 +16,8 @@ Publish posts to Telegram and synchronize text comments with a linked discussion
 ThreadTandem connects one WordPress site to one Telegram bot, one channel and its linked discussion group.
 Each published post keeps a persistent link to its Telegram announcement and discussion.
 ThreadTandem is independently developed and is not affiliated with or endorsed by Telegram.
+
+You can support ThreadTandem development through [DaLink](https://dalink.to/ichi_nya) or [DonationAlerts](https://www.donationalerts.com/r/ichi_nya).
 
 Features:
 
@@ -134,6 +137,9 @@ WordPress.org language packs are installed automatically when an approved transl
 English is the source language. Russian translations are included with the plugin and follow the WordPress site or user language, without requiring a separate download.
 
 == Changelog ==
+
+= 1.3.2 =
+* Add DaLink and DonationAlerts links to the plugin description and settings.
 
 = 1.3.1 =
 * Migrate legacy integration identifiers to ThreadTandem while preserving bot settings, publication links, comments, queue history and update cursors.

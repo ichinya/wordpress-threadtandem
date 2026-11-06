@@ -144,6 +144,14 @@ $threadtandem_local_webhook = ! ThreadTandem_Settings::valid_https_url( $threadt
 			</section>
 
 			<section class="threadtandem-setup-guide"><h2><?php esc_html_e( 'Before connecting', 'threadtandem-sync-for-telegram' ); ?></h2><ol><li><?php esc_html_e( 'Create a dedicated bot in BotFather.', 'threadtandem-sync-for-telegram' ); ?></li><li><?php esc_html_e( 'Make the bot a channel administrator with permission to publish.', 'threadtandem-sync-for-telegram' ); ?></li><li><?php esc_html_e( 'Link a discussion group and add the bot as its administrator.', 'threadtandem-sync-for-telegram' ); ?></li></ol></section>
+			<section class="threadtandem-card threadtandem-status-card">
+				<div class="threadtandem-sidebar-heading"><h2><?php esc_html_e( 'Support development', 'threadtandem-sync-for-telegram' ); ?></h2></div>
+				<p class="threadtandem-help">
+					<a href="https://dalink.to/ichi_nya">DaLink</a>
+					<span aria-hidden="true"> · </span>
+					<a href="https://www.donationalerts.com/r/ichi_nya">DonationAlerts</a>
+				</p>
+			</section>
 		</aside>
 	</div>
 

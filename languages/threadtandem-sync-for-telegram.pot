@@ -318,6 +318,10 @@ msgstr ""
 msgid "Before connecting"
 msgstr ""
 
+#: includes/admin-view.php:148
+msgid "Support development"
+msgstr ""
+
 #: includes/admin-view.php:146
 msgid "Create a dedicated bot in BotFather."
 msgstr ""
